@@ -1,0 +1,31 @@
+# OS generated files
+.DS_Store
+.DS_Store?
+._*
+.Spotlight-V100
+.Trashes
+ehthumbs.db
+Thumbs.db
+
+# Deployment / Compressed files
+*.zip
+*.tar.gz
+*.rar
+amlodashboard_deploy*.zip
+
+# IDE / Editor folders
+.vscode/
+.idea/
+*.suo
+*.ntvs*
+*.njsproj
+*.sln
+*.sw?
+
+# Log files
+*.log
+logs/
+
+# Optional: Configuration files with sensitive data
+# Jika config/database.php berisi password server produksi, uncomment baris di bawah ini:
+# config/database.php
