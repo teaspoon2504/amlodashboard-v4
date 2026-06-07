@@ -85,13 +85,6 @@ php -S localhost:8000
 http://localhost:8000
 ```
 
-## Login Credentials
-
-| Username | Password | Role |
-|----------|----------|------|
-| a.nugroho | amlo123 | Officer |
-| r.sari | amlo123 | Lead |
-| h.wijaya | amlo123 | Head Office |
 
 ## Deployment ke Shared Hosting (cPanel)
 
