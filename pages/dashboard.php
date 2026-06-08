@@ -602,18 +602,29 @@ $alerts = array_slice($alerts, 0, 5);
            ============================================ */
         .kpi-grid {
             display: grid;
-            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            grid-auto-flow: column;
+            grid-auto-columns: minmax(0, 1fr);
             gap: var(--s-base);
             margin-bottom: var(--s-xl);
         }
 
         .kpi-card {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
             background: var(--surface-soft);
             border: 1px solid var(--hairline);
             border-radius: var(--r-xxl);   /* 24px (DESIGN.md card-icon-feature) */
             padding: var(--s-xl);
             position: relative;
             transition: border-color 0.15s ease-out;
+        }
+        .kpi-details {
+            display: flex;
+            flex-direction: column;
+            align-items: flex-start;
+            text-align: left;
+            gap: 4px;
         }
         .kpi-card:hover { border-color: var(--hairline); }
 
@@ -626,7 +637,7 @@ $alerts = array_slice($alerts, 0, 5);
             align-items: center;
             justify-content: center;
             font-size: 20px;
-            margin-bottom: var(--s-base);
+            margin-bottom: 8px;
         }
         .kpi-card.gold .kpi-card-icon { background: var(--warning-bg); color: var(--warning); }
         .kpi-card.green .kpi-card-icon { background: var(--success-bg); color: var(--success); }
@@ -644,7 +655,7 @@ $alerts = array_slice($alerts, 0, 5);
         .kpi-value {
             font-size: 32px;
             font-weight: 700;
-            margin: 6px 0 4px;
+            margin: 0;
             color: var(--ink-deep);
             letter-spacing: -0.4px;
             line-height: 1.1;
@@ -666,7 +677,7 @@ $alerts = array_slice($alerts, 0, 5);
             display: grid;
             grid-template-columns: 1fr 1fr;
             gap: var(--s-base);
-            margin-bottom: var(--s-base);
+            margin-bottom: 8px;
         }
 
         /* card-product-feature / card-icon-feature (DESIGN.md) */
@@ -706,7 +717,7 @@ $alerts = array_slice($alerts, 0, 5);
         /* ============================================
            PROGRESS BAR
            ============================================ */
-        .prog-bar-wrap { margin-bottom: var(--s-base); }
+        .prog-bar-wrap { margin-bottom: 8px; }
         .prog-bar-label {
             display: flex;
             justify-content: space-between;
@@ -813,7 +824,9 @@ $alerts = array_slice($alerts, 0, 5);
             position: relative;
         }
         .cal-details-container {
-            margin-top: 16px;
+            grid-column: 1 / -1;
+            margin-top: 4px;
+            margin-bottom: 8px;
             padding: 12px;
             background: var(--surface-soft);
             border-radius: var(--r-md);
@@ -836,23 +849,18 @@ $alerts = array_slice($alerts, 0, 5);
             font-weight: 700;
         }
         .cal-day.has-task::after {
-            content: 'Tugas';
+            content: '';
             position: absolute;
-            bottom: 3px;
+            bottom: 4px;
             left: 50%;
             transform: translateX(-50%);
+            width: 20px;
+            height: 4px;
             background: var(--teal-light);
-            color: #fff;
-            font-size: 8px;
-            font-weight: 600;
-            padding: 2px 4px;
-            border-radius: 4px;
-            line-height: 1;
-            letter-spacing: 0.2px;
+            border-radius: 2px;
         }
         .cal-day.completed { color: var(--success); }
         .cal-day.completed::after {
-            content: 'Selesai';
             background: var(--success);
         }
         .cal-day.today.has-task::after { border: 1px solid var(--canvas); }
@@ -1119,7 +1127,7 @@ $alerts = array_slice($alerts, 0, 5);
            RESPONSIVE
            ============================================ */
         @media (max-width: 1280px) {
-            .kpi-grid { grid-template-columns: repeat(2, 1fr); }
+            .kpi-grid { grid-auto-flow: row; grid-template-columns: repeat(2, 1fr); }
             .hero-stats { gap: var(--s-lg); }
         }
         @media (max-width: 1024px) {
@@ -1205,88 +1213,114 @@ $alerts = array_slice($alerts, 0, 5);
             <?php if ($user['role'] === 'officer'): ?>
                 <div class="kpi-grid">
                     <div class="kpi-card gold">
-                        <div class="kpi-card-icon">📋</div>
-                        <div class="kpi-label">Total Tugas</div>
+                        <div class="kpi-details">
+                            <div class="kpi-card-icon">📋</div>
+                            <div class="kpi-label">Total Tugas</div>
+                            <div class="kpi-sub">📅 <?= date('F Y') ?></div>
+                        </div>
                         <div class="kpi-value"><?= $kpi_gold ?></div>
-                        <div class="kpi-sub">📅 <?= date('F Y') ?></div>
                     </div>
                     <div class="kpi-card green">
-                        <div class="kpi-card-icon">✅</div>
-                        <div class="kpi-label">Selesai</div>
+                        <div class="kpi-details">
+                            <div class="kpi-card-icon">✅</div>
+                            <div class="kpi-label">Selesai</div>
+                            <div class="kpi-sub">🎯 <?= $kpi_gold > 0 ? round($kpi_green / $kpi_gold * 100) : 0 ?>% dari total</div>
+                        </div>
                         <div class="kpi-value"><?= $kpi_green ?></div>
-                        <div class="kpi-sub">🎯 <?= $kpi_gold > 0 ? round($kpi_green / $kpi_gold * 100) : 0 ?>% dari total</div>
                     </div>
                     <div class="kpi-card orange">
-                        <div class="kpi-card-icon">⌛</div>
-                        <div class="kpi-label">Waiting Approval</div>
+                        <div class="kpi-details">
+                            <div class="kpi-card-icon">⌛</div>
+                            <div class="kpi-label">Waiting Approval</div>
+                            <div class="kpi-sub">⏳ Menunggu Lead</div>
+                        </div>
                         <div class="kpi-value"><?= $kpi_waiting ?></div>
-                        <div class="kpi-sub">⏳ Menunggu Lead</div>
                     </div>
                     <div class="kpi-card teal">
-                        <div class="kpi-card-icon">⚡</div>
-                        <div class="kpi-label">Berjalan</div>
+                        <div class="kpi-details">
+                            <div class="kpi-card-icon">⚡</div>
+                            <div class="kpi-label">Berjalan</div>
+                            <div class="kpi-sub">🔄 In progress</div>
+                        </div>
                         <div class="kpi-value"><?= $kpi_teal ?></div>
-                        <div class="kpi-sub">🔄 In progress</div>
                     </div>
                     <div class="kpi-card red">
-                        <div class="kpi-card-icon">⏳</div>
-                        <div class="kpi-label">Pending</div>
+                        <div class="kpi-details">
+                            <div class="kpi-card-icon">⏳</div>
+                            <div class="kpi-label">Pending</div>
+                            <div class="kpi-sub">⚠️ Perlu perhatian</div>
+                        </div>
                         <div class="kpi-value"><?= $kpi_red ?></div>
-                        <div class="kpi-sub">⚠️ Perlu perhatian</div>
                     </div>
                 </div>
             <?php elseif ($user['role'] === 'lead'): ?>
                 <div class="kpi-grid">
                     <div class="kpi-card gold">
-                        <div class="kpi-card-icon">👥</div>
-                        <div class="kpi-label">Officer Tim</div>
+                        <div class="kpi-details">
+                            <div class="kpi-card-icon">👥</div>
+                            <div class="kpi-label">Officer Tim</div>
+                            <div class="kpi-sub">📍 <?= e($user['kanwil_nama']) ?></div>
+                        </div>
                         <div class="kpi-value"><?= count($team_tasks) ?></div>
-                        <div class="kpi-sub">📍 <?= e($user['kanwil_nama']) ?></div>
                     </div>
                     <div class="kpi-card green">
-                        <div class="kpi-card-icon">⭐</div>
-                        <div class="kpi-label">Exceed</div>
+                        <div class="kpi-details">
+                            <div class="kpi-card-icon">⭐</div>
+                            <div class="kpi-label">Exceed</div>
+                            <div class="kpi-sub">✅ Officer berprestasi</div>
+                        </div>
                         <div class="kpi-value"><?= count(array_filter($team_tasks, fn($t) => $t['summary']['done'] + $t['summary']['approved'] >= 8)) ?></div>
-                        <div class="kpi-sub">✅ Officer berprestasi</div>
                     </div>
                     <div class="kpi-card teal">
-                        <div class="kpi-card-icon">👍</div>
-                        <div class="kpi-label">Good</div>
+                        <div class="kpi-details">
+                            <div class="kpi-card-icon">👍</div>
+                            <div class="kpi-label">Good</div>
+                            <div class="kpi-sub">📊 Sesuai target</div>
+                        </div>
                         <div class="kpi-value"><?= count(array_filter($team_tasks, fn($t) => $t['summary']['done'] + $t['summary']['approved'] >= 5 && $t['summary']['done'] + $t['summary']['approved'] < 8)) ?></div>
-                        <div class="kpi-sub">📊 Sesuai target</div>
                     </div>
                     <div class="kpi-card red">
-                        <div class="kpi-card-icon">❗</div>
-                        <div class="kpi-label">Below</div>
+                        <div class="kpi-details">
+                            <div class="kpi-card-icon">❗</div>
+                            <div class="kpi-label">Below</div>
+                            <div class="kpi-sub">⚡ Coaching</div>
+                        </div>
                         <div class="kpi-value"><?= count(array_filter($team_tasks, fn($t) => $t['summary']['done'] + $t['summary']['approved'] < 5)) ?></div>
-                        <div class="kpi-sub">⚡ Coaching</div>
                     </div>
                 </div>
             <?php else: ?>
                 <div class="kpi-grid">
                     <div class="kpi-card gold">
-                        <div class="kpi-card-icon">🌐</div>
-                        <div class="kpi-label">Total Kanwil</div>
+                        <div class="kpi-details">
+                            <div class="kpi-card-icon">🌐</div>
+                            <div class="kpi-label">Total Kanwil</div>
+                            <div class="kpi-sub">📍 Seluruh Indonesia</div>
+                        </div>
                         <div class="kpi-value"><?= count($wilayah_data) ?></div>
-                        <div class="kpi-sub">📍 Seluruh Indonesia</div>
                     </div>
                     <div class="kpi-card green">
-                        <div class="kpi-card-icon">✅</div>
-                        <div class="kpi-label">Exceed</div>
+                        <div class="kpi-details">
+                            <div class="kpi-card-icon">✅</div>
+                            <div class="kpi-label">Exceed</div>
+                            <div class="kpi-sub">↑ Wilayah berprestasi</div>
+                        </div>
                         <div class="kpi-value"><?= count(array_filter($wilayah_data, fn($w) => $w['exceed_count'] > $w['below_count'])) ?></div>
-                        <div class="kpi-sub">↑ Wilayah berprestasi</div>
                     </div>
                     <div class="kpi-card teal">
-                        <div class="kpi-card-icon">👤</div>
-                        <div class="kpi-label">Total Officer</div>
+                        <div class="kpi-details">
+                            <div class="kpi-card-icon">👤</div>
+                            <div class="kpi-label">Total Officer</div>
+                            <div class="kpi-sub">📊 Kanwil se-Indonesia</div>
+                        </div>
                         <div class="kpi-value"><?= array_sum(array_column($wilayah_data, 'total_officer')) ?></div>
-                        <div class="kpi-sub">📊 Kanwil se-Indonesia</div>
                     </div>
                     <div class="kpi-card red">
-                        <div class="kpi-card-icon">⚠️</div>
-                        <div class="kpi-label">Butuh Perhatian</div>
+                        <div class="kpi-details">
+                            <div class="kpi-card-icon">⚠️</div>
+                            <div class="kpi-label">Butuh Perhatian</div>
+                            <div class="kpi-sub">🔴 Intervensi segera</div>
+                        </div>
                         <div class="kpi-value"><?= count(array_filter($wilayah_data, fn($w) => $w['below_count'] > 0)) ?></div>
-                        <div class="kpi-sub">🔴 Intervensi segera</div>
                     </div>
                 </div>
             <?php endif; ?>
@@ -1393,8 +1427,7 @@ $alerts = array_slice($alerts, 0, 5);
                                 if ($t['status'] !== 'selesai') $allDone = false;
                             }
                             if ($allDone) $isDone = true;
-                            
-                            $onclick = " onclick=\"showCalTasks($d)\" style=\"cursor:pointer\" title=\"Klik untuk Menampilkan/Menyembunyikan Penugasan\"";
+                            $onclick = " onclick=\"showCalTasks($d, this)\" style=\"cursor:pointer\" title=\"Klik untuk Menampilkan/Menyembunyikan Penugasan\"";
                         }
 
                         $cls = 'cal-day';
@@ -1426,7 +1459,7 @@ $alerts = array_slice($alerts, 0, 5);
                     ?>
                     <script>
                         const calTaskData = <?= json_encode($taskData) ?>;
-                        function showCalTasks(day) {
+                        function showCalTasks(day, element) {
                             const container = document.getElementById('cal-details-container');
                             if (calTaskData[day]) {
                                 if (container.dataset.activeDay == day && container.style.display === 'block') {
@@ -1435,6 +1468,20 @@ $alerts = array_slice($alerts, 0, 5);
                                     container.innerHTML = calTaskData[day];
                                     container.style.display = 'block';
                                     container.dataset.activeDay = day;
+
+                                    if (element && element.parentNode.classList.contains('cal-grid')) {
+                                        const grid = element.parentNode;
+                                        const cells = Array.from(grid.children).filter(c => c.id !== 'cal-details-container');
+                                        const cellIndex = cells.indexOf(element);
+                                        const remainder = cellIndex % 7;
+                                        const endOfRowIndex = cellIndex + (6 - remainder);
+                                        
+                                        if (endOfRowIndex >= cells.length - 1) {
+                                            grid.appendChild(container);
+                                        } else {
+                                            grid.insertBefore(container, cells[endOfRowIndex + 1]);
+                                        }
+                                    }
                                 }
                             }
                         }
