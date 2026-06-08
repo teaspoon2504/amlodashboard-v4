@@ -163,53 +163,13 @@ if ($user['role'] !== 'officer') {
     );
 }
 ?>
-<!DOCTYPE html>
-<html lang="id">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Tracking Laporan — AMLO Dashboard</title>
-    <link href="../assets/css/fonts.css" rel="stylesheet">
-    <link href="../assets/css/amlo-design-system.css" rel="stylesheet">
-    <style>        .perf-table { width: 100%; border-collapse: collapse; }
-        .perf-table th { text-align: left; font-size: 10px; text-transform: uppercase; letter-spacing: 1px; color: var(--steel); padding: 8px 12px; border-bottom: 1px solid var(--hairline); }
-        .perf-table td { padding: 12px; border-bottom: 1px solid var(--hairline); font-size: 12px; }
-        .perf-table tr:last-child td { border-bottom: none; }
-        .perf-table tr:hover td { background: var(--hairline); }
-        .perf-badge { padding: 4px 10px; border-radius: var(--r-circle); font-size: 11px; font-weight: 700; text-transform: uppercase; letter-spacing: 0.5px; }
-        .perf-exceed { background: var(--success-bg); color: var(--success); }
-        .perf-good { background: var(--primary-soft); color: var(--teal-light); }
-        .perf-below { background: var(--critical-bg); color: var(--critical-strong); }
-        .perf-pending { background: var(--surface); color: var(--steel); border: 1px dashed var(--hairline); }
-        .perf-waiting { background: rgba(245, 158, 11, 0.15); color: var(--attention); }
-        .mini-progress { width: 100px; height: 6px; background: var(--hairline); border-radius: 3px; overflow: hidden; }
-        .mini-progress-bar { height: 100%; border-radius: 3px; }
-        .bar-exceed { background: var(--success); }
-        .bar-good { background: #3498db; }
-        .bar-below { background: var(--critical); }
-        .card-action { font-size: 11px; color: var(--teal-light); cursor: pointer; text-decoration: none; }
-        .chip-wilayah { display: inline-block; background: rgba(27,143,158,0.15); color: var(--teal-light); border-radius: 4px; padding: 2px 8px; font-size: 10px; font-weight: 600; }
-        .todo-tag { font-size: 10px; font-weight: 600; padding: 2px 8px; border-radius: 10px; text-transform: uppercase; }
-        .tag-harian { background: rgba(27,143,158,0.2); color: var(--teal-light); }
-        .tag-bulanan { background: var(--gold-soft); color: var(--gold); }
-        .tag-adhoc { background: rgba(243,156,18,0.2); color: var(--attention); }
-        .tag-semesteran { background: rgba(46,204,113,0.15); color: var(--success); }
-        .tag-triwulan { background: rgba(155,89,182,0.2); color: #bb8dd8; }
-        ::-webkit-scrollbar { width: 4px; }
-        ::-webkit-scrollbar-thumb { background: var(--gold-soft); border-radius: 2px; }
-    </style>
-</head>
-<body>
-<div id="app">
-    <?php include __DIR__ . '/sidebar.php'; ?>
+<?php
+$page_title = 'Tracking Laporan & Progress — AMLO Dashboard';
+$topbar_title = 'Tracking Laporan & Progress';
+include __DIR__ . '/../includes/layout_header.php';
+?>
 
-    <div class="main-area">
-        <div class="topbar">
-            <div class="topbar-title">Tracking Laporan & Progress</div>
-            <div class="topbar-date"><?= tanggal_indonesia('now', 'long') ?></div>
-        </div>
-
-        <div class="content">
+<div class="content">
             <div class="page-header">
                 <h2>Tracking Laporan & Progress</h2>
                 <p>Status seluruh jenis laporan AMLO beserta progress realization untuk Tahun <?= $period['tahun'] ?></p>
@@ -370,8 +330,8 @@ if ($user['role'] !== 'officer') {
             </div>
             <?php endif; ?>
         </div>
-    </div>
-</div>
+    
+
 <script>
 function applyFilters() {
     const filterKategori = document.getElementById('filter-kategori').value;
@@ -401,5 +361,4 @@ function applyFilters() {
 
 document.addEventListener('DOMContentLoaded', applyFilters);
 </script>
-</body>
-</html>
+<?php include __DIR__ . '/../includes/layout_footer.php'; ?>

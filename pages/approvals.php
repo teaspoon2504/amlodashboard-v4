@@ -41,40 +41,19 @@ $submissions = db_fetch_all(
 
 $page_title = get_page_title('approvals');
 ?>
-<!DOCTYPE html>
-<html lang="id">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title><?= e($page_title) ?> - AMLO Dashboard</title>
-    <link rel="stylesheet" href="../assets/css/fonts.css">
-    <link rel="stylesheet" href="../assets/css/amlo-design-system.css">
-    <script>
-        const csrfToken = '<?= $_SESSION['csrf_token'] ?? '' ?>';
-    </script>
-</head>
-<body>
-<div class="layout">
-    <?php include 'sidebar.php'; ?>
+<?php
+$page_title = 'Approvals Dashboard';
+$topbar_title = 'Approvals Dashboard';
+include __DIR__ . '/../includes/layout_header.php';
+?>
 
-    <div class="main-content">
-        <div class="header-bar">
-            <div>
-                <div class="header-title">Approvals Dashboard</div>
-                <div class="header-subtitle">Review dan setujui pengajuan status Selesai dari Officer</div>
-            </div>
-            <div class="header-actions">
-                <div class="user-chip">
-                    <div class="user-avatar" style="background:var(--gold);color:white;"><?= strtoupper(substr($user['nama'], 0, 2)) ?></div>
-                    <div class="user-chip-info">
-                        <div class="user-chip-name"><?= e($user['nama']) ?></div>
-                        <div class="user-chip-role"><?= e(get_role_label($user['role'])) ?></div>
-                    </div>
-                </div>
-            </div>
-        </div>
 
-        <div class="content-container">
+        <div class="content">
+            <div class="page-header">
+                <h2>Approval</h2>
+                <p>Periksa dan setujui tugas yang sudah dikerjakan AMLO</p>
+            </div>
+            
             <div class="card">
                 <div class="card-header">
                     <div class="card-title">⏳ Menunggu Persetujuan (Pending Approvals)</div>
@@ -163,7 +142,7 @@ $page_title = get_page_title('approvals');
             </div>
         </div>
     </div>
-</div>
+
 
 <script>
 function openApprovalModal(submissionId, action, officerName) {
@@ -231,7 +210,7 @@ function submitApproval() {
                         tbody.innerHTML = `
                             <tr>
                                 <td colspan="7" style="text-align:center;color:var(--steel);padding:40px">
-                                    <div style="font-size:24px;margin-bottom:8px">🎉</div>
+                                    <div style="font-size:24px;margin-bottom:8px">🎉
                                     Tidak ada pengajuan yang perlu di-review saat ini.
                                 </td>
                             </tr>
@@ -251,7 +230,4 @@ function submitApproval() {
         btn.disabled = false;
         btn.textContent = action === 'approve' ? 'Approve Tugas' : 'Reject Tugas';
     });
-}
-</script>
-</body>
-</html>
+<?php include __DIR__ . '/../includes/layout_footer.php'; ?>

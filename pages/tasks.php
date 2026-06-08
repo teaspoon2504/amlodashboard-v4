@@ -242,116 +242,13 @@ $tasks = $display_tasks;
 
 $nav_items = get_nav_items($user['role']);
 ?>
-<!DOCTYPE html>
-<html lang="id">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>To-Do Harian — AMLO Dashboard</title>
-    <link href="../assets/css/fonts.css" rel="stylesheet">
-    <link href="../assets/css/amlo-design-system.css" rel="stylesheet">
-    <style>
-        .todo-filters { display: flex; gap: 8px; margin-bottom: 20px; flex-wrap: wrap; }
-        .filter-btn { padding: 6px 14px; border-radius: 20px; border: 1px solid var(--hairline); background: transparent; color: var(--steel); font-size: 12px; font-weight: 500; cursor: pointer; font-family: 'Inter', sans-serif; transition: all 0.2s; }
-        .filter-btn:hover { border-color: var(--gold); color: var(--gold); }
-        .filter-btn.active { background: var(--gold-soft); border-color: var(--gold); color: var(--gold); }
+<?php
+$page_title = 'To-Do Harian — AMLO Dashboard';
+$topbar_title = 'To-Do List Harian';
+$topbar_date = tanggal_indonesia('now', 'long');
+include __DIR__ . '/../includes/layout_header.php';
+?>
 
-        .todo-item { background: var(--hairline); border: 1px solid var(--hairline); border-radius: 12px; padding: 16px; margin-bottom: 10px; transition: all 0.2s; cursor: pointer; }
-        .todo-item:hover { border-color: var(--gold-soft); background: var(--gold-soft); }
-        .todo-item.done { }
-        .todo-item.pending-submit { border-color: var(--attention); }
-
-        .todo-row { display: flex; align-items: flex-start; gap: 14px; }
-        .todo-check { width: 22px; height: 22px; border-radius: 6px; border: 2px solid var(--steel); flex-shrink: 0; display: flex; align-items: center; justify-content: center; font-size: 13px; margin-top: 1px; }
-        .todo-item.done .todo-check { background: var(--success); border-color: var(--success); }
-        .todo-body { flex: 1; min-width: 0; }
-        .todo-title { font-size: 13px; font-weight: 600; margin-bottom: 4px; }
-        .todo-item.done .todo-title { color: var(--steel); }
-        .todo-meta { display: flex; gap: 10px; flex-wrap: wrap; margin-top: 6px; }
-        .todo-tag { font-size: 10px; font-weight: 600; padding: 2px 8px; border-radius: 10px; letter-spacing: 0.5px; text-transform: uppercase; }
-        .tag-harian { background: rgba(27,143,158,0.2); color: var(--teal-light); }
-        .tag-bulanan { background: var(--gold-soft); color: var(--gold); }
-        .tag-adhoc { background: rgba(243,156,18,0.2); color: var(--attention); }
-        .tag-semesteran { background: rgba(46,204,113,0.15); color: var(--success); }
-        .tag-triwulan { background: rgba(155,89,182,0.2); color: #bb8dd8; }
-
-        .mini-progress { width: 80px; height: 6px; background: var(--hairline); border-radius: 3px; overflow: hidden; }
-        .mini-progress-bar { height: 100%; border-radius: 3px; transition: width 0.5s; }
-        .bar-exceed { background: var(--success); }
-        .bar-good { background: #3498db; }
-        .bar-below { background: var(--critical); }
-        .progress-pct { font-size: 11px; font-weight: 700; font-family: monospace; min-width: 32px; }
-        .due-badge { font-size: 10px; color: var(--steel); display: flex; align-items: center; gap: 4px; }
-
-        /* Modal */
-        .modal-overlay { position: fixed; inset: 0; background: var(--canvas); backdrop-filter: blur(6px); z-index: 200; display: none; align-items: center; justify-content: center; }
-        .modal-overlay.open { display: flex; }
-        .modal { background: linear-gradient(135deg, var(--surface-soft), var(--surface-elevated)); border: 1px solid var(--hairline); border-radius: 18px; width: 550px; max-height: 80vh; overflow-y: auto; padding: 32px; animation: slideUp 0.3s ease; }
-        @keyframes slideUp { from { opacity: 0; transform: translateY(30px); } to { opacity: 1; transform: translateY(0); } }
-        .modal-header { display: flex; justify-content: space-between; align-items: flex-start; margin-bottom: 24px; }
-        .modal-title { font-family: 'Inter', sans-serif; font-size: 18px; max-width: 460px; }
-        .modal-close { cursor: pointer; color: var(--steel); font-size: 20px; padding: 4px; }
-        .input-group { margin-bottom: 16px; }
-        .input-label { font-size: 11px; font-weight: 600; text-transform: uppercase; letter-spacing: 1px; color: var(--steel); margin-bottom: 6px; display: block; }
-        .input-field, .select-field, .textarea-field { width: 100%; background: var(--hairline); border: 1px solid var(--hairline); border-radius: 8px; padding: 10px 14px; color: var(--ink-deep); font-family: 'Inter', sans-serif; font-size: 13px; outline: none; transition: border-color 0.2s; }
-        .input-field:focus, .select-field:focus, .textarea-field:focus { border-color: var(--gold); }
-        .textarea-field { resize: vertical; min-height: 80px; }
-        .select-field option { background: var(--canvas); }
-        .progress-input-wrap { display: flex; gap: 12px; align-items: center; }
-        .progress-input-wrap input[type="range"] { flex: 1; accent-color: var(--gold); }
-        .prog-num { font-family: monospace; font-size: 18px; font-weight: 600; color: var(--gold); min-width: 50px; text-align: right; }
-
-        /* ===== Segmented Progress Input ===== */
-        .seg-progress { display: flex; flex-direction: column; gap: 10px; width: 100%; }
-        .seg-progress-header { display: flex; justify-content: space-between; align-items: baseline; }
-        .seg-progress-label { font-family: 'Inter', sans-serif; font-size: 11px; color: var(--steel); letter-spacing: 0.5px; text-transform: uppercase; font-weight: 600; }
-        .seg-progress-value { font-family: 'Inter', sans-serif; font-size: 28px; font-weight: 700; color: var(--gold); font-variant-numeric: tabular-nums; line-height: 1; }
-        .seg-progress-value.exceed { color: var(--success); }
-        .seg-progress-value.good { color: #3498db; }
-        .seg-progress-value.below { color: var(--critical); }
-        .seg-progress-value.pending { color: var(--steel); }
-        .seg-progress-track { display: grid; grid-template-columns: repeat(11, 1fr); gap: 4px; padding: 8px; background: var(--hairline); border: 1px solid var(--hairline); border-radius: 10px; }
-        .seg-progress-seg { position: relative; height: 38px; background: var(--hairline); border: 1px solid transparent; border-radius: 6px; cursor: pointer; transition: all 0.15s ease; display: flex; align-items: end; justify-content: center; padding-bottom: 4px; font-size: 9px; font-weight: 600; color: var(--steel); user-select: none; }
-        .seg-progress-seg:hover { background: var(--gold-soft); border-color: var(--gold-soft); color: var(--ink-deep); transform: translateY(-1px); }
-        .seg-progress-seg.active { background: linear-gradient(180deg, var(--gold), #a8862a); border-color: var(--gold); color: var(--canvas); box-shadow: 0 2px 8px var(--gold-soft); font-weight: 700; }
-        .seg-progress-seg.active.exceed { background: linear-gradient(180deg, var(--success), #1e8449); border-color: var(--success); color: white; box-shadow: 0 2px 8px rgba(46,204,113,0.4); }
-        .seg-progress-seg.active.good { background: linear-gradient(180deg, #3498db, #1d6fa5); border-color: #3498db; color: white; box-shadow: 0 2px 8px rgba(52,152,219,0.4); }
-        .seg-progress-seg.active.below { background: linear-gradient(180deg, var(--critical), #b73838); border-color: var(--critical); color: white; box-shadow: 0 2px 8px rgba(224,82,82,0.4); }
-        .seg-progress-seg.zero { opacity: 0.5; font-size: 10px; }
-        .seg-progress-seg.full { font-weight: 800; }
-        .seg-progress-bar { height: 4px; background: var(--hairline); border-radius: 2px; overflow: hidden; margin-top: 2px; }
-        .seg-progress-bar-fill { height: 100%; background: linear-gradient(90deg, var(--critical) 0%, var(--attention) 50%, #3498db 80%, var(--success) 100%); border-radius: 2px; transition: width 0.3s ease; }
-        .seg-progress-quick { display: flex; gap: 6px; margin-top: 4px; }
-        .seg-progress-quick-btn { flex: 1; padding: 5px 8px; background: var(--hairline); border: 1px solid var(--hairline); border-radius: 6px; color: var(--steel); font-size: 10px; font-weight: 600; cursor: pointer; transition: all 0.15s; font-family: 'Inter', sans-serif; }
-        .seg-progress-quick-btn:hover { background: var(--gold-soft); border-color: var(--gold); color: var(--gold); }
-        .modal-actions { display: flex; gap: 10px; margin-top: 24px; }
-        .btn-primary { flex: 1; padding: 12px; background: linear-gradient(135deg, var(--gold), #b8962a); border: none; border-radius: 8px; color: var(--canvas); font-family: 'Inter', sans-serif; font-weight: 700; font-size: 13px; cursor: pointer; transition: all 0.2s; }
-        .btn-primary:hover { transform: translateY(-1px); box-shadow: 0 6px 16px var(--gold-soft); }
-        .btn-secondary { padding: 12px 20px; background: var(--hairline); border: 1px solid var(--hairline); border-radius: 8px; color: var(--steel); font-family: 'Inter', sans-serif; font-weight: 600; font-size: 13px; cursor: pointer; }
-        .btn-secondary:hover { color: var(--ink-deep); }
-        .btn-submit { padding: 12px 20px; background: var(--teal); border: none; border-radius: 8px; color: white; font-family: 'Inter', sans-serif; font-weight: 700; font-size: 13px; cursor: pointer; }
-        .btn-submit:hover { background: var(--teal-light); }
-
-        .perf-badge { display: inline-flex; align-items: center; gap: 5px; padding: 3px 10px; border-radius: 20px; font-size: 10px; font-weight: 700; }
-        .perf-exceed { background: rgba(46,204,113,0.15); color: var(--success); }
-        .perf-good { background: rgba(52,152,219,0.15); color: #3498db; }
-        .perf-below { background: rgba(224,82,82,0.15); color: var(--critical); }
-
-        ::-webkit-scrollbar { width: 4px; }
-        ::-webkit-scrollbar-track { background: transparent; }
-        ::-webkit-scrollbar-thumb { background: var(--gold-soft); border-radius: 2px; }
-    </style>
-</head>
-<body>
-<div id="app">
-    <?php include __DIR__ . '/sidebar.php'; ?>
-
-    <div class="main-area">
-        <div class="topbar">
-            <div class="topbar-title">To-Do List Harian</div>
-            <div class="topbar-date"><?= tanggal_indonesia('now', 'long') ?></div>
-            <div class="topbar-notif">🔔</div>
-        </div>
 
         <div class="content">
             <?php if ($flash): ?>
@@ -472,7 +369,6 @@ $nav_items = get_nav_items($user['role']);
     </div>
 </div>
 
-<!-- Modal -->
 <div class="modal-overlay" id="modal-overlay" onclick="if(event.target===this)closeModal()">
     <div class="modal" id="modal-box">
         <div class="modal-header">
@@ -484,7 +380,7 @@ $nav_items = get_nav_items($user['role']);
 </div>
 
 <script>
-const csrfToken = '<?= e($csrf_token) ?>';
+const userRole = '<?= e($user['role']) ?>';
 
 function applyFilters() {
     const statusFilter = document.getElementById('filter-status').value;
@@ -575,7 +471,7 @@ function openTaskModal(templateId, reqBulan, reqTahun, officerId) {
             <input type="hidden" name="tahun" value="${reqTahun}">
             <input type="hidden" name="officer_id" value="${officerId}">
 
-            <div style="display:grid;grid-template-columns:1fr 1fr 1fr;gap:12px;margin-bottom:16px">
+            <div style="display:grid;grid-template-columns:1fr 1fr 1fr;gap:8px;margin-bottom:8px">
                 <div>
                     <div class="input-label">Kategori</div>
                     <div style="font-size:13px">[${task.kategori}] ${task.periode}</div>
@@ -590,19 +486,19 @@ function openTaskModal(templateId, reqBulan, reqTahun, officerId) {
                 </div>
             </div>
 
-            <div style="background:var(--hairline);border:1px solid var(--hairline);border-radius:8px;padding:12px;margin-bottom:16px;font-size:12px;line-height:1.6">
+            <div style="background:var(--hairline);border:1px solid var(--hairline);border-radius:8px;padding:8px;margin-bottom:8px;font-size:12px;line-height:1.6">
                 <div class="input-label">Target</div>
                 ${task.target || '-'}
             </div>
 
-            <div class="input-group">
+            <div class="input-group" style="margin-bottom: 8px;">
                 <label class="input-label">Progress Realisasi (%)</label>
                 <div class="seg-progress">
                     <div class="seg-progress-header">
-                        <span class="seg-progress-label">Pilih atau klik segmen</span>
+                        <span class="seg-progress-label">${userRole === 'lead' ? 'Status Progress' : 'Pilih atau klik segmen'}</span>
                         <span class="seg-progress-value pending" id="seg-progress-value">${task.progress}%</span>
                     </div>
-                    <div class="seg-progress-track" id="seg-progress-track">
+                    <div class="seg-progress-track" id="seg-progress-track" ${userRole === 'lead' ? 'style="pointer-events: none;"' : ''}>
                         ${[0,10,20,30,40,50,60,70,80,90,100].map(v => {
                             const isActive = v <= task.progress;
                             const isZero = v === 0;
@@ -614,26 +510,39 @@ function openTaskModal(templateId, reqBulan, reqTahun, officerId) {
                             else if (v > 0) cls += ' below';
                             if (isZero) cls += ' zero';
                             if (isFull) cls += ' full';
-                            return `<div class="${cls}" data-value="${v}" onclick="setSegProgress(${v})">${v}</div>`;
+                            return `<div class="${cls}" data-value="${v}" ${userRole !== 'lead' ? `onclick="setSegProgress(${v})"` : ''}>${v}</div>`;
                         }).join('')}
                     </div>
                     <div class="seg-progress-bar">
                         <div class="seg-progress-bar-fill" id="seg-progress-bar-fill" style="width:${task.progress}%"></div>
                     </div>
+                    ${userRole !== 'lead' ? `
                     <div class="seg-progress-quick">
                         <button type="button" class="seg-progress-quick-btn" onclick="setSegProgress(0)">0% Pending</button>
                         <button type="button" class="seg-progress-quick-btn" onclick="setSegProgress(50)">50% Setengah</button>
                         <button type="button" class="seg-progress-quick-btn" onclick="setSegProgress(80)">80% Good</button>
                         <button type="button" class="seg-progress-quick-btn" onclick="setSegProgress(100)">100% Exceed</button>
                     </div>
+                    ` : ''}
                     <input type="hidden" name="progress" id="prog-slider" value="${task.progress}">
                 </div>
             </div>
 
-            <div class="input-group">
+            ${userRole === 'lead' ? 
+                (task.keterangan ? `
+                <div class="input-group" style="margin-bottom: 8px;">
+                    <label class="input-label">Keterangan / Evidence dari Officer</label>
+                    <div style="background:var(--surface); border:1px solid var(--hairline); border-radius:8px; padding:10px; font-size:13px; color:var(--ink); min-height:48px;">
+                        ${task.keterangan}
+                    </div>
+                </div>
+                ` : '') 
+            : `
+            <div class="input-group" style="margin-bottom: 8px;">
                 <label class="input-label">Keterangan / Evidence</label>
-                <textarea name="keterangan" class="textarea-field" placeholder="Attach link evidence, no. dokumen, atau keterangan...">${task.keterangan}</textarea>
+                <textarea name="keterangan" class="textarea-field" style="min-height: 48px; height: 48px; padding: 6px 10px;" placeholder="Attach link evidence, no. dokumen, atau keterangan...">${task.keterangan}</textarea>
             </div>
+            `}
 
             ${getActionsHtml(task)}
         </form>
@@ -643,15 +552,13 @@ function openTaskModal(templateId, reqBulan, reqTahun, officerId) {
 }
 
 function getActionsHtml(task) {
-    const userRole = '<?= e($user['role']) ?>';
-    
     if (userRole === 'lead' && task.submission_status === 'pending') {
         return `
-            <div style="margin-top:16px;">
-                <button type="button" class="btn-submit" onclick="approveTask(${task.submission_id})" style="width: 100%; background: var(--success); color: white;">
+            <div class="modal-actions" style="display: flex; gap: 10px; margin-top: 8px;">
+                <button type="button" class="btn-submit" onclick="approveTask(${task.submission_id})" style="flex: 1; background: var(--success); color: white; padding: 10px;">
                     ✅ APPROVE TUGAS INI
                 </button>
-                <button type="button" class="btn-secondary" onclick="closeModal()" style="width: 100%; margin-top: 8px;">Tutup</button>
+                <button type="button" class="btn-secondary" onclick="closeModal()" style="flex: 1; padding: 10px;">Tutup</button>
             </div>
         `;
     } else if (task.submission_status === 'approved' || task.progress_status === 'approved') {
@@ -660,25 +567,33 @@ function getActionsHtml(task) {
                 <button type="button" class="btn-secondary" onclick="closeModal()" style="width: 100%;">Tutup</button>
             </div>
 
-            <div style="margin-top:16px; padding-top:16px; border-top:1px solid var(--hairline); text-align:center;">
-                <div style="background: var(--success-bg); color: var(--success); padding: 12px; border-radius: 8px; font-weight: bold; font-size: 14px;">
+            <div style="margin-top:8px; padding-top:8px; border-top:1px solid var(--hairline); text-align:center;">
+                <div style="background: var(--success-bg); color: var(--success); padding: 10px; border-radius: 8px; font-weight: bold; font-size: 14px;">
                     ✅ TUGAS SELESAI (APPROVED)
                 </div>
             </div>
         `;
     } else {
-        return `
-            <div class="modal-actions">
-                <button type="submit" class="btn-primary">💾 Simpan Progress</button>
-                <button type="button" class="btn-secondary" onclick="closeModal()">Tutup</button>
-            </div>
+        if (userRole === 'lead') {
+            return `
+                <div class="modal-actions" style="display: flex; justify-content: flex-end; margin-top: 8px;">
+                    <button type="button" class="btn-secondary" onclick="closeModal()" style="width: 100%; padding: 10px;">Tutup</button>
+                </div>
+            `;
+        } else {
+            return `
+                <div class="modal-actions" style="display: flex; gap: 10px; margin-top: 8px;">
+                    <button type="submit" class="btn-primary" style="flex: 1; padding: 10px;">💾 Simpan Progress</button>
+                    <button type="button" class="btn-secondary" onclick="closeModal()" style="flex: 1; padding: 10px;">Tutup</button>
+                </div>
 
-            <div style="margin-top:16px; padding-top:16px; border-top:1px solid var(--hairline)">
-                <button type="button" id="btn-request-approval" class="btn-submit" onclick="submitForApproval(${task.progress_id ? `'` + task.progress_id + `'` : 'null'})" style="width: 100%; ${task.progress == 100 && !task.submission_status ? '' : 'opacity: 0.5; cursor: not-allowed;'}" ${task.progress == 100 && !task.submission_status ? '' : 'disabled'}>
-                    ${task.submission_status ? (task.submission_status === 'pending' ? '⏳ WAITING FOR APPROVAL' : 'Status: ' + task.submission_status.toUpperCase()) : '📤 Request for Approval'}
-                </button>
-            </div>
-        `;
+                <div style="margin-top: 8px; padding-top: 12px; border-top: 1px solid var(--hairline);">
+                    <button type="button" id="btn-request-approval" class="btn-submit" onclick="submitForApproval(${task.progress_id ? `'` + task.progress_id + `'` : 'null'})" style="width: 100%; padding: 10px; ${task.progress == 100 && !task.submission_status ? '' : 'opacity: 0.5; cursor: not-allowed;'}" ${task.progress == 100 && !task.submission_status ? '' : 'disabled'}>
+                        ${task.submission_status ? (task.submission_status === 'pending' ? '⏳ WAITING FOR APPROVAL' : 'Status: ' + task.submission_status.toUpperCase()) : '📤 Request for Approval'}
+                    </button>
+                </div>
+            `;
+        }
     }
 }
 
@@ -792,5 +707,4 @@ function setSegProgress(value) {
     });
 }
 </script>
-</body>
-</html>
+<?php include __DIR__ . '/../includes/layout_footer.php'; ?>

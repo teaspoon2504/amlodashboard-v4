@@ -85,36 +85,13 @@ $job_categories = [
 
 $total_jobdesc = array_sum(array_column($job_categories, 'count'));
 ?>
-<!DOCTYPE html>
-<html lang="id">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Job Description — AMLO Dashboard</title>
-    <link href="../assets/css/fonts.css" rel="stylesheet">
-    <link href="../assets/css/amlo-design-system.css" rel="stylesheet">
-    <style>        .chip-wilayah { display: inline-block; background: rgba(27,143,158,0.15); color: var(--teal-light); border-radius: 4px; padding: 4px 12px; font-size: 13px; font-weight: 600; }
-        .alert-item { display: flex; align-items: flex-start; gap: 12px; padding: 10px; border-radius: 8px; background: var(--hairline); margin-bottom: 6px; }
-        .alert-dot { width: 8px; height: 8px; border-radius: 50%; flex-shrink: 0; margin-top: 5px; background: var(--teal-light); }
-        .alert-text { font-size: 12px; line-height: 1.5; }
-        .regulasi-box { background: var(--gold-soft); border: 1px solid var(--gold); border-radius: 10px; padding: 16px; margin-top: 16px; }
-        .regulasi-title { font-size: 12px; font-weight: 600; color: var(--gold); margin-bottom: 8px; }
-        .regulasi-list { font-size: 11px; color: var(--steel); }
-        ::-webkit-scrollbar { width: 4px; }
-        ::-webkit-scrollbar-thumb { background: var(--gold-soft); border-radius: 2px; }
-    </style>
-</head>
-<body>
-<div id="app">
-    <?php include __DIR__ . '/sidebar.php'; ?>
+<?php
+$page_title = 'Job Description AMLO — AMLO Dashboard';
+$topbar_title = 'Job Description AMLO';
+include __DIR__ . '/../includes/layout_header.php';
+?>
 
-    <div class="main-area">
-        <div class="topbar">
-            <div class="topbar-title">Job Description AMLO</div>
-            <div class="topbar-date"><?= tanggal_indonesia('now', 'long') ?></div>
-        </div>
-
-        <div class="content">
+<div class="content">
             <div class="page-header">
                 <h2>Job Description AMLO — Kantor Wilayah</h2>
                 <p><?= count($job_categories) ?> Kategori · Berdasarkan POJK 8/2023</p>
@@ -184,8 +161,8 @@ $total_jobdesc = array_sum(array_column($job_categories, 'count'));
                 </div>
             </div>
         </div>
-    </div>
-</div>
+    
+
 
 <script>
 function toggleCat(id) {
@@ -239,5 +216,4 @@ function filterJobs() {
     }
 }
 </script>
-</body>
-</html>
+<?php include __DIR__ . '/../includes/layout_footer.php'; ?>

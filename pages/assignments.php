@@ -73,36 +73,13 @@ $assignments = db_fetch_all(
     [$user['id'], $user['id']]
 );
 ?>
-<!DOCTYPE html>
-<html lang="id">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Penugasan — AMLO Dashboard</title>
-    <link href="../assets/css/fonts.css" rel="stylesheet">
-    <link href="../assets/css/amlo-design-system.css" rel="stylesheet">
-    <style>
-        .btn-primary { width: 100%; padding: 14px; background: linear-gradient(135deg, var(--gold), #b8962a); border: none; border-radius: 8px; color: var(--canvas); font-weight: 700; font-size: 14px; cursor: pointer; transition: transform 0.2s, box-shadow 0.2s; margin-top: 10px; }
-        .btn-primary:hover { transform: translateY(-2px); box-shadow: 0 4px 12px rgba(212,175,55,0.3); }
-        .btn-primary:active { transform: translateY(0); box-shadow: none; }
-        .input-group { margin-bottom: 16px; }
-        .input-label { font-size: 11px; font-weight: 600; text-transform: uppercase; letter-spacing: 1px; color: var(--steel); margin-bottom: 6px; display: block; }
-        .input-field, .select-field, .textarea-field { width: 100%; background: var(--surface-soft); border: 1px solid var(--hairline); border-radius: 8px; padding: 10px 14px; color: var(--ink-deep); font-family: 'Inter', sans-serif; font-size: 13px; outline: none; transition: border-color 0.2s; }
-        .input-field:focus, .select-field:focus, .textarea-field:focus { border-color: var(--gold); }
-        .textarea-field { resize: vertical; min-height: 100px; }
-    </style>
-</head>
-<body>
-<div id="app">
-    <?php include __DIR__ . '/sidebar.php'; ?>
+<?php
+$page_title = 'Penugasan Tugas — AMLO Dashboard';
+$topbar_title = 'Penugasan Tugas';
+include __DIR__ . '/../includes/layout_header.php';
+?>
 
-    <div class="main-area">
-        <div class="topbar">
-            <div class="topbar-title">Penugasan Tugas</div>
-            <div class="topbar-date"><?= tanggal_indonesia('now', 'long') ?></div>
-        </div>
-
-        <div class="content">
+<div class="content">
             <?php if ($flash): ?>
                 <div class="alert alert-success">✅ <?= e($flash['message']) ?></div>
             <?php endif; ?>
@@ -194,7 +171,5 @@ $assignments = db_fetch_all(
                 </div>
             </div>
         </div>
-    </div>
-</div>
-</body>
-</html>
+    
+<?php include __DIR__ . '/../includes/layout_footer.php'; ?>

@@ -11,39 +11,13 @@ $user = amlo_get_current_user();
 $period = get_current_period();
 $wilayah_data = get_wilayah_summary();
 ?>
-<!DOCTYPE html>
-<html lang="id">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Monitoring Wilayah — AMLO Dashboard</title>
-    <link href="../assets/css/fonts.css" rel="stylesheet">
-    <link href="../assets/css/amlo-design-system.css" rel="stylesheet">
-    <style>        .wilayah-table { width: 100%; border-collapse: collapse; }
-        .wilayah-table th { text-align: left; font-size: 10px; text-transform: uppercase; letter-spacing: 1px; color: var(--steel); padding: 10px 14px; border-bottom: 1px solid var(--hairline); }
-        .wilayah-table td { padding: 13px 14px; border-bottom: 1px solid var(--hairline); font-size: 12px; }
-        .wilayah-table tr:hover td { background: var(--hairline); }
-        .chip-wilayah { display: inline-block; background: rgba(27,143,158,0.15); color: var(--teal-light); border-radius: 4px; padding: 2px 8px; font-size: 10px; font-weight: 600; }
-        .perf-badge { display: inline-flex; align-items: center; gap: 5px; padding: 3px 10px; border-radius: 20px; font-size: 10px; font-weight: 700; }
-        .perf-exceed { background: rgba(46,204,113,0.15); color: var(--success); }
-        .perf-good { background: rgba(52,152,219,0.15); color: #3498db; }
-        .perf-below { background: rgba(224,82,82,0.15); color: var(--critical); }
-        .kpi-grid { grid-template-columns: repeat(5, 1fr); }
-        ::-webkit-scrollbar { width: 4px; }
-        ::-webkit-scrollbar-thumb { background: var(--gold-soft); border-radius: 2px; }
-    </style>
-</head>
-<body>
-<div id="app">
-    <?php include __DIR__ . '/sidebar.php'; ?>
+<?php
+$page_title = 'Monitoring Seluruh Wilayah — AMLO Dashboard';
+$topbar_title = 'Monitoring Seluruh Wilayah';
+include __DIR__ . '/../includes/layout_header.php';
+?>
 
-    <div class="main-area">
-        <div class="topbar">
-            <div class="topbar-title">Monitoring Seluruh Wilayah</div>
-            <div class="topbar-date"><?= tanggal_indonesia('now', 'long') ?></div>
-        </div>
-
-        <div class="content">
+<div class="content">
             <div class="page-header">
                 <h2>Monitoring Seluruh Kantor Wilayah</h2>
                 <p><?= count($wilayah_data) ?> Kantor Wilayah — Kinerja AML Nasional</p>
@@ -140,7 +114,5 @@ $wilayah_data = get_wilayah_summary();
                 </table>
             </div>
         </div>
-    </div>
-</div>
-</body>
-</html>
+    
+<?php include __DIR__ . '/../includes/layout_footer.php'; ?>

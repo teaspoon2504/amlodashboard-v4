@@ -237,39 +237,13 @@ if ($user['role'] === 'lead' || $user['role'] === 'ho') {
     });
 }
 ?>
-<!DOCTYPE html>
-<html lang="id">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Performa — AMLO Dashboard</title>
-    <link href="../assets/css/fonts.css" rel="stylesheet">
-    <link href="../assets/css/amlo-design-system.css" rel="stylesheet">
-    <style>        .perf-table { width: 100%; border-collapse: collapse; }
-        .perf-table th { text-align: left; font-size: 10px; text-transform: uppercase; letter-spacing: 1px; color: var(--steel); padding: 8px 12px; border-bottom: 1px solid var(--hairline); }
-        .perf-table td { padding: 12px; border-bottom: 1px solid var(--hairline); font-size: 12px; }
-        .perf-table tr:last-child td { border-bottom: none; }
-        .perf-table tr:hover td { background: var(--hairline); }
-        .perf-badge { display: inline-flex; align-items: center; gap: 5px; padding: 3px 10px; border-radius: 20px; font-size: 10px; font-weight: 700; }
-        .perf-exceed { background: rgba(46,204,113,0.15); color: var(--success); }
-        .perf-good { background: rgba(52,152,219,0.15); color: #3498db; }
-        .perf-below { background: rgba(224,82,82,0.15); color: var(--critical); }
-        .separator { height: 1px; background: var(--hairline); margin: 20px 0; }
-        ::-webkit-scrollbar { width: 4px; }
-        ::-webkit-scrollbar-thumb { background: var(--gold-soft); border-radius: 2px; }
-    </style>
-</head>
-<body>
-<div id="app">
-    <?php include __DIR__ . '/sidebar.php'; ?>
+<?php
+$page_title = 'Monitoring Performa — AMLO Dashboard';
+$topbar_title = 'Monitoring Performa';
+include __DIR__ . '/../includes/layout_header.php';
+?>
 
-    <div class="main-area">
-        <div class="topbar">
-            <div class="topbar-title">Monitoring Performa</div>
-            <div class="topbar-date"><?= tanggal_indonesia('now', 'long') ?></div>
-        </div>
-
-        <div class="content">
+<div class="content">
             <div class="page-header">
                 <h2>Monitoring Performa AMLO</h2>
             </div>
@@ -485,7 +459,5 @@ if ($user['role'] === 'lead' || $user['role'] === 'ho') {
             </div>
             <?php endif; ?>
         </div>
-    </div>
-</div>
-</body>
-</html>
+    
+<?php include __DIR__ . '/../includes/layout_footer.php'; ?>

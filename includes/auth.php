@@ -146,7 +146,6 @@ function get_nav_items($role) {
         'ho' => [
             ['id' => 'wilayah', 'icon' => '🗺', 'label' => 'Monitoring Wilayah'],
             ['id' => 'laporan', 'icon' => '📋', 'label' => 'Tracking Laporan'],
-            ['id' => 'approvals', 'icon' => '✓', 'label' => 'Approvals'],
             ['id' => 'performa', 'icon' => '📈', 'label' => 'Performa Agregat'],
             ['id' => 'assessment', 'icon' => '📝', 'label' => 'Assessment & Feedback'],
             ['id' => 'jobdesc', 'icon' => '📌', 'label' => 'Job Description']
