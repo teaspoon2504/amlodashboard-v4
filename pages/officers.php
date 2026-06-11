@@ -276,8 +276,19 @@ include __DIR__ . '/../includes/layout_header.php';
                 </div>
 
                 <div class="modal-actions">
-                    <button type="submit" class="btn-primary">Kirim Feedback</button>
-                    <button type="button" class="btn-secondary" onclick="closeModal()">Batal</button>
+                    <?= render_ds_button([
+                        'type' => 'submit',
+                        'variant' => 'filled',
+                        'size' => 'medium',
+                        'children' => 'Kirim Feedback'
+                    ]) ?>
+                    <?= render_ds_button([
+                        'type' => 'button',
+                        'variant' => 'outlined',
+                        'size' => 'medium',
+                        'children' => 'Batal',
+                        'onClick' => 'closeModal()'
+                    ]) ?>
                 </div>
             </form>
         </div>

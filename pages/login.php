@@ -254,7 +254,13 @@ $csrf_token = generate_csrf_token();
                                placeholder="••••••••" required>
                     </div>
 
-                    <button type="submit" class="btn btn-primary login-submit">Masuk Dashboard →</button>
+                    <?= render_ds_button([
+                        'type' => 'submit',
+                        'variant' => 'filled',
+                        'size' => 'large',
+                        'children' => 'Masuk Dashboard →',
+                        'style' => 'width: 100%; margin-top: 16px;'
+                    ]) ?>
                 </form>
 
                 <div class="login-footer">

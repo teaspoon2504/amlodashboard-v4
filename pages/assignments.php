@@ -136,7 +136,12 @@ include __DIR__ . '/../includes/layout_header.php';
                             <input type="text" name="dokumen_pendukung" class="input-field" placeholder="Link atau nomor dokumen">
                         </div>
 
-                        <button type="submit" class="btn-primary">📤 Kirim Penugasan</button>
+                        <?= render_ds_button([
+                            'type' => 'submit',
+                            'variant' => 'filled',
+                            'size' => 'large',
+                            'children' => '📤 Kirim Penugasan'
+                        ]) ?>
                     </form>
                 </div>
 

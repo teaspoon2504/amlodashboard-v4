@@ -98,12 +98,22 @@ include __DIR__ . '/../includes/layout_header.php';
                                     <td><?= date('d M Y, H:i', strtotime($s['submitted_at'])) ?></td>
                                     <td style="text-align:center">
                                         <div style="display:flex;gap:8px;justify-content:center;">
-                                            <button type="button" class="btn-primary" style="padding:6px 12px;font-size:12px" onclick="openApprovalModal(<?= $s['id'] ?>, 'approve', '<?= htmlspecialchars($s['officer_name'], ENT_QUOTES) ?>')">
-                                                ✅ Approve
-                                            </button>
-                                            <button type="button" class="btn-secondary" style="padding:6px 12px;font-size:12px;color:var(--critical);border-color:var(--critical)" onclick="openApprovalModal(<?= $s['id'] ?>, 'reject', '<?= htmlspecialchars($s['officer_name'], ENT_QUOTES) ?>')">
-                                                ❌ Reject
-                                            </button>
+                                            <?= render_ds_button([
+                                                'type' => 'button',
+                                                'variant' => 'filled',
+                                                'size' => 'small',
+                                                'children' => 'Approve',
+                                                'leftIcon' => '✅',
+                                                'onClick' => "openApprovalModal({$s['id']}, 'approve', '" . htmlspecialchars($s['officer_name'], ENT_QUOTES) . "')"
+                                            ]) ?>
+                                            <?= render_ds_button([
+                                                'type' => 'button',
+                                                'variant' => 'outlined',
+                                                'size' => 'small',
+                                                'children' => 'Reject',
+                                                'leftIcon' => '❌',
+                                                'onClick' => "openApprovalModal({$s['id']}, 'reject', '" . htmlspecialchars($s['officer_name'], ENT_QUOTES) . "')"
+                                            ]) ?>
                                         </div>
                                     </td>
                                 </tr>
@@ -137,8 +147,21 @@ include __DIR__ . '/../includes/layout_header.php';
             </div>
             
             <div class="modal-actions">
-                <button type="button" class="btn-primary" id="btn-submit-modal" onclick="submitApproval()">Proses</button>
-                <button type="button" class="btn-secondary" onclick="closeModal()">Batal</button>
+                <?= render_ds_button([
+                    'type' => 'button',
+                    'id' => 'btn-submit-modal',
+                    'variant' => 'filled',
+                    'size' => 'medium',
+                    'children' => 'Proses',
+                    'onClick' => 'submitApproval()'
+                ]) ?>
+                <?= render_ds_button([
+                    'type' => 'button',
+                    'variant' => 'outlined',
+                    'size' => 'medium',
+                    'children' => 'Batal',
+                    'onClick' => 'closeModal()'
+                ]) ?>
             </div>
         </div>
     </div>

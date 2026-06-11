@@ -135,7 +135,13 @@ include __DIR__ . '/../includes/layout_header.php';
                     <textarea name="isi" class="textarea-field" placeholder="Tulis feedback untuk Kanwil..." required></textarea>
                 </div>
 
-                <button type="submit" class="btn-primary">📤 Kirim Feedback</button>
+                <?= render_ds_button([
+                    'type' => 'submit',
+                    'variant' => 'filled',
+                    'size' => 'large',
+                    'children' => 'Kirim Feedback',
+                    'leftIcon' => '📤'
+                ]) ?>
             </form>
         </div>
 

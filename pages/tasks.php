@@ -518,10 +518,34 @@ function openTaskModal(templateId, reqBulan, reqTahun, officerId) {
                     </div>
                     ${userRole !== 'lead' ? `
                     <div class="seg-progress-quick">
-                        <button type="button" class="seg-progress-quick-btn" onclick="setSegProgress(0)">0% Pending</button>
-                        <button type="button" class="seg-progress-quick-btn" onclick="setSegProgress(50)">50% Setengah</button>
-                        <button type="button" class="seg-progress-quick-btn" onclick="setSegProgress(80)">80% Good</button>
-                        <button type="button" class="seg-progress-quick-btn" onclick="setSegProgress(100)">100% Exceed</button>
+                        <?= render_ds_button([
+                            'type' => 'button',
+                            'variant' => 'outlined',
+                            'size' => 'small',
+                            'children' => '0% Pending',
+                            'onClick' => 'setSegProgress(0)'
+                        ]) ?>
+                        <?= render_ds_button([
+                            'type' => 'button',
+                            'variant' => 'outlined',
+                            'size' => 'small',
+                            'children' => '50% Setengah',
+                            'onClick' => 'setSegProgress(50)'
+                        ]) ?>
+                        <?= render_ds_button([
+                            'type' => 'button',
+                            'variant' => 'outlined',
+                            'size' => 'small',
+                            'children' => '80% Good',
+                            'onClick' => 'setSegProgress(80)'
+                        ]) ?>
+                        <?= render_ds_button([
+                            'type' => 'button',
+                            'variant' => 'outlined',
+                            'size' => 'small',
+                            'children' => '100% Exceed',
+                            'onClick' => 'setSegProgress(100)'
+                        ]) ?>
                     </div>
                     ` : ''}
                     <input type="hidden" name="progress" id="prog-slider" value="${task.progress}">
@@ -555,16 +579,36 @@ function getActionsHtml(task) {
     if (userRole === 'lead' && task.submission_status === 'pending') {
         return `
             <div class="modal-actions" style="display: flex; gap: 10px; margin-top: 8px;">
-                <button type="button" class="btn-submit" onclick="approveTask(${task.submission_id})" style="flex: 1; background: var(--success); color: white; padding: 10px;">
-                    ✅ APPROVE TUGAS INI
-                </button>
-                <button type="button" class="btn-secondary" onclick="closeModal()" style="flex: 1; padding: 10px;">Tutup</button>
+                <?= render_ds_button([
+                    'type' => 'button',
+                    'variant' => 'filled',
+                    'size' => 'medium',
+                    'children' => 'APPROVE TUGAS INI',
+                    'leftIcon' => '✅',
+                    'onClick' => 'approveTask(${task.submission_id})',
+                    'style' => 'flex: 1;'
+                ]) ?>
+                <?= render_ds_button([
+                    'type' => 'button',
+                    'variant' => 'outlined',
+                    'size' => 'medium',
+                    'children' => 'Tutup',
+                    'onClick' => 'closeModal()',
+                    'style' => 'flex: 1;'
+                ]) ?>
             </div>
         `;
     } else if (task.submission_status === 'approved' || task.progress_status === 'approved') {
         return `
             <div class="modal-actions">
-                <button type="button" class="btn-secondary" onclick="closeModal()" style="width: 100%;">Tutup</button>
+                <?= render_ds_button([
+                    'type' => 'button',
+                    'variant' => 'outlined',
+                    'size' => 'medium',
+                    'children' => 'Tutup',
+                    'onClick' => 'closeModal()',
+                    'style' => 'width: 100%;'
+                ]) ?>
             </div>
 
             <div style="margin-top:8px; padding-top:8px; border-top:1px solid var(--hairline); text-align:center;">
@@ -577,18 +621,39 @@ function getActionsHtml(task) {
         if (userRole === 'lead') {
             return `
                 <div class="modal-actions" style="display: flex; justify-content: flex-end; margin-top: 8px;">
-                    <button type="button" class="btn-secondary" onclick="closeModal()" style="width: 100%; padding: 10px;">Tutup</button>
+                    <?= render_ds_button([
+                        'type' => 'button',
+                        'variant' => 'outlined',
+                        'size' => 'medium',
+                        'children' => 'Tutup',
+                        'onClick' => 'closeModal()',
+                        'style' => 'width: 100%;'
+                    ]) ?>
                 </div>
             `;
         } else {
             return `
                 <div class="modal-actions" style="display: flex; gap: 10px; margin-top: 8px;">
-                    <button type="submit" class="btn-primary" style="flex: 1; padding: 10px;">💾 Simpan Progress</button>
-                    <button type="button" class="btn-secondary" onclick="closeModal()" style="flex: 1; padding: 10px;">Tutup</button>
+                    <?= render_ds_button([
+                        'type' => 'submit',
+                        'variant' => 'filled',
+                        'size' => 'medium',
+                        'children' => 'Simpan Progress',
+                        'leftIcon' => '💾',
+                        'style' => 'flex: 1;'
+                    ]) ?>
+                    <?= render_ds_button([
+                        'type' => 'button',
+                        'variant' => 'outlined',
+                        'size' => 'medium',
+                        'children' => 'Tutup',
+                        'onClick' => 'closeModal()',
+                        'style' => 'flex: 1;'
+                    ]) ?>
                 </div>
 
                 <div style="margin-top: 8px; padding-top: 12px; border-top: 1px solid var(--hairline);">
-                    <button type="button" id="btn-request-approval" class="btn-submit" onclick="submitForApproval(${task.progress_id ? `'` + task.progress_id + `'` : 'null'})" style="width: 100%; padding: 10px; ${task.progress == 100 && !task.submission_status ? '' : 'opacity: 0.5; cursor: not-allowed;'}" ${task.progress == 100 && !task.submission_status ? '' : 'disabled'}>
+                    <button type="button" id="btn-request-approval" class="ds-btn ds-btn-filled ds-btn-medium" onclick="submitForApproval(${task.progress_id ? `'` + task.progress_id + `'` : 'null'})" style="width: 100%; ${task.progress == 100 && !task.submission_status ? '' : 'opacity: 0.5; pointer-events: none;'}" ${task.progress == 100 && !task.submission_status ? '' : 'disabled'}>
                         ${task.submission_status ? (task.submission_status === 'pending' ? '⏳ WAITING FOR APPROVAL' : 'Status: ' + task.submission_status.toUpperCase()) : '📤 Request for Approval'}
                     </button>
                 </div>

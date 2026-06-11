@@ -82,6 +82,19 @@
     --t-fast: 150ms ease-out;
     --t-base: 200ms ease-out;
     --t-slow: 300ms ease-in-out;
+
+    /* ── Button Design System Tokens ── */
+    --color-brand-primary: #0070E0;
+    --color-brand-hover: #0051A8;
+    --color-brand-bg-hover-light: #EAF4FF;
+    --color-text-on-primary: #FFFFFF;
+    --color-text-disabled: #A6A6A6;
+    --color-bg-disabled: #F2F2F2;
+    --color-border-disabled: #D9D9D9;
+
+    --btn-radius: 8px;
+    --btn-font-weight: 500;
+    --btn-gap-icon: 8px;
 }
 
 [data-theme="light"] {
@@ -105,6 +118,74 @@
     /* ── Buttons/Misc ── */
     --ink-button: #050505;
     --ink-button-pressed: #606770;
+}
+
+/* ============================================
+   DESIGN SYSTEM BUTTON COMPONENT
+   ============================================ */
+.ds-btn {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: var(--btn-gap-icon);
+  border-radius: var(--btn-radius);
+  font-weight: var(--btn-font-weight);
+  font-family: inherit;
+  cursor: pointer;
+  transition: all 200ms ease-in-out;
+  border: none;
+  text-decoration: none;
+  box-sizing: border-box;
+}
+
+.ds-btn:disabled, .ds-btn.ds-btn-disabled {
+  pointer-events: none;
+  cursor: not-allowed;
+}
+
+/* Variants */
+.ds-btn-filled {
+  background-color: var(--color-brand-primary);
+  color: var(--color-text-on-primary);
+}
+.ds-btn-filled:hover {
+  background-color: var(--color-brand-hover);
+}
+.ds-btn-filled:disabled, .ds-btn-filled.ds-btn-disabled {
+  background-color: var(--color-bg-disabled);
+  color: var(--color-text-disabled);
+}
+
+.ds-btn-outlined {
+  background-color: transparent;
+  border: 1px solid var(--color-brand-primary);
+  color: var(--color-brand-primary);
+}
+.ds-btn-outlined:hover {
+  background-color: var(--color-brand-bg-hover-light);
+}
+.ds-btn-outlined:disabled, .ds-btn-outlined.ds-btn-disabled {
+  border-color: var(--color-border-disabled);
+  color: var(--color-text-disabled);
+}
+
+/* Sizes */
+.ds-btn-large {
+  font-size: 16px;
+  padding: 12px 24px;
+}
+.ds-btn-medium {
+  font-size: 14px;
+  padding: 10px 20px;
+}
+.ds-btn-small {
+  font-size: 12px;
+  padding: 8px 16px;
+}
+
+.ds-btn-icon {
+  display: flex;
+  align-items: center;
 }
 
 /* ============================================

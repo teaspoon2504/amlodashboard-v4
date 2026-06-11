@@ -291,3 +291,51 @@ function get_flash() {
     }
     return null;
 }
+
+/**
+ * Render Design System Button
+ * 
+ * @param array $props
+ *   - variant: 'filled' | 'outlined'
+ *   - size: 'small' | 'medium' | 'large'
+ *   - isDisabled: bool
+ *   - leftIcon: string (HTML)
+ *   - children: string
+ *   - onClick: string
+ *   - type: string ('button' | 'submit' | 'reset')
+ *   - class: string
+ *   - style: string
+ *   - id: string
+ */
+function render_ds_button($props) {
+    $variant = $props['variant'] ?? 'filled';
+    $size = $props['size'] ?? 'medium';
+    $isDisabled = $props['isDisabled'] ?? false;
+    $leftIcon = $props['leftIcon'] ?? '';
+    $children = $props['children'] ?? '';
+    $onClick = $props['onClick'] ?? '';
+    $type = $props['type'] ?? 'button';
+    $class = $props['class'] ?? '';
+    $style = $props['style'] ?? '';
+    $id = $props['id'] ?? '';
+    $disabledAttr = $isDisabled ? 'disabled' : '';
+
+    $classes = ['ds-btn', "ds-btn-{$variant}", "ds-btn-{$size}"];
+    if ($isDisabled) $classes[] = 'ds-btn-disabled';
+    if ($class) $classes[] = $class;
+
+    $classStr = implode(' ', $classes);
+    
+    $onClickAttr = $onClick ? "onclick=\"" . htmlspecialchars($onClick, ENT_QUOTES) . "\"" : "";
+    $idAttr = $id ? "id=\"" . htmlspecialchars($id, ENT_QUOTES) . "\"" : "";
+    $styleAttr = $style ? "style=\"" . htmlspecialchars($style, ENT_QUOTES) . "\"" : "";
+
+    $html = "<button type=\"$type\" class=\"$classStr\" $onClickAttr $idAttr $styleAttr $disabledAttr>";
+    if ($leftIcon) {
+        $html .= "<span class=\"ds-btn-icon\">$leftIcon</span>";
+    }
+    $html .= "<span>$children</span>";
+    $html .= "</button>";
+
+    return $html;
+}
