@@ -28,6 +28,8 @@ if (!isset($page_title)) {
 
     <!-- Global Variables -->
     <script>
+        const savedTheme = localStorage.getItem('theme') || 'dark';
+        document.documentElement.setAttribute('data-theme', savedTheme);
         const csrfToken = '<?= $_SESSION['csrf_token'] ?? '' ?>';
     </script>
 </head>

@@ -21,6 +21,9 @@
         <?php endif; ?>
     </div>
     <div class="topbar-right">
+        <div class="topbar-notif theme-toggle" onclick="toggleTheme()" title="Toggle Theme" style="cursor:pointer; font-size: 16px;">
+            <span id="theme-icon">🌙</span>
+        </div>
         <?php if (!empty($topbar_notif_action)): ?>
             <div class="topbar-notif" onclick="<?= htmlspecialchars($topbar_notif_action, ENT_QUOTES, 'UTF-8') ?>" style="cursor:pointer;" title="Lihat Notifikasi">
                 🔔<?php if (!empty($alerts)): ?><div class="notif-dot"></div><?php endif; ?>
@@ -43,3 +46,25 @@
         </div>
     </div>
 </div>
+
+<script>
+function updateThemeIcon(theme) {
+    const icon = document.getElementById('theme-icon');
+    if(icon) {
+        icon.textContent = theme === 'light' ? '☀️' : '🌙';
+    }
+}
+
+function toggleTheme() {
+    const html = document.documentElement;
+    const currentTheme = html.getAttribute('data-theme') || 'dark';
+    const newTheme = currentTheme === 'light' ? 'dark' : 'light';
+    html.setAttribute('data-theme', newTheme);
+    localStorage.setItem('theme', newTheme);
+    updateThemeIcon(newTheme);
+}
+
+document.addEventListener('DOMContentLoaded', () => {
+    updateThemeIcon(document.documentElement.getAttribute('data-theme') || 'dark');
+});
+</script>

@@ -18,7 +18,7 @@ if (file_exists($env_file)) {
 define('DB_HOST', $env['DB_HOST'] ?? 'localhost');
 define('DB_USER', $env['DB_USER'] ?? 'root');
 define('DB_PASS', $env['DB_PASS'] ?? '');
-define('DB_NAME', $env['DB_NAME'] ?? 'amlo_dashboard');
+define('DB_NAME', $env['DB_NAME'] ?? 'amlo_dashboard_v4');
 define('DB_PORT', $env['DB_PORT'] ?? '3306');
 
 // Create connection

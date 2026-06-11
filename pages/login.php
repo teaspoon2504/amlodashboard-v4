@@ -58,6 +58,10 @@ $csrf_token = generate_csrf_token();
     <title>Login — AMLO Dashboard</title>
     <link href="../assets/css/fonts.css" rel="stylesheet">
     <link href="../assets/css/amlo-design-system.css" rel="stylesheet">
+    <script>
+        const savedTheme = localStorage.getItem('theme') || 'dark';
+        document.documentElement.setAttribute('data-theme', savedTheme);
+    </script>
     <style>
         /* Login-specific overrides on top of design system */
         body {
@@ -214,6 +218,9 @@ $csrf_token = generate_csrf_token();
     <canvas id="particles"></canvas>
 
     <div class="login-shell">
+        <div class="theme-toggle" onclick="toggleTheme()" title="Toggle Theme" style="position: absolute; top: 20px; right: 20px; cursor: pointer; font-size: 24px; z-index: 10; background: var(--surface-soft); border: 1px solid var(--hairline); padding: 8px 12px; border-radius: var(--r-full); box-shadow: 0 4px 12px rgba(0,0,0,0.1);">
+            <span id="theme-icon">🌙</span>
+        </div>
         <div class="login-card">
             <div class="login-form-wrap">
                 <h2 class="login-form-title">Masuk ke Akun Anda</h2>
@@ -258,6 +265,26 @@ $csrf_token = generate_csrf_token();
     </div>
 
     <script>
+        function updateThemeIcon(theme) {
+            const icon = document.getElementById('theme-icon');
+            if(icon) {
+                icon.textContent = theme === 'light' ? '☀️' : '🌙';
+            }
+        }
+
+        function toggleTheme() {
+            const html = document.documentElement;
+            const currentTheme = html.getAttribute('data-theme') || 'dark';
+            const newTheme = currentTheme === 'light' ? 'dark' : 'light';
+            html.setAttribute('data-theme', newTheme);
+            localStorage.setItem('theme', newTheme);
+            updateThemeIcon(newTheme);
+        }
+
+        document.addEventListener('DOMContentLoaded', () => {
+            updateThemeIcon(document.documentElement.getAttribute('data-theme') || 'dark');
+        });
+
         // Subtle particle animation
         (function() {
             const canvas = document.getElementById('particles');

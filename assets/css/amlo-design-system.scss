@@ -4,7 +4,7 @@
    Dark variant of Meta's light commerce palette
    ============================================ */
 
-:root {
+:root, [data-theme="dark"] {
     /* ── Surfaces (dark variant of Meta's light surface system) ── */
     --canvas: #0b1929;
     --surface-soft: #122236;
@@ -82,6 +82,29 @@
     --t-fast: 150ms ease-out;
     --t-base: 200ms ease-out;
     --t-slow: 300ms ease-in-out;
+}
+
+[data-theme="light"] {
+    /* ── Surfaces ── */
+    --canvas: #f0f2f5;
+    --surface-soft: #ffffff;
+    --surface-elevated: #ffffff;
+    --surface-translucent: rgba(255, 255, 255, 0.8);
+    --hairline: rgba(0, 0, 0, 0.1);
+    --hairline-soft: rgba(0, 0, 0, 0.05);
+
+    /* ── Text ── */
+    --ink-deep: #050505;
+    --ink: #1c1e21;
+    --charcoal: #606770;
+    --slate: #65676B;
+    --steel: #8D949E;
+    --stone: #BEC3C9;
+    --disabled: #E4E6EB;
+
+    /* ── Buttons/Misc ── */
+    --ink-button: #050505;
+    --ink-button-pressed: #606770;
 }
 
 /* ============================================
