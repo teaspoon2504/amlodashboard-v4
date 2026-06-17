@@ -65,9 +65,12 @@ $officers = db_fetch_all(
 
 // Get assignment history
 $assignments = db_fetch_all(
-    "SELECT a.*, u.nama as to_name, u.username as to_username
+    "SELECT a.*, u.nama as to_name, u.username as to_username,
+            tp.status as real_status, tp.progress as real_progress
      FROM assignments a
      JOIN users u ON a.to_user_id = u.id
+     LEFT JOIN task_templates tt ON tt.nama = a.task_name
+     LEFT JOIN task_progress tp ON tp.template_id = tt.id AND tp.user_id = a.to_user_id AND tp.tahun = YEAR(a.due_date) AND tp.bulan = MONTH(a.due_date)
      WHERE a.from_user_id = ? OR a.to_user_id = ?
      ORDER BY a.created_at DESC LIMIT 20",
     [$user['id'], $user['id']]
@@ -156,8 +159,33 @@ include __DIR__ . '/../includes/layout_header.php';
                         </div>
                     <?php else: ?>
                         <?php foreach ($assignments as $a):
-                            $status_colors = ['selesai' => 'green', 'in_progress' => 'amber', 'belum_mulai' => 'red'];
-                            $status_cls = $status_colors[$a['status']] ?? 'amber';
+                            $display_status = 'Belum mulai';
+                            $status_cls = 'red';
+                            
+                            // Determine real status based on task_progress
+                            if (!empty($a['real_status'])) {
+                                $rs = $a['real_status'];
+                                if ($rs === 'done' || $rs === 'approved') {
+                                    $display_status = 'Selesai';
+                                    $status_cls = 'green';
+                                } elseif ($rs === 'pending') {
+                                    $display_status = 'Menunggu Review';
+                                    $status_cls = 'amber';
+                                } elseif ($rs === 'active') {
+                                    $display_status = 'In Progress';
+                                    $status_cls = 'amber';
+                                }
+                            } else {
+                                // Fallback to assignments.status
+                                $orig = $a['status'];
+                                if ($orig === 'selesai') {
+                                    $display_status = 'Selesai';
+                                    $status_cls = 'green';
+                                } elseif ($orig === 'in_progress') {
+                                    $display_status = 'In Progress';
+                                    $status_cls = 'amber';
+                                }
+                            }
                         ?>
                             <div class="alert-item">
                                 <div class="alert-dot <?= $status_cls ?>"></div>
@@ -166,7 +194,7 @@ include __DIR__ . '/../includes/layout_header.php';
                                     <div class="alert-time">
                                         Due: <?= date('d M Y', strtotime($a['due_date'])) ?>
                                         · <span style="color:<?= $status_cls === 'green' ? 'var(--success)' : ($status_cls === 'amber' ? 'var(--attention)' : 'var(--critical)') ?>">
-                                            <?= str_replace('_', ' ', ucfirst($a['status'])) ?>
+                                            <?= e($display_status) ?>
                                         </span>
                                     </div>
                                 </div>

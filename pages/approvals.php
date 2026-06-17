@@ -165,7 +165,7 @@ include __DIR__ . '/../includes/layout_header.php';
             </div>
         </div>
     </div>
-
+</div>
 
 <script>
 function openApprovalModal(submissionId, action, officerName) {
@@ -233,7 +233,7 @@ function submitApproval() {
                         tbody.innerHTML = `
                             <tr>
                                 <td colspan="7" style="text-align:center;color:var(--steel);padding:40px">
-                                    <div style="font-size:24px;margin-bottom:8px">🎉
+                                    <div style="font-size:24px;margin-bottom:8px">🎉</div>
                                     Tidak ada pengajuan yang perlu di-review saat ini.
                                 </td>
                             </tr>
@@ -253,4 +253,6 @@ function submitApproval() {
         btn.disabled = false;
         btn.textContent = action === 'approve' ? 'Approve Tugas' : 'Reject Tugas';
     });
+}
+</script>
 <?php include __DIR__ . '/../includes/layout_footer.php'; ?>
