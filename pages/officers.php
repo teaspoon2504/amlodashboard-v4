@@ -41,7 +41,7 @@ if (empty($officer_ids)) $officer_ids = [-1];
 $placeholders = implode(',', array_fill(0, count($officer_ids), '?'));
 $params = array_merge($officer_ids, [$req_tahun]);
 $team_prog_records = db_fetch_all(
-    "SELECT user_id, template_id, bulan, progress FROM task_progress WHERE user_id IN ($placeholders) AND tahun = ?",
+    "SELECT user_id, template_id, bulan, progress FROM task_progress WHERE user_id IN ($placeholders) AND tahun = ? AND periode != 'harian'",
     $params
 );
 

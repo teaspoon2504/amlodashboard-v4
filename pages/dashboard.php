@@ -31,7 +31,7 @@ $progress_records = db_fetch_all("
     SELECT tp.*, 
            (SELECT status FROM submissions WHERE task_progress_id = tp.id ORDER BY id DESC LIMIT 1) as submission_status 
     FROM task_progress tp 
-    WHERE user_id = ? AND tahun = ?", 
+    WHERE user_id = ? AND tahun = ? AND periode != 'harian'", 
     [$user['id'], $tahun]
 );
 $progress_map = [];

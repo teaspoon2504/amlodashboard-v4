@@ -184,7 +184,7 @@ function json_response($success, $message = '', $data = []) {
 function get_task_summary($user_id, $tahun, $bulan) {
     $all = db_fetch_all(
         "SELECT status, COUNT(*) as count FROM task_progress
-         WHERE user_id = ? AND tahun = ? AND bulan = ?
+         WHERE user_id = ? AND tahun = ? AND bulan = ? AND periode != 'harian'
          GROUP BY status",
         [$user_id, $tahun, $bulan]
     );
@@ -205,7 +205,7 @@ function get_user_performance($user_id, $tahun, $bulan) {
         "SELECT tp.*, tt.nama, tt.kategori, tt.periode, tt.tag
          FROM task_progress tp
          JOIN task_templates tt ON tp.template_id = tt.id
-         WHERE tp.user_id = ? AND tp.tahun = ? AND tp.bulan = ?
+         WHERE tp.user_id = ? AND tp.tahun = ? AND tp.bulan = ? AND tp.periode != 'harian'
          ORDER BY tt.kategori, tt.nama",
         [$user_id, $tahun, $bulan]
     );
@@ -238,13 +238,13 @@ function get_wilayah_summary() {
             (SELECT COUNT(*) FROM users WHERE kanwil_id = kw.id AND aktif = 1 AND role = 'officer') as total_officer,
             (SELECT COUNT(*) FROM users u
              JOIN task_progress tp ON u.id = tp.user_id
-             WHERE u.kanwil_id = kw.id AND tp.progress >= 100) as exceed_count,
+             WHERE u.kanwil_id = kw.id AND tp.progress >= 100 AND tp.periode != 'harian') as exceed_count,
             (SELECT COUNT(*) FROM users u
              JOIN task_progress tp ON u.id = tp.user_id
-             WHERE u.kanwil_id = kw.id AND tp.progress >= 80 AND tp.progress < 100) as good_count,
+             WHERE u.kanwil_id = kw.id AND tp.progress >= 80 AND tp.progress < 100 AND tp.periode != 'harian') as good_count,
             (SELECT COUNT(*) FROM users u
              JOIN task_progress tp ON u.id = tp.user_id
-             WHERE u.kanwil_id = kw.id AND tp.progress > 0 AND tp.progress < 80) as below_count
+             WHERE u.kanwil_id = kw.id AND tp.progress > 0 AND tp.progress < 80 AND tp.periode != 'harian') as below_count
          FROM kantor_wilayah kw
          WHERE kw.aktif = 1
          ORDER BY kw.kode"

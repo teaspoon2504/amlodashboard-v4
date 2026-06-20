@@ -99,7 +99,7 @@ $flash = get_flash();
 // 1. Get ALL active task templates
 $templates = db_fetch_all(
     "SELECT tt.* FROM task_templates tt
-     WHERE tt.is_active = 1
+     WHERE tt.is_active = 1 AND tt.periode != 'harian'
      ORDER BY FIELD(tt.periode, 'harian', 'bulanan', 'triwulan', 'semesteran', 'adhoc'), tt.kategori, tt.nama"
 );
 
@@ -278,7 +278,6 @@ include __DIR__ . '/../includes/layout_header.php';
                     <label style="font-size: 11px; font-weight: 600; text-transform: uppercase; letter-spacing: 1px; color: var(--steel); margin-bottom: 6px; display: block;">Periode</label>
                     <select id="filter-periode" class="select-field" style="width: 150px; padding: 10px 14px;" onchange="applyFilters()">
                         <option value="all">Semua Periode</option>
-                        <option value="harian">Harian</option>
                         <option value="bulanan">Bulanan</option>
                         <option value="triwulan">Triwulanan</option>
                         <option value="semesteran">Semesteran</option>

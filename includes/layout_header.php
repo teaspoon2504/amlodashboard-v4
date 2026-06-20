@@ -19,7 +19,7 @@ if (!isset($page_title)) {
     <link href="../assets/css/fonts.css" rel="stylesheet">
     
     <!-- Design System (Global Styles) -->
-    <link href="../assets/css/amlo-design-system.css" rel="stylesheet">
+    <link href="../assets/css/amlo-design-system.css?v=1780939681" rel="stylesheet">
     
     <!-- Page Specific CSS -->
     <?php if (isset($page_css)): ?>

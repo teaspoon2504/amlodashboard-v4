@@ -30,7 +30,7 @@ if ($user['role'] === 'ho') {
 
 // Load progress for requested year
 $progress_records = db_fetch_all(
-    "SELECT * FROM task_progress WHERE user_id = ? AND tahun = ?",
+    "SELECT * FROM task_progress WHERE user_id = ? AND tahun = ? AND periode != 'harian'",
     [$user['id'], $req_tahun]
 );
 $progress_map = [];
@@ -134,7 +134,7 @@ if ($user['role'] === 'lead' || $user['role'] === 'ho') {
     $placeholders = implode(',', array_fill(0, count($officer_ids), '?'));
     $params = array_merge($officer_ids, [$req_tahun]);
     $team_prog_records = db_fetch_all(
-        "SELECT user_id, template_id, bulan, progress FROM task_progress WHERE user_id IN ($placeholders) AND tahun = ?",
+        "SELECT user_id, template_id, bulan, progress FROM task_progress WHERE user_id IN ($placeholders) AND tahun = ? AND periode != 'harian'",
         $params
     );
     
