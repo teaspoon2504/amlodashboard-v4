@@ -139,7 +139,20 @@ foreach ($progress_records as $pr) {
     $progress_map[$pr['user_id']][$pr['template_id']][$pr['bulan']] = $pr;
 }
 
-// 4. Build $display_tasks array
+// 4. Get ALL targets for target officers
+$targets_records = db_fetch_all(
+    "SELECT user_id, task_template_id, bulan, target_value 
+     FROM task_targets 
+     WHERE user_id IN ($placeholders) AND tahun = ?",
+    $query_params
+);
+
+$targets_map = [];
+foreach ($targets_records as $tg) {
+    $targets_map[$tg['user_id']][$tg['task_template_id']][$tg['bulan']] = $tg['target_value'];
+}
+
+// 5. Build $display_tasks array
 $default_prog = [
     'progress_id' => null,
     'progress' => 0,
@@ -161,12 +174,16 @@ foreach ($target_officers as $officer) {
             // Generate 12 items
             for ($m = 1; $m <= 12; $m++) {
                 $t = $tt;
-                // Rename 'Monthly' or append month
                 if (stripos($t['nama'], 'Monthly') !== false) {
-                    $t['nama'] = str_ireplace('Monthly', $nama_bulan[$m] . ' ' . $period['tahun'], $t['nama']);
+                    $t['nama'] = str_ireplace('Monthly', '- ' . $nama_bulan[$m] . ' ' . $period['tahun'], $t['nama']);
                 } else {
                     $t['nama'] .= ' - ' . $nama_bulan[$m] . ' ' . $period['tahun'];
                 }
+                
+                // Dynamic due date for bulanan (last day of the month)
+                $last_day = date('t', strtotime($period['tahun'] . '-' . sprintf('%02d', $m) . '-01'));
+                $t['due_label'] = $last_day . ' ' . $nama_bulan[$m] . ' ' . $period['tahun'];
+
                 $t['req_bulan'] = $m;
                 $t['req_tahun'] = $period['tahun'];
                 $t['vis_bulan'] = (string)$m;
@@ -174,6 +191,7 @@ foreach ($target_officers as $officer) {
                 // Attach progress if exists
                 $prog = $progress_map[$uid][$tt['id']][$m] ?? $default_prog;
                 $t = array_merge($t, $prog);
+                $t['numeric_target'] = $targets_map[$uid][$tt['id']][$m] ?? 0;
                 $t['officer_id'] = $uid;
                 $t['officer_nama'] = $unama;
                 $display_tasks[] = $t;
@@ -193,6 +211,7 @@ foreach ($target_officers as $officer) {
                 // Attach progress if exists
                 $prog = $progress_map[$uid][$tt['id']][$m] ?? $default_prog;
                 $t = array_merge($t, $prog);
+                $t['numeric_target'] = $targets_map[$uid][$tt['id']][$m] ?? 0;
                 $t['officer_id'] = $uid;
                 $t['officer_nama'] = $unama;
                 $display_tasks[] = $t;
@@ -212,6 +231,7 @@ foreach ($target_officers as $officer) {
                 // Attach progress if exists
                 $prog = $progress_map[$uid][$tt['id']][$m] ?? $default_prog;
                 $t = array_merge($t, $prog);
+                $t['numeric_target'] = $targets_map[$uid][$tt['id']][$m] ?? 0;
                 $t['officer_id'] = $uid;
                 $t['officer_nama'] = $unama;
                 $display_tasks[] = $t;
@@ -231,6 +251,7 @@ foreach ($target_officers as $officer) {
             
             $prog = $progress_map[$uid][$tt['id']][$m] ?? $default_prog;
             $t = array_merge($t, $prog);
+            $t['numeric_target'] = $targets_map[$uid][$tt['id']][$m] ?? 0;
             $t['officer_id'] = $uid;
             $t['officer_nama'] = $unama;
             $display_tasks[] = $t;
@@ -259,7 +280,7 @@ include __DIR__ . '/../includes/layout_header.php';
 
             <div class="page-header">
                 <h2>To-Do List Harian AMLO</h2>
-                <p><?= count($tasks) ?> jenis laporan & tugas sesuai ketentuan — klik item untuk input progress</p>
+                <p>Input progress tugas secara real-time</p>
             </div>
 
             <div class="todo-filters-container" style="display: flex; gap: 16px; margin-bottom: 20px; align-items: flex-end; flex-wrap: wrap;">
@@ -323,9 +344,18 @@ include __DIR__ . '/../includes/layout_header.php';
             <div id="todo-list">
                 <?php foreach ($tasks as $t): ?>
                     <?php
+                    // Visual percentage calculation
+                    $vis_pct = 0;
+                    if ($t['numeric_target'] > 0) {
+                        $vis_pct = round(($t['progress'] / $t['numeric_target']) * 100);
+                        if ($vis_pct > 100) $vis_pct = 100;
+                    } else {
+                        $vis_pct = $t['progress'] >= 100 ? 100 : $t['progress']; // fallback
+                    }
+
                     $isDone = $t['submission_status'] === 'approved' || $t['progress_status'] === 'approved';
-                    $pctColor = $t['progress'] >= 100 ? 'var(--success)' : ($t['progress'] >= 80 ? '#3498db' : ($t['progress'] >= 50 ? 'var(--attention)' : 'var(--critical)'));
-                    $barClass = $t['progress'] >= 100 ? 'bar-exceed' : ($t['progress'] >= 80 ? 'bar-good' : 'bar-below');
+                    $pctColor = $vis_pct >= 100 ? 'var(--success)' : ($vis_pct >= 80 ? '#3498db' : ($vis_pct >= 50 ? 'var(--attention)' : 'var(--critical)'));
+                    $barClass = $vis_pct >= 100 ? 'bar-exceed' : ($vis_pct >= 80 ? 'bar-good' : 'bar-below');
                     ?>
                     <div class="todo-item <?= $isDone ? 'done' : '' ?> <?= $t['submission_status'] === 'pending' && $t['progress'] > 0 ? 'pending-submit' : '' ?>"
                          data-tag="<?= e($t['tag']) ?>"
@@ -356,9 +386,9 @@ include __DIR__ . '/../includes/layout_header.php';
                             </div>
                             <div style="display:flex;align-items:center;gap:12px">
                                 <div class="mini-progress">
-                                    <div class="mini-progress-bar <?= $barClass ?>" style="width:<?= $t['progress'] ?? 0 ?>%"></div>
+                                    <div class="mini-progress-bar <?= $barClass ?>" style="width:<?= $vis_pct ?>%"></div>
                                 </div>
-                                <div class="progress-pct" style="color:<?= $pctColor ?>"><?= $t['progress'] ?? 0 ?>%</div>
+                                <div class="progress-pct" style="color:<?= $pctColor ?>"><?= $vis_pct ?>%</div>
                             </div>
                         </div>
                     </div>
@@ -370,13 +400,15 @@ include __DIR__ . '/../includes/layout_header.php';
 
 <div class="modal-overlay" id="modal-overlay" onclick="if(event.target===this)closeModal()">
     <div class="modal" id="modal-box">
-        <div class="modal-header">
+        <div class="modal-header" style="display: none;">
             <div class="modal-title" id="modal-title">✏️ Input Progress</div>
             <div class="modal-close" onclick="closeModal()">✕</div>
         </div>
         <div id="modal-body"></div>
     </div>
 </div>
+
+
 
 <script>
 const userRole = '<?= e($user['role']) ?>';
@@ -446,6 +478,7 @@ function openTaskModal(templateId, reqBulan, reqTahun, officerId) {
         'req_tahun' => $t['req_tahun'],
         'due_label' => $t['due_label'],
         'target' => $t['target'],
+        'numeric_target' => $t['numeric_target'],
         'progress' => $t['progress'] ?? 0,
         'progress_status' => $t['progress_status'] ?? 'pending',
         'progress_id' => $t['progress_id'],
@@ -459,116 +492,77 @@ function openTaskModal(templateId, reqBulan, reqTahun, officerId) {
     const task = tasks.find(t => t.id === templateId && t.req_bulan === reqBulan && t.req_tahun === reqTahun && t.officer_id === officerId);
     if (!task) return;
 
-    document.getElementById('modal-title').textContent = '✏️ Input Progress — ' + task.nama;
+    const oldHeader = document.querySelector('#modal-box .modal-header');
+    if (oldHeader) oldHeader.style.display = 'none';
+
+    const modalBox = document.getElementById('modal-box');
+    if (modalBox) {
+        modalBox.removeAttribute('style');
+    }
 
     document.getElementById('modal-body').innerHTML = `
-        <form method="POST" action="tasks.php">
-            <input type="hidden" name="csrf_token" value="${csrfToken}">
-            <input type="hidden" name="action" value="update_progress">
-            <input type="hidden" name="template_id" value="${templateId}">
-            <input type="hidden" name="bulan" value="${reqBulan}">
-            <input type="hidden" name="tahun" value="${reqTahun}">
-            <input type="hidden" name="officer_id" value="${officerId}">
-
-            <div style="display:grid;grid-template-columns:1fr 1fr 1fr;gap:8px;margin-bottom:8px">
-                <div>
-                    <div class="input-label">Kategori</div>
-                    <div style="font-size:13px">[${task.kategori}] ${task.periode}</div>
-                </div>
-                <div>
-                    <div class="input-label">Due Date</div>
-                    <div style="font-size:13px">${task.due_label}</div>
-                </div>
-                <div>
-                    <div class="input-label">Officer</div>
-                    <div style="font-size:13px">👤 ${task.officer_nama}</div>
-                </div>
+        <div class="tm-modal">
+            <!-- HEADER -->
+            <div class="tm-header">
+                <div class="tm-title">${task.nama}</div>
+                <div class="tm-subtitle">Update progress tugas <span class="todo-tag tag-${task.periode}">${task.periode.charAt(0).toUpperCase() + task.periode.slice(1)}</span></div>
+                <div class="tm-close" onclick="closeModal()">×</div>
             </div>
 
-            <div style="background:var(--hairline);border:1px solid var(--hairline);border-radius:8px;padding:8px;margin-bottom:8px;font-size:12px;line-height:1.6">
-                <div class="input-label">Target</div>
-                ${task.target || '-'}
-            </div>
+            <!-- CONTENT -->
+            <form id="progressForm" onsubmit="saveProgressAjax(event)">
+                <input type="hidden" name="csrf_token" value="${csrfToken}">
+                <input type="hidden" name="action" value="update_progress">
+                <input type="hidden" name="template_id" value="${templateId}">
+                <input type="hidden" name="bulan" value="${reqBulan}">
+                <input type="hidden" name="tahun" value="${reqTahun}">
+                <input type="hidden" name="officer_id" value="${officerId}">
 
-            <div class="input-group" style="margin-bottom: 8px;">
-                <label class="input-label">Progress Realisasi (%)</label>
-                <div class="seg-progress">
-                    <div class="seg-progress-header">
-                        <span class="seg-progress-label">${userRole === 'lead' ? 'Status Progress' : 'Pilih atau klik segmen'}</span>
-                        <span class="seg-progress-value pending" id="seg-progress-value">${task.progress}%</span>
+                <div class="tm-content">
+                    <div class="tm-counter">
+                        <button type="button" id="minusBtn" onclick="adjustProgress(-1, ${task.numeric_target})" ${userRole === 'lead' || task.progress <= 0 ? 'disabled' : ''}>−</button>
+                        <div class="tm-score">
+                            <div class="tm-number" id="progress-display-value">${task.progress}</div>
+                            <input type="hidden" name="progress" id="prog-slider" value="${task.progress}">
+                            <div class="tm-target">Target ${task.numeric_target > 0 ? task.numeric_target : '100'}</div>
+                        </div>
+                        <button type="button" id="plusBtn" onclick="adjustProgress(1, ${task.numeric_target})" ${userRole === 'lead' || task.progress >= (task.numeric_target > 0 ? task.numeric_target : 100) ? 'disabled' : ''}>+</button>
                     </div>
-                    <div class="seg-progress-track" id="seg-progress-track" ${userRole === 'lead' ? 'style="pointer-events: none;"' : ''}>
-                        ${[0,10,20,30,40,50,60,70,80,90,100].map(v => {
-                            const isActive = v <= task.progress;
-                            const isZero = v === 0;
-                            const isFull = v === 100;
-                            let cls = 'seg-progress-seg';
-                            if (isActive) cls += ' active';
-                            if (v >= 100) cls += ' exceed';
-                            else if (v >= 80) cls += ' good';
-                            else if (v > 0) cls += ' below';
-                            if (isZero) cls += ' zero';
-                            if (isFull) cls += ' full';
-                            return `<div class="${cls}" data-value="${v}" ${userRole !== 'lead' ? `onclick="setSegProgress(${v})"` : ''}>${v}</div>`;
-                        }).join('')}
+
+                    <div class="tm-divider"></div>
+
+                    <div class="tm-form-group tm-form-row">
+                        <div class="tm-label" style="margin-bottom:0;">Due Date</div>
+                        <div class="tm-value">${task.due_label}</div>
                     </div>
-                    <div class="seg-progress-bar">
-                        <div class="seg-progress-bar-fill" id="seg-progress-bar-fill" style="width:${task.progress}%"></div>
-                    </div>
-                    ${userRole !== 'lead' ? `
-                    <div class="seg-progress-quick">
-                        <?= render_ds_button([
-                            'type' => 'button',
-                            'variant' => 'outlined',
-                            'size' => 'small',
-                            'children' => '0% Pending',
-                            'onClick' => 'setSegProgress(0)'
-                        ]) ?>
-                        <?= render_ds_button([
-                            'type' => 'button',
-                            'variant' => 'outlined',
-                            'size' => 'small',
-                            'children' => '50% Setengah',
-                            'onClick' => 'setSegProgress(50)'
-                        ]) ?>
-                        <?= render_ds_button([
-                            'type' => 'button',
-                            'variant' => 'outlined',
-                            'size' => 'small',
-                            'children' => '80% Good',
-                            'onClick' => 'setSegProgress(80)'
-                        ]) ?>
-                        <?= render_ds_button([
-                            'type' => 'button',
-                            'variant' => 'outlined',
-                            'size' => 'small',
-                            'children' => '100% Exceed',
-                            'onClick' => 'setSegProgress(100)'
-                        ]) ?>
-                    </div>
-                    ` : ''}
-                    <input type="hidden" name="progress" id="prog-slider" value="${task.progress}">
+
+                    ${userRole === 'lead' ? 
+                        (task.keterangan.trim() ? `
+                        <div class="tm-form-group">
+                            <div class="tm-label">Catatan dari AMLO</div>
+                            <div class="tm-description" style="font-style:italic; background:var(--surface-soft); padding:10px; border-radius:8px; border:1px solid var(--hairline); color:var(--ink-deep);">
+                                ${task.keterangan}
+                            </div>
+                        </div>
+                        ` : '') 
+                    : `
+                        <div class="tm-form-group">
+                            <div class="tm-label">Deskripsi</div>
+                            <div class="tm-description">
+                                Ini adalah deskripsi tugas. Kategori penugasan ini adalah [${task.kategori}]. Target yang harus dicapai adalah: ${task.target || 'Tepat Waktu'}.
+                            </div>
+                        </div>
+
+                        <div class="tm-form-group">
+                            <div class="tm-label">Catatan</div>
+                            <textarea class="tm-textarea" name="keterangan" placeholder="tuliskan jika ada catatan disini">${task.keterangan}</textarea>
+                        </div>
+                    `}
                 </div>
-            </div>
 
-            ${userRole === 'lead' ? 
-                (task.keterangan ? `
-                <div class="input-group" style="margin-bottom: 8px;">
-                    <label class="input-label">Keterangan / Evidence dari Officer</label>
-                    <div style="background:var(--surface); border:1px solid var(--hairline); border-radius:8px; padding:10px; font-size:13px; color:var(--ink); min-height:48px;">
-                        ${task.keterangan}
-                    </div>
-                </div>
-                ` : '') 
-            : `
-            <div class="input-group" style="margin-bottom: 8px;">
-                <label class="input-label">Keterangan / Evidence</label>
-                <textarea name="keterangan" class="textarea-field" style="min-height: 48px; height: 48px; padding: 6px 10px;" placeholder="Attach link evidence, no. dokumen, atau keterangan...">${task.keterangan}</textarea>
-            </div>
-            `}
-
-            ${getActionsHtml(task)}
-        </form>
+                ${getActionsHtml(task)}
+            </form>
+        </div>
     `;
 
     document.getElementById('modal-overlay').classList.add('open');
@@ -577,41 +571,16 @@ function openTaskModal(templateId, reqBulan, reqTahun, officerId) {
 function getActionsHtml(task) {
     if (userRole === 'lead' && task.submission_status === 'pending') {
         return `
-            <div class="modal-actions" style="display: flex; gap: 10px; margin-top: 8px;">
-                <?= render_ds_button([
-                    'type' => 'button',
-                    'variant' => 'filled',
-                    'size' => 'medium',
-                    'children' => 'APPROVE TUGAS INI',
-                    'leftIcon' => '✅',
-                    'onClick' => 'approveTask(${task.submission_id})',
-                    'style' => 'flex: 1;'
-                ]) ?>
-                <?= render_ds_button([
-                    'type' => 'button',
-                    'variant' => 'outlined',
-                    'size' => 'medium',
-                    'children' => 'Tutup',
-                    'onClick' => 'closeModal()',
-                    'style' => 'flex: 1;'
-                ]) ?>
+            <div class="tm-actions">
+                <button type="button" onclick="closeModal()" class="tm-btn tm-cancel">Tutup</button>
+                <button type="button" onclick="approveTask(${task.submission_id})" class="tm-btn tm-save" style="background:var(--success);">✅ Approve Tugas</button>
             </div>
         `;
     } else if (task.submission_status === 'approved' || task.progress_status === 'approved') {
         return `
-            <div class="modal-actions">
-                <?= render_ds_button([
-                    'type' => 'button',
-                    'variant' => 'outlined',
-                    'size' => 'medium',
-                    'children' => 'Tutup',
-                    'onClick' => 'closeModal()',
-                    'style' => 'width: 100%;'
-                ]) ?>
-            </div>
-
-            <div style="margin-top:8px; padding-top:8px; border-top:1px solid var(--hairline); text-align:center;">
-                <div style="background: var(--success-bg); color: var(--success); padding: 10px; border-radius: 8px; font-weight: bold; font-size: 14px;">
+            <div class="tm-approval">
+                <button type="button" onclick="closeModal()" class="tm-btn tm-cancel" style="width:100%; margin-bottom:20px;">Tutup</button>
+                <div style="background: var(--success-bg); color: var(--success); padding: 10px; border-radius: 8px; font-weight: bold; font-size: 14px; text-align:center;">
                     ✅ TUGAS SELESAI (APPROVED)
                 </div>
             </div>
@@ -619,41 +588,26 @@ function getActionsHtml(task) {
     } else {
         if (userRole === 'lead') {
             return `
-                <div class="modal-actions" style="display: flex; justify-content: flex-end; margin-top: 8px;">
-                    <?= render_ds_button([
-                        'type' => 'button',
-                        'variant' => 'outlined',
-                        'size' => 'medium',
-                        'children' => 'Tutup',
-                        'onClick' => 'closeModal()',
-                        'style' => 'width: 100%;'
-                    ]) ?>
+                <div class="tm-actions">
+                    <button type="button" onclick="closeModal()" class="tm-btn tm-cancel" style="width:100%;">Tutup</button>
                 </div>
             `;
         } else {
+            let targetMax = task.numeric_target > 0 ? task.numeric_target : 100;
+            let showApproval = (task.progress >= targetMax || task.submission_status) ? 'block' : 'none';
+
             return `
-                <div class="modal-actions" style="display: flex; gap: 10px; margin-top: 8px;">
-                    <?= render_ds_button([
-                        'type' => 'submit',
-                        'variant' => 'filled',
-                        'size' => 'medium',
-                        'children' => 'Simpan Progress',
-                        'leftIcon' => '💾',
-                        'style' => 'flex: 1;'
-                    ]) ?>
-                    <?= render_ds_button([
-                        'type' => 'button',
-                        'variant' => 'outlined',
-                        'size' => 'medium',
-                        'children' => 'Tutup',
-                        'onClick' => 'closeModal()',
-                        'style' => 'flex: 1;'
-                    ]) ?>
+                <!-- BUTTON -->
+                <div class="tm-actions">
+                    <button type="button" onclick="closeModal()" class="tm-btn tm-cancel">Batal</button>
+                    <button type="submit" class="tm-btn tm-save">Simpan</button>
                 </div>
 
-                <div style="margin-top: 8px; padding-top: 12px; border-top: 1px solid var(--hairline);">
-                    <button type="button" id="btn-request-approval" class="ds-btn ds-btn-filled ds-btn-medium" onclick="submitForApproval(${task.progress_id ? `'` + task.progress_id + `'` : 'null'})" style="width: 100%; ${task.progress == 100 && !task.submission_status ? '' : 'opacity: 0.5; pointer-events: none;'}" ${task.progress == 100 && !task.submission_status ? '' : 'disabled'}>
-                        ${task.submission_status ? (task.submission_status === 'pending' ? '⏳ WAITING FOR APPROVAL' : 'Status: ' + task.submission_status.toUpperCase()) : '📤 Request for Approval'}
+                <!-- APPROVAL -->
+                <div class="tm-approval" id="approval-section" style="display: ${showApproval};">
+                    <div class="tm-approval-title">Silakan Lakukan</div>
+                    <button type="button" id="btn-request-approval" class="tm-btn-approval" onclick="submitForApproval(${task.progress_id ? '\'' + task.progress_id + '\'' : 'null'})" ${task.progress >= targetMax && !task.submission_status ? '' : 'disabled'}>
+                        ${task.submission_status ? (task.submission_status === 'pending' ? '⏳ WAITING FOR APPROVAL' : 'Status: ' + task.submission_status.toUpperCase()) : '✓ &nbsp; Request for approval'}
                     </button>
                 </div>
             `;
@@ -691,84 +645,113 @@ async function approveTask(submissionId) {
     }
 }
 
-function submitForApproval(taskProgressId) {
+async function submitForApproval(taskProgressId) {
     if (!taskProgressId || taskProgressId === 'null' || taskProgressId === 'undefined') {
         alert('Silakan tekan tombol "💾 Simpan Progress" terlebih dahulu untuk menyimpan data baru ini ke dalam sistem sebelum melakukan Request for Approval.');
         return;
     }
     if (!confirm('Submit tugas ini untuk direview oleh Lead?')) return;
 
-    const form = document.createElement('form');
-    form.method = 'POST';
-    form.action = 'tasks.php';
+    try {
+        const response = await fetch('../api/tasks.php', {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+                'X-Requested-With': 'XMLHttpRequest'
+            },
+            body: JSON.stringify({
+                action: 'submit_approval',
+                task_progress_id: parseInt(taskProgressId)
+            })
+        });
 
-    const csrfInput = document.createElement('input');
-    csrfInput.type = 'hidden';
-    csrfInput.name = 'csrf_token';
-    csrfInput.value = csrfToken;
-    form.appendChild(csrfInput);
+        const result = await response.json();
+        if (result.success) {
+            alert('Tugas berhasil disubmit untuk review!');
+            const btn = document.getElementById('btn-request-approval');
+            if(btn) {
+                btn.innerText = '⏳ WAITING FOR APPROVAL';
+                btn.disabled = true;
+            }
+        } else {
+            alert(result.message || 'Terjadi kesalahan');
+        }
+    } catch (e) {
+        console.error(e);
+        alert('Terjadi kesalahan jaringan');
+    }
+}
 
-    const actionInput = document.createElement('input');
-    actionInput.type = 'hidden';
-    actionInput.name = 'action';
-    actionInput.value = 'submit_approval';
-    form.appendChild(actionInput);
+async function saveProgressAjax(event) {
+    event.preventDefault();
+    const form = event.target;
+    const formData = new FormData(form);
+    const data = Object.fromEntries(formData.entries());
 
-    const idInput = document.createElement('input');
-    idInput.type = 'hidden';
-    idInput.name = 'task_progress_id';
-    idInput.value = taskProgressId;
-    form.appendChild(idInput);
+    // Since api/tasks.php handles 'update_progress', we can hit it
+    try {
+        const response = await fetch('../api/tasks.php', {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+                'X-Requested-With': 'XMLHttpRequest'
+            },
+            body: JSON.stringify(data)
+        });
 
-    document.body.appendChild(form);
-    form.submit();
+        const result = await response.json();
+        if (result.success) {
+            alert('Progress berhasil disimpan!');
+            // Update the task_progress_id dynamically so they can request approval immediately
+            // But api/tasks.php doesn't return the ID, so we might just advise them to close and reload if needed,
+            // or we assume it's fine. For now, just alert success.
+        } else {
+            alert(result.message || 'Error saving progress');
+        }
+    } catch (e) {
+        console.error(e);
+        alert('Terjadi kesalahan jaringan');
+    }
 }
 
 function closeModal() {
     document.getElementById('modal-overlay').classList.remove('open');
+    // Reload to refresh the background task list
+    location.reload();
 }
 
-function setSegProgress(value) {
+function adjustProgress(diff, numericTarget) {
+    if (userRole === 'lead') return;
     const hiddenInput = document.getElementById('prog-slider');
-    const display = document.getElementById('seg-progress-value');
-    const barFill = document.getElementById('seg-progress-bar-fill');
-    const segments = document.querySelectorAll('.seg-progress-seg');
-
-    if (hiddenInput) hiddenInput.value = value;
-    if (display) {
-        display.textContent = value + '%';
-        display.classList.remove('exceed', 'good', 'below', 'pending');
-        if (value >= 100) display.classList.add('exceed');
-        else if (value >= 80) display.classList.add('good');
-        else if (value > 0) display.classList.add('below');
-        else display.classList.add('pending');
-    }
-    if (barFill) barFill.style.width = value + '%';
+    const display = document.getElementById('progress-display-value');
+    if(!hiddenInput || !display) return;
     
+    let maxVal = numericTarget > 0 ? numericTarget : 100;
+    
+    let val = parseInt(hiddenInput.value) || 0;
+    val += diff;
+    if(val < 0) val = 0;
+    if(val > maxVal) val = maxVal;
+    
+    hiddenInput.value = val;
+    display.textContent = val;
+
+    const btnMinus = document.getElementById('minusBtn');
+    const btnPlus = document.getElementById('plusBtn');
+    if(btnMinus) btnMinus.disabled = (val <= 0);
+    if(btnPlus) btnPlus.disabled = (val >= maxVal);
+
+    const approvalSection = document.getElementById('approval-section');
     const btnRequest = document.getElementById('btn-request-approval');
-    if (btnRequest) {
-        const isSubmitted = btnRequest.innerText.includes('Status:');
-        if (value >= 100 && !isSubmitted) {
-            btnRequest.disabled = false;
-            btnRequest.style.opacity = '1';
-            btnRequest.style.cursor = 'pointer';
+    if (approvalSection && btnRequest) {
+        const isSubmitted = btnRequest.innerText.includes('Status:') || btnRequest.innerText.includes('WAITING');
+        if (val >= maxVal || isSubmitted) {
+            approvalSection.style.display = 'block';
+            btnRequest.disabled = isSubmitted;
         } else {
-            btnRequest.disabled = true;
-            btnRequest.style.opacity = '0.5';
-            btnRequest.style.cursor = 'not-allowed';
+            approvalSection.style.display = 'none';
         }
     }
-
-    segments.forEach(seg => {
-        const segVal = parseInt(seg.dataset.value);
-        seg.classList.remove('active', 'exceed', 'good', 'below');
-        if (segVal <= value) {
-            seg.classList.add('active');
-            if (value >= 100) seg.classList.add('exceed');
-            else if (value >= 80) seg.classList.add('good');
-            else if (value > 0) seg.classList.add('below');
-        }
-    });
 }
 </script>
 <?php include __DIR__ . '/../includes/layout_footer.php'; ?>

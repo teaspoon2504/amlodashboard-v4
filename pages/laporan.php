@@ -58,6 +58,19 @@ $progress_map = [];
 foreach ($progress_records as $pr) {
     $progress_map[$pr['user_id']][$pr['template_id']][$pr['bulan']] = $pr;
 }
+// 4. Get ALL targets for target officers
+$targets_records = db_fetch_all(
+    "SELECT user_id, task_template_id, bulan, target_value 
+     FROM task_targets 
+     WHERE user_id IN ($placeholders) AND tahun = ?",
+    $query_params
+);
+
+$targets_map = [];
+foreach ($targets_records as $tg) {
+    $targets_map[$tg['user_id']][$tg['task_template_id']][$tg['bulan']] = $tg['target_value'];
+}
+
 
 // 4. Build $display_tasks array
 $default_prog = [
@@ -77,7 +90,7 @@ foreach ($target_officers as $officer) {
             for ($m = 1; $m <= 12; $m++) {
                 $t = $tt;
                 if (stripos($t['nama'], 'Monthly') !== false) {
-                    $t['nama'] = str_ireplace('Monthly', $nama_bulan[$m] . ' ' . $period['tahun'], $t['nama']);
+                    $t['nama'] = str_ireplace('Monthly', '- ' . $nama_bulan[$m] . ' ' . $period['tahun'], $t['nama']);
                 } else {
                     $t['nama'] .= ' - ' . $nama_bulan[$m] . ' ' . $period['tahun'];
                 }
@@ -87,6 +100,7 @@ foreach ($target_officers as $officer) {
                 
                 $prog = $progress_map[$uid][$tt['id']][$m] ?? $default_prog;
                 $t = array_merge($t, $prog);
+                $t['numeric_target'] = $targets_map[$uid][$tt['id']][$m] ?? 0;
                 $t['officer_id'] = $uid;
                 $t['officer_nama'] = $unama;
                 $display_tasks[] = $t;
@@ -105,6 +119,7 @@ foreach ($target_officers as $officer) {
                 
                 $prog = $progress_map[$uid][$tt['id']][$m] ?? $default_prog;
                 $t = array_merge($t, $prog);
+                $t['numeric_target'] = $targets_map[$uid][$tt['id']][$m] ?? 0;
                 $t['officer_id'] = $uid;
                 $t['officer_nama'] = $unama;
                 $display_tasks[] = $t;
@@ -123,6 +138,7 @@ foreach ($target_officers as $officer) {
                 
                 $prog = $progress_map[$uid][$tt['id']][$m] ?? $default_prog;
                 $t = array_merge($t, $prog);
+                $t['numeric_target'] = $targets_map[$uid][$tt['id']][$m] ?? 0;
                 $t['officer_id'] = $uid;
                 $t['officer_nama'] = $unama;
                 $display_tasks[] = $t;
@@ -141,6 +157,7 @@ foreach ($target_officers as $officer) {
             
             $prog = $progress_map[$uid][$tt['id']][$m] ?? $default_prog;
             $t = array_merge($t, $prog);
+            $t['numeric_target'] = $targets_map[$uid][$tt['id']][$m] ?? 0;
             $t['officer_id'] = $uid;
             $t['officer_nama'] = $unama;
             $display_tasks[] = $t;
@@ -262,15 +279,19 @@ include __DIR__ . '/../includes/layout_header.php';
                             <?php $no = 1; foreach ($tasks as $t): ?>
                                 <?php
                                 $progress = (int)($t['progress'] ?? 0);
+                                $target = (int)($t['numeric_target'] ?? 0);
+                                $actual_target = $target > 0 ? $target : 100;
+                                $percent = $actual_target > 0 ? min(100, round(($progress / $actual_target) * 100)) : 0;
+                                
                                 $periode = $t['periode'];
                                 
                                 $isTriSemZero = ($progress === 0 && ($periode === 'triwulan' || $periode === 'semesteran'));
                                 $isAdhocZero = ($progress === 0 && $periode === 'adhoc');
 
                                 $subStatus = $t['submission_status'] ?? null;
-                                $perf = $progress >= 100 ? ($subStatus === 'pending' ? 'Waiting Approval' : 'Exceed') : ($progress >= 80 ? 'Good' : ($progress > 0 ? 'Below' : 'Pending'));
-                                $perfClass = $perf === 'Exceed' ? 'perf-exceed' : ($perf === 'Waiting Approval' ? 'perf-waiting' : ($perf === 'Good' ? 'perf-good' : ($perf === 'Pending' ? 'perf-pending' : 'perf-below')));
-                                $barClass = $progress >= 100 ? 'bar-exceed' : ($progress >= 80 ? 'bar-good' : 'bar-below');
+                                $perf = $subStatus === 'pending' ? 'Waiting Approval' : ($percent >= 100 ? 'Exceed' : ($percent >= 80 ? 'Good' : ($progress > 0 ? 'Below' : 'Not started')));
+                                $perfClass = $perf === 'Exceed' ? 'perf-exceed' : ($perf === 'Waiting Approval' ? 'perf-waiting' : ($perf === 'Good' ? 'perf-good' : ($perf === 'Not started' ? 'perf-pending' : 'perf-below')));
+                                $barClass = $percent >= 100 ? 'bar-exceed' : ($percent >= 80 ? 'bar-good' : 'bar-below');
                                 ?>
                                 <tr class="laporan-row" data-kategori="<?= e($t['kategori']) ?>" data-periode="<?= e($t['periode']) ?>" data-bulan="<?= e($t['vis_bulan']) ?>" data-officer="<?= e($t['officer_id']) ?>">
                                     <td style="color:var(--steel)"><?= $no++ ?></td>
@@ -286,9 +307,9 @@ include __DIR__ . '/../includes/layout_header.php';
                                         <?php else: ?>
                                             <div style="display:flex;align-items:center;gap:8px">
                                                 <div class="mini-progress">
-                                                    <div class="mini-progress-bar <?= $barClass ?>" style="width:<?= $progress ?>%"></div>
+                                                    <div class="mini-progress-bar <?= $barClass ?>" style="width:<?= $percent ?>%"></div>
                                                 </div>
-                                                <span style="font-family:monospace;font-weight:700;color:<?= $progress >= 80 ? 'var(--success)' : ($progress >= 50 ? 'var(--attention)' : 'var(--critical)') ?>"><?= $progress ?>%</span>
+                                                <span style="font-family:monospace;font-weight:700;color:<?= $percent >= 80 ? 'var(--success)' : ($percent >= 50 ? 'var(--attention)' : 'var(--critical)') ?>"><?= $percent ?>%</span>
                                             </div>
                                         <?php endif; ?>
                                     </td>

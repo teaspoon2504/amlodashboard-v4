@@ -7,7 +7,7 @@ $nav_items = get_nav_items($user['role']);
 ?>
 <div class="sidebar">
     <div class="sidebar-header">
-        <div class="sidebar-brand">AMLO Dashboard<span><?= e($user['kanwil_nama']) ?></span></div>
+        <div class="sidebar-brand">AMLO Dashboard<span><?= $user['role'] === 'ho' ? 'Kantor Pusat' : e($user['kanwil_nama'] ?? 'Unknown Regional Office') ?></span></div>
     </div>
 
     <nav class="sidebar-nav" id="sidebar-nav">

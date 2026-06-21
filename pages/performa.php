@@ -38,6 +38,17 @@ foreach ($progress_records as $pr) {
     $progress_map[$pr['template_id']][$pr['bulan']] = $pr;
 }
 
+$targets_records = db_fetch_all(
+    "SELECT task_template_id, bulan, target_value 
+     FROM task_targets 
+     WHERE user_id = ? AND tahun = ?",
+    [$user['id'], $req_tahun]
+);
+$targets_map = [];
+foreach ($targets_records as $tg) {
+    $targets_map[$tg['task_template_id']][$tg['bulan']] = $tg['target_value'];
+}
+
 // Build visible tasks for req_bulan
 $all_templates = db_fetch_all("SELECT * FROM task_templates WHERE is_active = 1 ORDER BY kategori, nama");
 $nama_bulan = [1=>'Januari',2=>'Februari',3=>'Maret',4=>'April',5=>'Mei',6=>'Juni',7=>'Juli',8=>'Agustus',9=>'September',10=>'Oktober',11=>'November',12=>'Desember'];
@@ -53,7 +64,7 @@ foreach ($all_templates as $tt) {
     if ($tt['periode'] === 'bulanan') {
         $m = $req_bulan;
         if (stripos($t['nama'], 'Monthly') !== false) {
-            $t['nama'] = str_ireplace('Monthly', $nama_bulan[$m] . ' ' . $req_tahun, $t['nama']);
+            $t['nama'] = str_ireplace('Monthly', '- ' . $nama_bulan[$m] . ' ' . $req_tahun, $t['nama']);
         } else {
             $t['nama'] .= ' - ' . $nama_bulan[$m] . ' ' . $req_tahun;
         }
@@ -91,7 +102,11 @@ foreach ($all_templates as $tt) {
     }
 
     if ($is_visible) {
-        $t['progress'] = $prog;
+        $target = $targets_map[$tt['id']][$m] ?? 0;
+        $actual_target = $target > 0 ? $target : 100;
+        $percent = $actual_target > 0 ? min(100, round(($prog / $actual_target) * 100)) : 0;
+        
+        $t['progress'] = $percent;
         $visible_tasks[] = $t;
     }
 }
@@ -143,6 +158,15 @@ if ($user['role'] === 'lead' || $user['role'] === 'ho') {
         $team_prog_map[$pr['user_id']][$pr['template_id']][$pr['bulan']] = $pr;
     }
 
+    $team_target_records = db_fetch_all(
+        "SELECT user_id, task_template_id, bulan, target_value FROM task_targets WHERE user_id IN ($placeholders) AND tahun = ?",
+        $params
+    );
+    $team_targets_map = [];
+    foreach ($team_target_records as $tg) {
+        $team_targets_map[$tg['user_id']][$tg['task_template_id']][$tg['bulan']] = $tg['target_value'];
+    }
+
     foreach ($officers as $off) {
         $uid = $off['id'];
         $o_visible = [];
@@ -190,6 +214,11 @@ if ($user['role'] === 'lead' || $user['role'] === 'ho') {
             }
             
             if ($is_visible) {
+                $target = $team_targets_map[$uid][$tt['id']][$m] ?? 0;
+                $actual_target = $target > 0 ? $target : 100;
+                $percent = $actual_target > 0 ? min(100, round(($prog / $actual_target) * 100)) : 0;
+                $prog = $percent;
+
                 $sum_prog += $prog;
                 $total_tugas++;
                 
@@ -279,8 +308,8 @@ include __DIR__ . '/../includes/layout_header.php';
                 <?php endif; ?>
             </form>
 
-            <div class="two-col">
-                <div class="card" style="text-align:center; display:flex; flex-direction:column; justify-content:center; align-items:center;">
+            <div class="two-col performa-layout">
+                <div class="card" style="text-align:center; display:flex; flex-direction:column; align-items:center;">
                     <div class="card-header" style="width:100%; justify-content:center; margin-bottom: 20px;">
                         <?php
                         $ho_title = 'Skor Performa Agregat';
@@ -340,34 +369,45 @@ include __DIR__ . '/../includes/layout_header.php';
                         </thead>
                         <tbody>
                             <?php 
-                            $group_def = [
-                                'Skor Validasi STR/Alert' => ['A','B','F'],
-                                'Skor Kepatuhan RBA' => ['C','G','H'],
-                                'Skor Kualitas Data CDD' => ['D','E','J','K'],
-                                'Skor Respon Instruksi' => ['I']
+                            $group_def_names = [
+                                'Skor Suspicious Transaction Report' => [
+                                    'STR Proaktif',
+                                    'Tindak Lanjut Alert STR'
+                                ],
+                                'Skor Kualitas Data' => [
+                                    'Pengkinian Bad Data',
+                                    'Pengkinian CIF ganda',
+                                    'Pengkinian data Beneficial Owner',
+                                    'Pengkinian data nasabah',
+                                    'Tindak Lanjut PEP Sistem AML CFT CPF',
+                                    'Adhoc Enhanced Due Diligence (EDD)',
+                                    'Adhoc RFI Remittance'
+                                ]
                             ];
 
                             $grouped_tasks = [];
-                            foreach ($group_def as $gname => $cats) {
+                            foreach ($group_def_names as $gname => $names) {
                                 $grouped_tasks[$gname] = ['tasks' => [], 'total' => 0, 'count' => 0];
                             }
-                            $grouped_tasks['Lainnya'] = ['tasks' => [], 'total' => 0, 'count' => 0];
+                            $grouped_tasks['Skor lainnya'] = ['tasks' => [], 'total' => 0, 'count' => 0];
 
                             foreach ($visible_tasks as $t) {
                                 $found = false;
-                                foreach ($group_def as $gname => $cats) {
-                                    if (in_array($t['kategori'], $cats)) {
-                                        $grouped_tasks[$gname]['tasks'][] = $t;
-                                        $grouped_tasks[$gname]['total'] += $t['progress'];
-                                        $grouped_tasks[$gname]['count']++;
-                                        $found = true;
-                                        break;
+                                foreach ($group_def_names as $gname => $names) {
+                                    foreach ($names as $n) {
+                                        if (stripos($t['nama'], $n) !== false) {
+                                            $grouped_tasks[$gname]['tasks'][] = $t;
+                                            $grouped_tasks[$gname]['total'] += $t['progress'];
+                                            $grouped_tasks[$gname]['count']++;
+                                            $found = true;
+                                            break 2;
+                                        }
                                     }
                                 }
                                 if (!$found) {
-                                    $grouped_tasks['Lainnya']['tasks'][] = $t;
-                                    $grouped_tasks['Lainnya']['total'] += $t['progress'];
-                                    $grouped_tasks['Lainnya']['count']++;
+                                    $grouped_tasks['Skor lainnya']['tasks'][] = $t;
+                                    $grouped_tasks['Skor lainnya']['total'] += $t['progress'];
+                                    $grouped_tasks['Skor lainnya']['count']++;
                                 }
                             }
                             
@@ -396,7 +436,7 @@ include __DIR__ . '/../includes/layout_header.php';
                                             $perf_label = 'Belum ada tugas adhoc';
                                             $perf_cls = 'perf-pending';
                                         } else {
-                                            $perf_label = 'Pending';
+                                            $perf_label = 'Not started';
                                             $perf_cls = 'perf-pending';
                                         }
                                     } else {
@@ -428,15 +468,15 @@ include __DIR__ . '/../includes/layout_header.php';
                         <th>Wilayah</th>
                         <th>Selesai</th>
                         <th>In Progress</th>
-                        <th>Pending</th>
+                        <th>Not started</th>
                         <th>Skor</th>
                         <th>Performance</th>
                     </tr></thead>
                     <tbody>
                         <?php foreach ($team_perf as $o):
                             $score = (int)($o['avg_progress'] ?? 0);
-                            $perf_label = $score >= 100 ? 'Exceed' : ($score >= 80 ? 'Good' : ($score > 0 ? 'Below' : 'Pending'));
-                            $perf_cls = $perf_label === 'Exceed' ? 'perf-exceed' : ($perf_label === 'Good' ? 'perf-good' : ($perf_label === 'Pending' ? 'perf-pending' : 'perf-below'));
+                            $perf_label = $score >= 100 ? 'Exceed' : ($score >= 80 ? 'Good' : ($score > 0 ? 'Below' : 'Not started'));
+                            $perf_cls = $perf_label === 'Exceed' ? 'perf-exceed' : ($perf_label === 'Good' ? 'perf-good' : ($perf_label === 'Not started' ? 'perf-pending' : 'perf-below'));
                             $color_done = $o['tugas_selesai'] > 0 ? 'var(--success)' : 'var(--steel)';
                             $color_prog = $o['tugas_progress'] > 0 ? 'var(--attention)' : 'var(--steel)';
                             $color_pend = $o['tugas_pending'] > 0 ? 'var(--critical)' : 'var(--steel)';

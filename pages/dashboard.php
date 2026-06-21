@@ -95,16 +95,12 @@ foreach ($all_templates as $tt) {
         
         if ($count_in_total) {
             $kpi_gold++;
-            if ($prog >= 100) {
-                if ($sub_status === 'pending') {
-                    $kpi_waiting++;
-                } elseif ($sub_status === 'approved') {
-                    $kpi_green++;
-                } else {
-                    $kpi_teal++; // 100% but not yet submitted
-                }
-            } elseif ($prog > 0 && $prog < 100) {
-                $kpi_teal++;
+            if ($sub_status === 'pending') {
+                $kpi_waiting++;
+            } elseif ($sub_status === 'approved') {
+                $kpi_green++;
+            } elseif ($prog > 0) {
+                $kpi_teal++; // In progress or reached target but not submitted
             }
         }
         
@@ -264,7 +260,7 @@ include __DIR__ . '/../includes/layout_header.php';
                     <div class="kpi-card red">
                         <div class="kpi-details">
                             <div class="kpi-card-icon">⏳</div>
-                            <div class="kpi-label">Pending</div>
+                            <div class="kpi-label">Not started</div>
                             <div class="kpi-sub">⚠️ Perlu perhatian</div>
                         </div>
                         <div class="kpi-value"><?= $kpi_red ?></div>
@@ -275,7 +271,7 @@ include __DIR__ . '/../includes/layout_header.php';
                     <div class="kpi-card gold">
                         <div class="kpi-details">
                             <div class="kpi-card-icon">👥</div>
-                            <div class="kpi-label">Officer Tim</div>
+                            <div class="kpi-label">AMLO member</div>
                             <div class="kpi-sub">📍 <?= e($user['kanwil_nama']) ?></div>
                         </div>
                         <div class="kpi-value"><?= count($team_tasks) ?></div>
@@ -300,7 +296,7 @@ include __DIR__ . '/../includes/layout_header.php';
                         <div class="kpi-details">
                             <div class="kpi-card-icon">❗</div>
                             <div class="kpi-label">Below</div>
-                            <div class="kpi-sub">⚡ Coaching</div>
+                            <div class="kpi-sub">⚡ Butuh Coaching</div>
                         </div>
                         <div class="kpi-value"><?= count(array_filter($team_tasks, fn($t) => $t['summary']['done'] + $t['summary']['approved'] < 5)) ?></div>
                     </div>
@@ -310,7 +306,7 @@ include __DIR__ . '/../includes/layout_header.php';
                     <div class="kpi-card gold">
                         <div class="kpi-details">
                             <div class="kpi-card-icon">🌐</div>
-                            <div class="kpi-label">Total Kanwil</div>
+                            <div class="kpi-label">Total Regional Office</div>
                             <div class="kpi-sub">📍 Seluruh Indonesia</div>
                         </div>
                         <div class="kpi-value"><?= count($wilayah_data) ?></div>
@@ -318,26 +314,26 @@ include __DIR__ . '/../includes/layout_header.php';
                     <div class="kpi-card green">
                         <div class="kpi-details">
                             <div class="kpi-card-icon">✅</div>
-                            <div class="kpi-label">Exceed</div>
-                            <div class="kpi-sub">↑ Wilayah berprestasi</div>
+                            <div class="kpi-label">RO Exceed</div>
+                            <div class="kpi-sub">↑ RO berprestasi</div>
                         </div>
                         <div class="kpi-value"><?= count(array_filter($wilayah_data, fn($w) => $w['exceed_count'] > $w['below_count'])) ?></div>
                     </div>
                     <div class="kpi-card teal">
                         <div class="kpi-details">
                             <div class="kpi-card-icon">👤</div>
-                            <div class="kpi-label">Total Officer</div>
-                            <div class="kpi-sub">📊 Kanwil se-Indonesia</div>
+                            <div class="kpi-label">Total AML Officer</div>
+                            <div class="kpi-sub">📊 AMLO Aktif</div>
                         </div>
                         <div class="kpi-value"><?= array_sum(array_column($wilayah_data, 'total_officer')) ?></div>
                     </div>
-                    <div class="kpi-card red">
+                    <div class="kpi-card blue">
                         <div class="kpi-details">
-                            <div class="kpi-card-icon">⚠️</div>
-                            <div class="kpi-label">Butuh Perhatian</div>
-                            <div class="kpi-sub">🔴 Intervensi segera</div>
+                            <div class="kpi-card-icon">🌟</div>
+                            <div class="kpi-label">AMLO Exceed</div>
+                            <div class="kpi-sub">✅ AMLO berprestasi</div>
                         </div>
-                        <div class="kpi-value"><?= count(array_filter($wilayah_data, fn($w) => $w['below_count'] > 0)) ?></div>
+                        <div class="kpi-value"><?= array_sum(array_column($wilayah_data, 'exceed_count')) ?></div>
                     </div>
                 </div>
             <?php endif; ?>
@@ -410,7 +406,7 @@ include __DIR__ . '/../includes/layout_header.php';
                             "SELECT task_name, due_date, status FROM assignments 
                              WHERE YEAR(due_date) = ? AND MONTH(due_date) = ? 
                              AND (from_user_id = ? OR to_user_id = ?)
-                             AND task_name IN ('RFI Remittance', 'Adhoc EDD', 'Pendampingan AML')",
+                             AND task_name IN ('Adhoc RFI Remittance', 'Adhoc EDD', 'Adhoc Pendampingan AML')",
                             [$tahun, $bulan, $user['id'], $user['id']]
                         );
                         foreach ($cal_assignments as $ca) {
@@ -532,39 +528,7 @@ include __DIR__ . '/../includes/layout_header.php';
                     ?>
                 </div>
 
-                <div class="card">
-                    <div class="card-header">
-                        <div class="card-title">🏆 Scorecard Kinerja</div>
-                    </div>
-                    <div class="score-grid">
-                        <div class="score-item">
-                            <div class="score-ring high"><?= $perf['exceed'] ?></div>
-                            <div class="score-label">Exceed<br>≥100%</div>
-                        </div>
-                        <div class="score-item">
-                            <div class="score-ring <?= $perf['good'] >= 5 ? 'high' : 'mid' ?>"><?= $perf['good'] ?></div>
-                            <div class="score-label">Good<br>≥80%</div>
-                        </div>
-                        <div class="score-item">
-                            <div class="score-ring low"><?= $perf['below'] ?></div>
-                            <div class="score-label">Below<br>&lt;80%</div>
-                        </div>
-                        <div class="score-item">
-                            <div class="score-ring <?= $perf['pending'] > 0 ? 'low' : 'mid' ?>"><?= $perf['pending'] ?></div>
-                            <div class="score-label">Pending<br>0%</div>
-                        </div>
-                    </div>
-                    <div class="separator"></div>
-                    <div class="overall-score">
-                        <div class="overall-label">Skor Keseluruhan</div>
-                        <div class="overall-value"><?= $perf['average_progress'] ?>%</div>
-                        <div>
-                            <span class="overall-badge <?= $perf['average_progress'] >= 80 ? 'success' : 'critical' ?>">
-                                <?= $perf['average_progress'] >= 80 ? '👍 Good Performance' : '⚠️ Perlu Perbaikan' ?>
-                            </span>
-                        </div>
-                    </div>
-                </div>
+
             </div>
         </div>
 

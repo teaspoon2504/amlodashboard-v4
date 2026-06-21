@@ -19,8 +19,8 @@ include __DIR__ . '/../includes/layout_header.php';
 
 <div class="content">
             <div class="page-header">
-                <h2>Monitoring Seluruh Kantor Wilayah</h2>
-                <p><?= count($wilayah_data) ?> Kantor Wilayah — Kinerja AML Nasional</p>
+                <h2>Monitoring Seluruh Regional Office</h2>
+                <p>Kinerja <?= count($wilayah_data) ?> Regional Office</p>
             </div>
 
             <?php
@@ -44,33 +44,33 @@ include __DIR__ . '/../includes/layout_header.php';
             ?>
 
             <div class="kpi-grid">
-                <div class="kpi-card gold">
-                    <span class="kpi-icon">🌐</span>
-                    <div class="kpi-label">Total Kanwil</div>
-                    <div class="kpi-value gold"><?= count($wilayah_data) ?></div>
-                    <div class="kpi-sub">Seluruh Indonesia</div>
-                </div>
                 <div class="kpi-card teal">
                     <span class="kpi-icon">👤</span>
                     <div class="kpi-label">Total AMLO Officer</div>
                     <div class="kpi-value teal"><?= $total_officer ?></div>
-                    <div class="kpi-sub">Kanwil aktif</div>
+                    <div class="kpi-sub">Regional Office aktif</div>
+                </div>
+                <div class="kpi-card gold">
+                    <span class="kpi-icon">🌐</span>
+                    <div class="kpi-label">Total RO</div>
+                    <div class="kpi-value gold"><?= count($wilayah_data) ?></div>
+                    <div class="kpi-sub">Seluruh Indonesia</div>
                 </div>
                 <div class="kpi-card green">
                     <span class="kpi-icon">⭐</span>
-                    <div class="kpi-label">Wilayah Exceed</div>
+                    <div class="kpi-label">RO Exceed</div>
                     <div class="kpi-value green"><?= $exceed_wilayah ?></div>
                     <div class="kpi-sub">↑ Performanya di atas target</div>
                 </div>
                 <div class="kpi-card blue">
                     <span class="kpi-icon">👍</span>
-                    <div class="kpi-label">Wilayah Good</div>
+                    <div class="kpi-label">RO Good</div>
                     <div class="kpi-value blue"><?= $good_wilayah ?></div>
                     <div class="kpi-sub">✓ Sesuai standar performa</div>
                 </div>
                 <div class="kpi-card red">
                     <span class="kpi-icon">⚠️</span>
-                    <div class="kpi-label">Wilayah Below</div>
+                    <div class="kpi-label">RO Below</div>
                     <div class="kpi-value red"><?= $below_wilayah ?></div>
                     <div class="kpi-sub">🔴 Perlu intervensi</div>
                 </div>
@@ -78,13 +78,13 @@ include __DIR__ . '/../includes/layout_header.php';
 
             <div class="card">
                 <div class="card-header">
-                    <div class="card-title">📊 Scorecard Kinerja per Kantor Wilayah</div>
+                    <div class="card-title">📊 Scorecard Kinerja per Regional Office</div>
                 </div>
                 <table class="wilayah-table">
                     <thead>
                         <tr>
                             <th>Kode</th>
-                            <th>Kantor Wilayah</th>
+                            <th>Regional Office</th>
                             <th>AMLO</th>
                             <th>Exceed</th>
                             <th>Good</th>

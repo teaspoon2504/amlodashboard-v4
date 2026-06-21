@@ -29,3 +29,4 @@ logs/
 # Optional: Configuration files with sensitive data
 # Jika config/database.php berisi password server produksi, uncomment baris di bawah ini:
 # config/database.php
+production

@@ -93,7 +93,7 @@ include __DIR__ . '/../includes/layout_header.php';
 
 <div class="content">
             <div class="page-header">
-                <h2>Job Description AMLO — Kantor Wilayah</h2>
+                <h2>Job Description AMLO — Regional Office</h2>
                 <p><?= count($job_categories) ?> Kategori · Berdasarkan POJK 8/2023</p>
             </div>
 
@@ -127,7 +127,7 @@ include __DIR__ . '/../includes/layout_header.php';
                 <div class="kpi-card red">
                     <div class="kpi-label">Struktur</div>
                     <div class="kpi-value red" style="font-size:16px">3 Tier</div>
-                    <div class="kpi-sub">KP → Kanwil → Kanca</div>
+                    <div class="kpi-sub">KP → Regional Office → Kanca</div>
                 </div>
             </div>
 

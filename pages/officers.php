@@ -216,7 +216,7 @@ include __DIR__ . '/../includes/layout_header.php';
                             </div>
                             <div class="officer-info">
                                 <h3><?= e($o['nama']) ?></h3>
-                                <p><?= $user['role'] === 'ho' ? e($o['kanwil_nama']) : 'Kanwil Anda' ?></p>
+                                <p><?= $user['role'] === 'ho' ? e($o['kanwil_nama']) : 'Regional Office Anda' ?></p>
                             </div>
                         </div>
                         <div class="officer-stats">

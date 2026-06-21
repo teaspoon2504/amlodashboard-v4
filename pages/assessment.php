@@ -33,7 +33,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && verify_csrf_token($_POST['csrf_toke
                     [$latest_task['id'], $user['id'], 'ho', "$penilaian: $isi"
                 ]);
                 log_activity('ho_feedback', "HO feedback for user $to_user_id");
-                $_SESSION['flash'] = ['type' => 'success', 'message' => 'Feedback berhasil dikirim ke Kantor Wilayah!'];
+                $_SESSION['flash'] = ['type' => 'success', 'message' => 'Feedback berhasil dikirim ke Regional Office!'];
             }
         }
 
@@ -92,22 +92,22 @@ include __DIR__ . '/../includes/layout_header.php';
 
     <div class="page-header">
         <h2>Assessment & Feedback Kantor Pusat</h2>
-        <p>Review submissions dan berikan feedback untuk seluruh Kanwil</p>
+        <p>Review submissions dan berikan feedback untuk seluruh Regional Office</p>
     </div>
 
     <div class="two-col">
         <div class="card">
             <div class="card-header">
-                <div class="card-title">📝 Beri Feedback ke Kanwil</div>
+                <div class="card-title">📝 Beri Feedback ke Regional Office</div>
             </div>
             <form method="POST" action="assessment.php">
                 <input type="hidden" name="csrf_token" value="<?= e($csrf_token) ?>">
                 <input type="hidden" name="action" value="give_feedback">
 
                 <div class="input-group">
-                    <label class="input-label">Pilih Kantor Wilayah</label>
+                    <label class="input-label">Pilih Regional Office</label>
                     <select name="kanwil_id" class="select-field" onchange="loadOfficers(this.value)" id="kanwil-select">
-                        <option value="">-- Pilih Kanwil --</option>
+                        <option value="">-- Pilih Regional Office --</option>
                         <?php foreach ($wilayah_list as $kw): ?>
                             <option value="<?= $kw['id'] ?>"><?= e($kw['kode']) ?> — <?= e($kw['nama']) ?></option>
                         <?php endforeach; ?>
@@ -132,7 +132,7 @@ include __DIR__ . '/../includes/layout_header.php';
 
                 <div class="input-group">
                     <label class="input-label">Catatan / Feedback</label>
-                    <textarea name="isi" class="textarea-field" placeholder="Tulis feedback untuk Kanwil..." required></textarea>
+                    <textarea name="isi" class="textarea-field" placeholder="Tulis feedback untuk Regional Office..." required></textarea>
                 </div>
 
                 <?= render_ds_button([

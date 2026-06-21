@@ -28,7 +28,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && verify_csrf_token($_POST['csrf_toke
         $adhoc_map = [
             'RFI Remittance' => 10,
             'Adhoc EDD' => 12,
-            'Pendampingan AML' => 13
+            'Adhoc Pendampingan AML' => 13
         ];
 
         if (isset($adhoc_map[$task_name])) {
@@ -116,7 +116,7 @@ include __DIR__ . '/../includes/layout_header.php';
                                 <option value="">-- Pilih Jenis Tugas --</option>
                                 <option>RFI Remittance</option>
                                 <option>Adhoc EDD</option>
-                                <option>Pendampingan AML</option>
+                                <option>Adhoc Pendampingan AML</option>
                                 <option>STR Proaktif</option>
                                 <option>PEP Target</option>
                                 <option>Bad Data Monitoring</option>

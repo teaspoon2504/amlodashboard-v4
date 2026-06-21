@@ -141,12 +141,14 @@ function get_nav_items($role) {
             ['id' => 'officers', 'icon' => '👥', 'label' => 'Monitoring Officer'],
             ['id' => 'performa', 'icon' => '📈', 'label' => 'Performa Tim'],
             ['id' => 'assignments', 'icon' => '📤', 'label' => 'Penugasan'],
+            ['id' => 'manajemen_tugas', 'icon' => '🎯', 'label' => 'Manajemen Tugas'],
             ['id' => 'jobdesc', 'icon' => '📌', 'label' => 'Job Description']
         ],
         'ho' => [
-            ['id' => 'wilayah', 'icon' => '🗺', 'label' => 'Monitoring Wilayah'],
+            ['id' => 'wilayah', 'icon' => '🗺', 'label' => 'Monitoring RO'],
             ['id' => 'laporan', 'icon' => '📋', 'label' => 'Tracking Laporan'],
             ['id' => 'performa', 'icon' => '📈', 'label' => 'Performa Agregat'],
+            ['id' => 'manajemen_tugas', 'icon' => '🎯', 'label' => 'Manajemen Tugas'],
             ['id' => 'assessment', 'icon' => '📝', 'label' => 'Assessment & Feedback'],
             ['id' => 'jobdesc', 'icon' => '📌', 'label' => 'Job Description']
         ]
@@ -167,6 +169,7 @@ function get_page_title($section) {
         'officers' => 'Monitoring AMLO Officer',
         'assignments' => 'Penugasan Tugas',
         'wilayah' => 'Monitoring Seluruh Wilayah',
+        'manajemen_tugas' => 'Manajemen Target Tugas',
         'assessment' => 'Assessment & Feedback Kanpus',
         'jobdesc' => 'Job Description AMLO'
     ];

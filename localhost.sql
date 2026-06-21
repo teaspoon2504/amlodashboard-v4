@@ -539,7 +539,7 @@ INSERT INTO `task_templates` (`id`, `nama`, `kategori`, `periode`, `tag`, `targe
 (2, 'Alert STR Monthly', 'A', 'bulanan', 'bulanan', 'Target 50 alert bulanan', 'H+1 bulan sejak munculnya alert', 'Link Alert STR', 1, '2026-06-06 15:06:44', '2026-06-06 15:06:44'),
 (3, 'STR Proaktif', 'A', 'bulanan', 'bulanan', 'Jumlah laporan STR proaktif', 'Cut off akhir bulan', 'Inputan AMLO', 1, '2026-06-06 15:06:44', '2026-06-06 15:06:44'),
 (4, 'Bad Data BO (Harian & Bulanan)', 'J', 'harian', 'harian', 'Sesuai data report BO', 'Dibagi sistem (target harian)', 'Report Bad Data BO', 1, '2026-06-06 15:06:44', '2026-06-06 15:06:44'),
-(5, 'Bad Data AML CTR IFTI', 'J', 'bulanan', 'bulanan', 'Sesuai data target + report', 'H+3 running ulang cek update', 'Upload/report bad data CTR IFTI', 1, '2026-06-06 15:06:44', '2026-06-06 15:06:44'),
+(5, 'Pengkinian Bad Data', 'J', 'bulanan', 'bulanan', 'Sesuai data target + report', 'H+3 running ulang cek update', 'Upload/report bad data CTR IFTI', 1, '2026-06-06 15:06:44', '2026-06-06 15:06:44'),
 (6, 'PEP Target', 'K', 'harian', 'harian', 'H+5 hari kerja sejak pemadanan PEP', 'H+5 hari kerja', 'Data PEP yang belum/sudah TL', 1, '2026-06-06 15:06:44', '2026-06-06 15:06:44'),
 (7, 'E-Learning Target', 'H', 'semesteran', 'semesteran', 'Seluruh pekerja TL sesuai target waktu', 'Tgl 10 April & Oktober', 'Input PSA + Progress E-Learning', 1, '2026-06-06 15:06:44', '2026-06-06 15:06:44'),
 (8, 'Sosialisasi AML CFT CPF', 'H', 'semesteran', 'semesteran', 'Min 1x sosialisasi per UKO bina', 'Tgl 10 April & Oktober', 'Inputan AMLO', 1, '2026-06-06 15:06:44', '2026-06-06 15:06:44'),

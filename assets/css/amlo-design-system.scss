@@ -5,28 +5,42 @@
    ============================================ */
 
 :root, [data-theme="dark"] {
-    /* ── Surfaces (dark variant of Meta's light surface system) ── */
-    --canvas: #0b1929;
-    --surface-soft: #122236;
+    /* ── Brand Colors (New Guideline) ── */
+    --primary: #0857C3;
+    --primary-hover: #064499;
+    --primary-soft: rgba(8, 87, 195, 0.15);
+    
+    --secondary: #71C5E8;
+    --secondary-hover: #5ab1d5;
+    --secondary-soft: rgba(113, 197, 232, 0.15);
+
+    /* ── Text Colors ── */
+    --text-primary: #FFFFFF;     
+    --text-secondary: #D4DDE6;   
+    --text-muted: #8A9CAE;       
+    --text-disabled: #455261;    
+
+    /* ── Surface & Background ── */
+    --canvas: #0B1929;
+    --surface: #122236;
+
+    /* ── Backwards Compatibility Mapping ── */
+    --surface-soft: var(--surface);
     --surface-elevated: #1a3352;
     --surface-translucent: rgba(26, 51, 82, 0.6);
     --hairline: rgba(255, 255, 255, 0.08);
     --hairline-soft: rgba(255, 255, 255, 0.05);
 
-    /* ── Text (Meta ink hierarchy — full 7-tier scale) ── */
-    --ink-deep: #f0f4f8;
-    --ink: #d4dde6;
-    --charcoal: #b0bcc8;
-    --slate: #8a9cae;
-    --steel: #7a93ab;
-    --stone: #5d6c7b;
-    --disabled: #455261;
+    --ink-deep: var(--text-primary);
+    --ink: var(--text-secondary);
+    --charcoal: var(--text-muted);
+    --slate: var(--text-muted);
+    --steel: var(--text-muted);
+    --stone: var(--text-muted);
+    --disabled: var(--text-disabled);
 
-    /* ── Brand & Accent (Meta's signature palette) ── */
-    --primary: #0064e0;
-    --primary-deep: #0457cb;
-    --primary-soft: rgba(0, 100, 224, 0.15);
-    --primary-ring: rgba(0, 100, 224, 0.4);
+    --primary-deep: var(--primary-hover);
+    --primary-ring: rgba(8, 87, 195, 0.4);
     --fb-blue: #1876f2;
     --meta-link: #385898;
     --oculus-purple: #a121ce;
@@ -47,11 +61,11 @@
     --critical-strong: #f0284a;
     --critical-bg: rgba(224, 82, 82, 0.15);
 
-    /* ── AMLO brand gold (secondary accent) ── */
+    /* ── Secondary mapping for old accents ── */
     --gold: #c8a84b;
     --gold-soft: rgba(200, 168, 75, 0.15);
-    --teal: #1b8f9e;
-    --teal-light: #25b5c9;
+    --teal: var(--secondary);
+    --teal-light: var(--secondary-hover);
 
     /* ── Spacing tokens (DESIGN.md) ── */
     --s-xxs: 4px;
@@ -98,24 +112,44 @@
 }
 
 [data-theme="light"] {
-    /* ── Surfaces ── */
-    --canvas: #f0f2f5;
-    --surface-soft: #ffffff;
-    --surface-elevated: #ffffff;
+    /* ── Brand Colors ── */
+    --primary: #0857C3; 
+    --primary-hover: #064499;
+    --primary-soft: rgba(8, 87, 195, 0.08);
+    
+    --secondary: #2C9CCF; 
+    --secondary-hover: #2183AF;
+    --secondary-soft: rgba(44, 156, 207, 0.1);
+
+    /* ── Text Colors ── */
+    --text-primary: #121212;     
+    --text-secondary: #4A5568;   
+    --text-muted: #718096;       
+    --text-disabled: #A0AEC0;    
+
+    /* ── Surface & Background ── */
+    --canvas: #F7FAFC;
+    --surface: #FFFFFF;
+
+    /* ── Backwards Compatibility Mapping ── */
+    --surface-soft: var(--surface);
+    --surface-elevated: #FFFFFF;
     --surface-translucent: rgba(255, 255, 255, 0.8);
     --hairline: rgba(0, 0, 0, 0.1);
     --hairline-soft: rgba(0, 0, 0, 0.05);
 
-    /* ── Text ── */
-    --ink-deep: #050505;
-    --ink: #1c1e21;
-    --charcoal: #606770;
-    --slate: #65676B;
-    --steel: #8D949E;
-    --stone: #BEC3C9;
-    --disabled: #E4E6EB;
+    --ink-deep: var(--text-primary);
+    --ink: var(--text-secondary);
+    --charcoal: var(--text-muted);
+    --slate: var(--text-muted);
+    --steel: var(--text-muted);
+    --stone: var(--text-muted);
+    --disabled: var(--text-disabled);
 
-    /* ── Buttons/Misc ── */
+    --primary-deep: var(--primary-hover);
+    --teal: var(--secondary);
+    --teal-light: var(--secondary-hover);
+    
     --ink-button: #050505;
     --ink-button-pressed: #606770;
 }
@@ -319,8 +353,9 @@ a:hover { text-decoration: underline; }
 }
 .nav-item:hover { background: var(--hairline-soft); color: var(--ink-deep); text-decoration: none; }
 .nav-item.active {
-    background: var(--ink-button);
-    color: var(--canvas);
+    background: var(--color-brand-primary);
+    border-radius: var(--s-sm);
+    color: #ffffff;
     font-weight: 700;
 }
 .nav-icon {
@@ -1242,7 +1277,7 @@ a:hover { text-decoration: underline; }
     
             .todo-item { background: var(--hairline); border: 1px solid var(--hairline); border-radius: 12px; padding: 16px; margin-bottom: 10px; transition: all 0.2s; cursor: pointer; }
             .todo-item:hover { border-color: var(--gold-soft); background: var(--gold-soft); }
-            .todo-item.done { }
+
             .todo-item.pending-submit { border-color: var(--attention); }
     
             .todo-row { display: flex; align-items: flex-start; gap: 14px; }
@@ -1474,14 +1509,14 @@ a:hover { text-decoration: underline; }
                 right: -10%;
                 width: 400px;
                 height: 400px;
-                background: radial-gradient(circle, var(--gold-soft) 0%, transparent 70%);
+                background: radial-gradient(circle, var(--primary-soft) 0%, transparent 100%);
                 pointer-events: none;
             }
             .hero-content { position: relative; z-index: 1; }
             .hero-eyebrow {
                 font-size: 12px;
                 font-weight: 700;
-                color: var(--gold);
+                color: var(--primary);
                 text-transform: uppercase;
                 letter-spacing: 1.5px;
                 margin-bottom: var(--s-md);
@@ -1771,8 +1806,8 @@ a:hover { text-decoration: underline; }
     
             .cal-day:hover { background: var(--hairline-soft); color: var(--ink-deep); }
             .cal-day.today {
-                background: var(--ink-button);
-                color: var(--canvas);
+                background: var(--color-brand-primary);
+                color: #ffffff;
                 font-weight: 700;
             }
             .cal-day.has-task::after {
