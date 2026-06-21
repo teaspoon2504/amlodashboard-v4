@@ -224,7 +224,7 @@ $csrf_token = generate_csrf_token();
         <div class="login-card">
             <div class="login-form-wrap">
                 <h2 class="login-form-title">Masuk ke Akun Anda</h2>
-                <p class="login-form-sub">Gunakan kredensial AMLO yang sudah terdaftar</p>
+                <p class="login-form-sub">Gunakan kredensial yang sudah terdaftar</p>
 
                 <?php if ($error): ?>
                     <div class="login-alert login-alert-error" style="margin-top: var(--s-lg)">
@@ -244,7 +244,7 @@ $csrf_token = generate_csrf_token();
                     <div class="form-group">
                         <label class="form-label">Username</label>
                         <input type="text" name="username" class="form-input"
-                               placeholder="contoh: a.nugroho" required autofocus
+                               placeholder="masukan username anda disini" required autofocus
                                value="<?= e($_POST['username'] ?? '') ?>">
                     </div>
 
