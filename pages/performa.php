@@ -277,26 +277,26 @@ include __DIR__ . '/../includes/layout_header.php';
                 <h2>Monitoring Performa AMLO</h2>
             </div>
 
-            <form method="GET" id="filter-form" class="todo-filters-container" style="display: flex; gap: 16px; margin-bottom: 24px; align-items: flex-end; flex-wrap: wrap;">
+            <form method="GET" id="filter-form" class="todo-filters-container cal-filter-form mb-xl">
                 <div>
-                    <label style="font-size: 11px; font-weight: 600; text-transform: uppercase; letter-spacing: 1px; color: var(--steel); margin-bottom: 6px; display: block;">Bulan</label>
-                    <select name="bulan" class="select-field" style="width: 180px; padding: 10px 14px; border-radius: 8px; border: 1px solid var(--hairline); background: var(--surface-soft); color: var(--ink-deep);" onchange="document.getElementById('filter-form').submit()">
+                    <label class="filter-label letter-spacing-1">Bulan</label>
+                    <select name="bulan" class="select-field filter-select w-180" onchange="document.getElementById('filter-form').submit()">
                         <?php for ($m=1; $m<=12; $m++): ?>
                             <option value="<?= $m ?>" <?= $req_bulan == $m ? 'selected' : '' ?>><?= $nama_bulan[$m] ?></option>
                         <?php endfor; ?>
                     </select>
                 </div>
                 <div>
-                    <label style="font-size: 11px; font-weight: 600; text-transform: uppercase; letter-spacing: 1px; color: var(--steel); margin-bottom: 6px; display: block;">Tahun</label>
-                    <select name="tahun" class="select-field" style="width: 140px; padding: 10px 14px; border-radius: 8px; border: 1px solid var(--hairline); background: var(--surface-soft); color: var(--ink-deep);" onchange="document.getElementById('filter-form').submit()">
+                    <label class="filter-label letter-spacing-1">Tahun</label>
+                    <select name="tahun" class="select-field filter-select w-140" onchange="document.getElementById('filter-form').submit()">
                         <option value="2026" <?= $req_tahun == 2026 ? 'selected' : '' ?>>2026</option>
                         <option value="2027" <?= $req_tahun == 2027 ? 'selected' : '' ?>>2027</option>
                     </select>
                 </div>
                 <?php if ($user['role'] === 'ho'): ?>
                 <div>
-                    <label style="font-size: 11px; font-weight: 600; text-transform: uppercase; letter-spacing: 1px; color: var(--steel); margin-bottom: 6px; display: block;">Regional Office</label>
-                    <select name="kanwil_id" class="select-field" style="width: 250px; padding: 10px 14px; border-radius: 8px; border: 1px solid var(--hairline); background: var(--surface-soft); color: var(--ink-deep);" onchange="document.getElementById('filter-form').submit()">
+                    <label class="filter-label letter-spacing-1">Regional Office</label>
+                    <select name="kanwil_id" class="select-field filter-select w-250" onchange="document.getElementById('filter-form').submit()">
                         <option value="0">Semua Regional Office</option>
                         <?php foreach ($all_kanwil as $kw): ?>
                             <option value="<?= $kw['id'] ?>" <?= $req_kanwil == $kw['id'] ? 'selected' : '' ?>>
@@ -309,8 +309,8 @@ include __DIR__ . '/../includes/layout_header.php';
             </form>
 
             <div class="two-col performa-layout">
-                <div class="card" style="text-align:center; display:flex; flex-direction:column; align-items:center;">
-                    <div class="card-header" style="width:100%; justify-content:center; margin-bottom: 20px;">
+                <div class="card perf-aggregate-card">
+                    <div class="card-header perf-aggregate-header">
                         <?php
                         $ho_title = 'Skor Performa Agregat';
                         if ($user['role'] === 'ho' && !empty($selected_kanwil_nama)) {
@@ -329,7 +329,7 @@ include __DIR__ . '/../includes/layout_header.php';
                         $display_avg = round($sum_team / count($team_perf));
                     }
                     ?>
-                    <div style="font-size:64px;font-weight:700;color:var(--gold);font-family:monospace"><?= $display_avg ?>%</div>
+                    <div class="perf-big-score"><?= $display_avg ?>%</div>
                     <?php
                     $avg = $display_avg;
                     if ($avg >= 100) {
@@ -346,15 +346,15 @@ include __DIR__ . '/../includes/layout_header.php';
                         $badge_desc = 'Perlu Perbaikan. Tingkatkan effort.';
                     }
                     ?>
-                    <div style="margin-top:8px">
-                        <span class="perf-badge <?= $badge_class ?>" style="font-size:16px; padding:8px 24px; font-weight:800; letter-spacing:1px; box-shadow: 0 4px 12px rgba(0,0,0,0.1);">
+                    <div class="mt-sm">
+                        <span class="perf-badge <?= $badge_class ?> perf-badge-large">
                             <?= $badge_text ?>
                         </span>
                     </div>
-                    <div style="margin-top:12px; font-size:13px; color:var(--steel); font-weight:500;">
+                    <div class="perf-badge-desc">
                         <?= $badge_desc ?>
                     </div>
-                    <div style="margin-top:24px; font-size:11px; color:var(--steel); font-weight:500;">
+                    <div class="perf-legend-text">
                         Exceed ≥ 100% &nbsp;|&nbsp; Good ≥ 80% &nbsp;|&nbsp; Below &lt; 80%
                     </div>
                 </div>
@@ -371,7 +371,6 @@ include __DIR__ . '/../includes/layout_header.php';
                             <?php 
                             $group_def_names = [
                                 'Skor Suspicious Transaction Report' => [
-                                    'STR Proaktif',
                                     'Tindak Lanjut Alert STR'
                                 ],
                                 'Skor Kualitas Data' => [
@@ -381,7 +380,7 @@ include __DIR__ . '/../includes/layout_header.php';
                                     'Pengkinian data nasabah',
                                     'Tindak Lanjut PEP Sistem AML CFT CPF',
                                     'Adhoc Enhanced Due Diligence (EDD)',
-                                    'Adhoc RFI Remittance'
+                                    'RFI Remittance'
                                 ]
                             ];
 
@@ -415,11 +414,11 @@ include __DIR__ . '/../includes/layout_header.php';
                                 if (empty($gdata['tasks'])) continue;
                                 $gscore = $gdata['count'] > 0 ? round($gdata['total'] / $gdata['count']) : 0;
                             ?>
-                                <tr style="background: rgba(212,175,55,0.05); border-top: 1px solid var(--gold-soft); border-bottom: 1px solid var(--gold-soft);">
+                                <tr class="perf-group-row">
                                     <td colspan="3">
-                                        <div style="display:flex; justify-content:space-between; align-items:center;">
-                                            <div style="font-weight: 700; font-size: 11px; color: var(--ink-deep); text-transform: uppercase; letter-spacing: 0.5px;"><?= e($gname) ?></div>
-                                            <div style="font-weight: 800; font-family: monospace; color: var(--gold); font-size: 14px;"><?= $gscore ?>%</div>
+                                        <div class="perf-group-header">
+                                            <div class="perf-group-title"><?= e($gname) ?></div>
+                                            <div class="perf-group-score"><?= $gscore ?>%</div>
                                         </div>
                                     </td>
                                 </tr>
@@ -445,8 +444,8 @@ include __DIR__ . '/../includes/layout_header.php';
                                     }
                                 ?>
                                     <tr>
-                                        <td style="font-size:11px; padding-left: 24px;"><span style="color:var(--steel); margin-right:4px;">[<?= e($t['kategori']) ?>]</span> <?= e($t['nama']) ?></td>
-                                        <td style="font-family:monospace;font-weight:700"><?= $prog ?>%</td>
+                                        <td class="perf-task-cell"><span class="text-steel mr-xs">[<?= e($t['kategori']) ?>]</span> <?= e($t['nama']) ?></td>
+                                        <td class="perf-score-cell"><?= $prog ?>%</td>
                                         <td><span class="perf-badge <?= $perf_cls ?>"><?= $perf_label ?></span></td>
                                     </tr>
                                 <?php endforeach; ?>
@@ -477,20 +476,17 @@ include __DIR__ . '/../includes/layout_header.php';
                             $score = (int)($o['avg_progress'] ?? 0);
                             $perf_label = $score >= 100 ? 'Exceed' : ($score >= 80 ? 'Good' : ($score > 0 ? 'Below' : 'Not started'));
                             $perf_cls = $perf_label === 'Exceed' ? 'perf-exceed' : ($perf_label === 'Good' ? 'perf-good' : ($perf_label === 'Not started' ? 'perf-pending' : 'perf-below'));
-                            $color_done = $o['tugas_selesai'] > 0 ? 'var(--success)' : 'var(--steel)';
-                            $color_prog = $o['tugas_progress'] > 0 ? 'var(--attention)' : 'var(--steel)';
-                            $color_pend = $o['tugas_pending'] > 0 ? 'var(--critical)' : 'var(--steel)';
                         ?>
                         <tr>
-                            <td><div style="display:flex;align-items:center;gap:8px">
-                                <div style="width:28px;height:28px;border-radius:50%;background:var(--gold-soft);border:1px solid var(--gold);display:flex;align-items:center;justify-content:center;font-size:10px;font-weight:700;color:var(--gold)"><?= strtoupper(substr($o['nama'],0,2)) ?></div>
+                            <td><div class="officer-name-row">
+                                <div class="officer-avatar-gold"><?= strtoupper(substr($o['nama'],0,2)) ?></div>
                                 <?= e($o['nama']) ?>
                             </div></td>
-                            <td><span style="font-size:10px;background:rgba(27,143,158,0.15);color:var(--teal-light);border-radius:4px;padding:2px 8px;font-weight:600"><?= e($o['kanwil_kode']) ?></span> <?= e(substr($o['kanwil_nama'],0,25)) ?></td>
-                            <td style="color:<?= $color_done ?>;font-weight:700"><?= $o['tugas_selesai'] ?></td>
-                            <td style="color:<?= $color_prog ?>;font-weight:700"><?= $o['tugas_progress'] ?></td>
-                            <td style="color:<?= $color_pend ?>;font-weight:700"><?= $o['tugas_pending'] ?></td>
-                            <td style="font-family:monospace;font-weight:700"><?= $score ?>%</td>
+                            <td><span class="wilayah-code-chip"><?= e($o['kanwil_kode']) ?></span> <?= e(substr($o['kanwil_nama'],0,25)) ?></td>
+                            <td class="<?= $o['tugas_selesai'] > 0 ? 'text-success' : 'text-steel' ?> font-bold"><?= $o['tugas_selesai'] ?></td>
+                            <td class="<?= $o['tugas_progress'] > 0 ? 'text-attention' : 'text-steel' ?> font-bold"><?= $o['tugas_progress'] ?></td>
+                            <td class="<?= $o['tugas_pending'] > 0 ? 'text-critical' : 'text-steel' ?> font-bold"><?= $o['tugas_pending'] ?></td>
+                            <td class="perf-score-cell"><?= $score ?>%</td>
                             <td><span class="perf-badge <?= $perf_cls ?>"><?= $perf_label ?></span></td>
                         </tr>
                         <?php endforeach; ?>

@@ -175,18 +175,18 @@ include __DIR__ . '/../includes/layout_header.php';
             <?php 
             $nama_bulan_arr = [1=>'Januari',2=>'Februari',3=>'Maret',4=>'April',5=>'Mei',6=>'Juni',7=>'Juli',8=>'Agustus',9=>'September',10=>'Oktober',11=>'November',12=>'Desember'];
             ?>
-            <form method="GET" id="filter-form" class="todo-filters-container" style="display: flex; gap: 16px; margin-bottom: 24px; align-items: flex-end; flex-wrap: wrap;">
+            <form method="GET" id="filter-form" class="todo-filters-container cal-filter-form mb-xl">
                 <div>
-                    <label style="font-size: 11px; font-weight: 600; text-transform: uppercase; letter-spacing: 1px; color: var(--steel); margin-bottom: 6px; display: block;">Bulan</label>
-                    <select name="bulan" class="select-field" style="width: 180px; padding: 10px 14px; border-radius: 8px; border: 1px solid var(--hairline); background: var(--surface-soft); color: var(--ink-deep);" onchange="document.getElementById('filter-form').submit()">
+                    <label class="filter-label letter-spacing-1">Bulan</label>
+                    <select name="bulan" class="select-field filter-select w-180" onchange="document.getElementById('filter-form').submit()">
                         <?php for ($m=1; $m<=12; $m++): ?>
                             <option value="<?= $m ?>" <?= $req_bulan == $m ? 'selected' : '' ?>><?= $nama_bulan_arr[$m] ?></option>
                         <?php endfor; ?>
                     </select>
                 </div>
                 <div>
-                    <label style="font-size: 11px; font-weight: 600; text-transform: uppercase; letter-spacing: 1px; color: var(--steel); margin-bottom: 6px; display: block;">Tahun</label>
-                    <select name="tahun" class="select-field" style="width: 140px; padding: 10px 14px; border-radius: 8px; border: 1px solid var(--hairline); background: var(--surface-soft); color: var(--ink-deep);" onchange="document.getElementById('filter-form').submit()">
+                    <label class="filter-label letter-spacing-1">Tahun</label>
+                    <select name="tahun" class="select-field filter-select w-140" onchange="document.getElementById('filter-form').submit()">
                         <?php 
                         $current_req_tahun = $period['tahun'];
                         for($y = 2024; $y <= 2030; $y++): ?>
@@ -196,7 +196,7 @@ include __DIR__ . '/../includes/layout_header.php';
                 </div>
             </form>
             
-            <div style="font-size: 13px; font-weight: 600; color: var(--steel); margin-bottom: 16px; padding-bottom: 8px; border-bottom: 1px solid var(--hairline);">
+            <div class="officers-period-subhead">
                 Data Performa: <?= $nama_bulan_arr[$req_bulan] ?> <?= $req_tahun ?>
             </div>
 
@@ -209,9 +209,10 @@ include __DIR__ . '/../includes/layout_header.php';
                     $colors = ['var(--teal)', 'var(--gold)', 'var(--success)', 'var(--critical)', '#bb8dd8', '#3498db'];
                     $color = $colors[$o['id'] % count($colors)];
                 ?>
+                    <?php $theme_idx = $o['id'] % 6; ?>
                     <div class="officer-card" onclick="openFeedbackModal(<?= $o['id'] ?>, '<?= e($o['nama']) ?>')">
                         <div class="officer-header">
-                            <div class="officer-avatar" style="background:<?= $color ?>22;border:1px solid <?= $color ?>;color:<?= $color ?>">
+                            <div class="officer-avatar officer-avatar-theme-<?= $theme_idx ?>">
                                 <?= strtoupper(substr($o['nama'], 0, 2)) ?>
                             </div>
                             <div class="officer-info">
@@ -221,23 +222,23 @@ include __DIR__ . '/../includes/layout_header.php';
                         </div>
                         <div class="officer-stats">
                             <div class="officer-stat">
-                                <div class="officer-stat-val" style="color:var(--success)"><?= $o['tugas_selesai'] ?></div>
+                                <div class="officer-stat-val text-success"><?= $o['tugas_selesai'] ?></div>
                                 <div class="officer-stat-label">Selesai</div>
                             </div>
                             <div class="officer-stat">
-                                <div class="officer-stat-val" style="color:var(--attention)"><?= $o['tugas_progress'] ?></div>
+                                <div class="officer-stat-val text-attention"><?= $o['tugas_progress'] ?></div>
                                 <div class="officer-stat-label">Progress</div>
                             </div>
                             <div class="officer-stat">
-                                <div class="officer-stat-val" style="color:var(--critical)"><?= $o['tugas_pending'] ?></div>
+                                <div class="officer-stat-val text-critical"><?= $o['tugas_pending'] ?></div>
                                 <div class="officer-stat-label">Pending</div>
                             </div>
                             <div class="officer-stat">
-                                <div class="officer-stat-val" style="color:var(--gold)"><?= $o['avg_progress'] ?>%</div>
+                                <div class="officer-stat-val text-gold"><?= $o['avg_progress'] ?>%</div>
                                 <div class="officer-stat-label">Skor</div>
                             </div>
                         </div>
-                        <div style="margin-top:12px;display:flex;justify-content:space-between;align-items:center">
+                        <div class="officer-card-footer">
                             <span class="perf-badge <?= $perf_class ?>"><?= $perf_label ?></span>
                             <span class="card-action" onclick="event.stopPropagation();openFeedbackModal(<?= $o['id'] ?>, '<?= e($o['nama']) ?>')">Beri Feedback →</span>
                         </div>

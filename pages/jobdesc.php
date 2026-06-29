@@ -12,17 +12,6 @@ $period = get_current_period();
 
 // Job categories with descriptions
 $job_categories = [
-    ['code' => 'A', 'name' => 'STR Proaktif', 'tasks' => [
-        'Koordinasi & analisa STR dari UKO',
-        'Submit STR via GoAML',
-        'Monitoring periodik STR',
-        'Dokumentasi arsip STR',
-        'Inisiasi pelaporan STR Online',
-        'Approval STR sesuai kewenangan',
-        'Verifikasi kelengkapan data mandatory',
-        'Pemantauan via aplikasi STR',
-        'Penegakan kepatuhan SLA'
-    ]],
     ['code' => 'B', 'name' => 'Alert pada Sistem AML', 'tasks' => [
         'Koordinasi dengan Pinca/UB Leader',
         'Analisis profil & transaksi',
@@ -97,8 +86,8 @@ include __DIR__ . '/../includes/layout_header.php';
                 <p><?= count($job_categories) ?> Kategori · Berdasarkan POJK 8/2023</p>
             </div>
 
-            <div style="margin-bottom: 24px;">
-                <input type="text" id="searchInput" onkeyup="filterJobs()" placeholder="🔍 Cari job description atau kategori..." style="width: 100%; padding: 12px 16px; border-radius: 8px; border: 1px solid var(--hairline); background: var(--canvas); color: var(--ink-deep); font-size: 14px; box-shadow: 0 1px 3px rgba(0,0,0,0.05); outline: none;">
+            <div class="mb-xxl">
+                <input type="text" id="searchInput" class="job-search-input" onkeyup="filterJobs()" placeholder="🔍 Cari job description atau kategori...">
             </div>
 
             <?php
@@ -121,18 +110,18 @@ include __DIR__ . '/../includes/layout_header.php';
                 </div>
                 <div class="kpi-card green">
                     <div class="kpi-label">Regulasi Utama</div>
-                    <div class="kpi-value green" style="font-size:18px">POJK 8/2023</div>
+                    <div class="kpi-value green font-18">POJK 8/2023</div>
                     <div class="kpi-sub">+ UU TPPU, FATF</div>
                 </div>
                 <div class="kpi-card red">
                     <div class="kpi-label">Struktur</div>
-                    <div class="kpi-value red" style="font-size:16px">3 Tier</div>
+                    <div class="kpi-value red font-16">3 Tier</div>
                     <div class="kpi-sub">KP → Regional Office → Kanca</div>
                 </div>
             </div>
 
             <?php foreach ($job_categories as $cat): ?>
-                <div class="card job-card" style="margin-bottom:14px" data-title="<?= strtolower(e($cat['name'])) ?>">
+                <div class="card job-card mb-lg" data-title="<?= strtolower(e($cat['name'])) ?>">
                     <div class="card-header" onclick="toggleCat('cat-<?= $cat['code'] ?>')">
                         <div class="card-title">
                             <span class="chip-wilayah">[<?= $cat['code'] ?>]</span>

@@ -20,26 +20,16 @@ $period = get_current_period();
 
 switch ($_SERVER['REQUEST_METHOD']) {
     case 'GET':
-        // Get tasks for current user
+        // Get all active templates and left join with user's progress for this month
         $tasks = db_fetch_all(
-            "SELECT tp.*, tt.nama, tt.kategori, tt.periode, tt.tag, tt.target, tt.due_label,
-                tt.source_link
-             FROM task_progress tp
-             JOIN task_templates tt ON tp.template_id = tt.id
-             WHERE tp.user_id = ? AND tp.tahun = ? AND tp.bulan = ?
+            "SELECT tt.id as template_id, tt.nama, tt.kategori, tt.periode, tt.tag, tt.target, tt.due_label, tt.source_link,
+                    tp.id as progress_id, tp.progress, IFNULL(tp.status, 'pending') as status, tp.keterangan
+             FROM task_templates tt
+             LEFT JOIN task_progress tp ON tp.template_id = tt.id AND tp.user_id = ? AND tp.tahun = ? AND tp.bulan = ?
+             WHERE tt.is_active = 1
              ORDER BY tt.kategori, tt.nama",
             [$user['id'], $period['tahun'], $period['bulan']]
         );
-
-        // If no tasks, get templates
-        if (empty($tasks)) {
-            $tasks = db_fetch_all(
-                "SELECT tt.*, NULL as progress, 'pending' as status, NULL as keterangan
-                 FROM task_templates tt
-                 WHERE tt.is_active = 1
-                 ORDER BY tt.kategori, tt.nama"
-            );
-        }
 
         echo json_encode([
             'success' => true,

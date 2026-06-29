@@ -21,11 +21,11 @@
         <?php endif; ?>
     </div>
     <div class="topbar-right">
-        <div class="topbar-notif theme-toggle" onclick="toggleTheme()" title="Toggle Theme" style="cursor:pointer; font-size: 16px;">
+        <div class="topbar-notif theme-toggle cursor-pointer font-16" onclick="toggleTheme()" title="Toggle Theme">
             <span id="theme-icon">🌙</span>
         </div>
         <?php if (!empty($topbar_notif_action)): ?>
-            <div class="topbar-notif" onclick="<?= htmlspecialchars($topbar_notif_action, ENT_QUOTES, 'UTF-8') ?>" style="cursor:pointer;" title="Lihat Notifikasi">
+            <div class="topbar-notif cursor-pointer" onclick="<?= htmlspecialchars($topbar_notif_action, ENT_QUOTES, 'UTF-8') ?>" title="Lihat Notifikasi">
                 🔔<?php if (!empty($alerts)): ?><div class="notif-dot"></div><?php endif; ?>
             </div>
         <?php else: ?>
@@ -40,7 +40,7 @@
                     <div class="dropdown-role"><?= htmlspecialchars(get_role_label($user['role'] ?? ''), ENT_QUOTES, 'UTF-8') ?></div>
                 </div>
                 <a href="../logout.php" class="dropdown-item text-critical">
-                    <span style="font-size: 16px;">🚪</span> Keluar
+                    <span class="font-16">🚪</span> Keluar
                 </a>
             </div>
         </div>

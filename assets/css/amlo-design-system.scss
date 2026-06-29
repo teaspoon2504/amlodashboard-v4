@@ -1281,8 +1281,8 @@ a:hover { text-decoration: underline; }
             .todo-item.pending-submit { border-color: var(--attention); }
     
             .todo-row { display: flex; align-items: flex-start; gap: 14px; }
-            .todo-check { width: 22px; height: 22px; border-radius: 6px; border: 2px solid var(--steel); flex-shrink: 0; display: flex; align-items: center; justify-content: center; font-size: 13px; margin-top: 1px; }
-            .todo-item.done .todo-check { background: var(--success); border-color: var(--success); }
+            .todo-check { width: 22px; height: 22px; border-radius: 6px; border: 2px solid var(--steel); flex-shrink: 0; display: flex; align-items: center; justify-content: center; font-size: 13px; margin-top: 1px; color: #ffffff; }
+            .todo-item.done .todo-check { background: var(--success); border-color: var(--success); color: #ffffff; }
             .todo-body { flex: 1; min-width: 0; }
             .todo-title { font-size: 13px; font-weight: 600; margin-bottom: 4px; }
             .todo-item.done .todo-title { color: var(--steel); }
@@ -1818,12 +1818,19 @@ a:hover { text-decoration: underline; }
                 transform: translateX(-50%);
                 width: 20px;
                 height: 4px;
-                background: var(--teal-light);
                 border-radius: 2px;
             }
             .cal-day.completed { color: var(--success); }
             .cal-day.completed::after {
                 background: var(--success);
+            }
+            .cal-day.in-progress { color: var(--attention); }
+            .cal-day.in-progress::after {
+                background: var(--attention);
+            }
+            .cal-day.belum-mulai { color: var(--critical); }
+            .cal-day.belum-mulai::after {
+                background: var(--critical);
             }
             .cal-day.today.has-task::after { border: 1px solid var(--canvas); }
             .cal-day.empty { visibility: hidden; }

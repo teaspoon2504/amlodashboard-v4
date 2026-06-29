@@ -12,16 +12,13 @@ $csrf_token = generate_csrf_token();
 
 // Fetch templates for filter
 $allowed_tasks = [
-    'Adhoc Enhanced Due Diligence (EDD)',
     'Pengkinian Bad Data',
     'Pengkinian CIF ganda',
     'Pengkinian data Beneficial Owner',
     'Pengkinian data nasabah',
-    'Adhoc RFI Remittance',
-    'STR Proaktif',
+    'RFI Remittance',
     'Tindak Lanjut Alert STR',
-    'Tindak Lanjut PEP Sistem AML CFT CPF',
-    'Tindak Lanjut RBA Bankwide'
+    'Tindak Lanjut PEP Sistem AML CFT CPF'
 ];
 $placeholders = implode(',', array_fill(0, count($allowed_tasks), '?'));
 $templates = db_fetch_all(
@@ -45,10 +42,10 @@ include __DIR__ . '/../includes/layout_header.php';
             <div class="card-title"><?= $user['role'] === 'ho' ? 'Assign Target Regional Office' : ($user['role'] === 'lead' ? 'Distribusi Target' : 'Filter Manajemen Target') ?></div>
         </div>
         <div class="card-body">
-            <form id="filter-form" class="todo-filters-container" style="display: flex; gap: 16px; align-items: flex-end; flex-wrap: wrap;">
+            <form id="filter-form" class="todo-filters-container cal-filter-form">
                 <div>
-                    <label style="font-size: 11px; font-weight: 600; text-transform: uppercase; color: var(--steel); margin-bottom: 6px; display: block;">Nama Tugas</label>
-                    <select id="filter_template" class="select-field" style="width: 250px; padding: 10px 14px; border-radius: 8px; border: 1px solid var(--hairline); background: var(--surface-soft);">
+                    <label class="filter-label">Nama Tugas</label>
+                    <select id="filter_template" class="select-field filter-select w-250">
                         <option value="">-- Pilih Tugas --</option>
                         <?php foreach($templates as $t): ?>
                             <option value="<?= $t['id'] ?>"><?= e($t['nama']) ?></option>
@@ -56,8 +53,8 @@ include __DIR__ . '/../includes/layout_header.php';
                     </select>
                 </div>
                 <div>
-                    <label style="font-size: 11px; font-weight: 600; text-transform: uppercase; color: var(--steel); margin-bottom: 6px; display: block;">Bulan</label>
-                    <select id="filter_bulan" class="select-field" style="width: 150px; padding: 10px 14px; border-radius: 8px; border: 1px solid var(--hairline); background: var(--surface-soft);">
+                    <label class="filter-label">Bulan</label>
+                    <select id="filter_bulan" class="select-field filter-select w-150">
                         <?php 
                         $nama_bulan = [1=>'Januari', 2=>'Februari', 3=>'Maret', 4=>'April', 5=>'Mei', 6=>'Juni', 7=>'Juli', 8=>'Agustus', 9=>'September', 10=>'Oktober', 11=>'November', 12=>'Desember'];
                         foreach($nama_bulan as $k => $v): 
@@ -67,8 +64,8 @@ include __DIR__ . '/../includes/layout_header.php';
                     </select>
                 </div>
                 <div>
-                    <label style="font-size: 11px; font-weight: 600; text-transform: uppercase; color: var(--steel); margin-bottom: 6px; display: block;">Tahun</label>
-                    <select id="filter_tahun" class="select-field" style="width: 120px; padding: 10px 14px; border-radius: 8px; border: 1px solid var(--hairline); background: var(--surface-soft);">
+                    <label class="filter-label">Tahun</label>
+                    <select id="filter_tahun" class="select-field filter-select w-120">
                         <option value="2026" <?= $tahun == 2026 ? 'selected' : '' ?>>2026</option>
                         <option value="2027" <?= $tahun == 2027 ? 'selected' : '' ?>>2027</option>
                     </select>
@@ -85,25 +82,25 @@ include __DIR__ . '/../includes/layout_header.php';
     </div>
 
     <!-- Alert / Info Container -->
-    <div id="target-alert-container" style="display: none; margin-top: 20px; padding: 16px; border-radius: 8px; font-weight: 500;"></div>
+    <div id="target-alert-container" class="target-alert-box"></div>
 
-    <div class="card" id="target-data-card" style="display: none; margin-top: 24px;">
+    <div class="card mt-xl d-none" id="target-data-card">
         <div class="card-header">
             <div class="card-title" id="data-target-title">Data Target</div>
         </div>
         <div class="card-body">
             <form id="target-form" onsubmit="saveTargets(event)">
-                <table class="ds-table" style="width: 100%; border-collapse: collapse;">
+                <table class="ds-table w-full">
                     <thead>
-                        <tr style="border-bottom: 1px solid var(--hairline);">
+                        <tr class="tr-border">
                             <?php if ($role === 'ho'): ?>
-                                <th style="text-align: left; padding: 12px; color: var(--steel);">Kode Regional Office</th>
-                                <th style="text-align: left; padding: 12px; color: var(--steel);">Nama Regional Office</th>
+                                <th class="th-left-p12">Kode Regional Office</th>
+                                <th class="th-left-p12">Nama Regional Office</th>
                             <?php else: ?>
-                                <th style="text-align: left; padding: 12px; color: var(--steel);">Nama Officer (AMLO)</th>
-                                <th style="text-align: left; padding: 12px; color: var(--steel);">Username</th>
+                                <th class="th-left-p12">Nama Officer (AMLO)</th>
+                                <th class="th-left-p12">Username</th>
                             <?php endif; ?>
-                            <th style="text-align: right; padding: 12px; color: var(--steel); width: 200px;">Target Value</th>
+                            <th class="th-right-p12 w-200">Target Value</th>
                         </tr>
                     </thead>
                     <tbody id="target-tbody">
@@ -111,11 +108,11 @@ include __DIR__ . '/../includes/layout_header.php';
                     </tbody>
                 </table>
 
-                <div style="margin-top: 24px; display: flex; justify-content: flex-end; align-items: center; gap: 16px;">
+                <div class="target-footer-row">
                     <?php if ($role === 'lead'): ?>
-                        <div style="font-size: 14px; color: var(--steel);">
-                            Total Distribusi: <span id="total-dist-label" style="font-weight: bold; color: var(--ink-deep);">0</span> 
-                            / <span id="plafon-label" style="font-weight: bold; color: var(--ink-deep);">0</span>
+                        <div class="font-14 text-steel">
+                            Total Distribusi: <span id="total-dist-label" class="font-bold text-ink">0</span> 
+                            / <span id="plafon-label" class="font-bold text-ink">0</span>
                         </div>
                     <?php endif; ?>
                     <?= render_ds_button([
@@ -147,7 +144,7 @@ function loadTargets() {
     const dataCard = document.getElementById('target-data-card');
     const alertBox = document.getElementById('target-alert-container');
     
-    tbody.innerHTML = '<tr><td colspan="3" style="text-align:center; padding: 20px;">Memuat data...</td></tr>';
+    tbody.innerHTML = '<tr><td colspan="3" class="td-center-p20">Memuat data...</td></tr>';
     dataCard.style.display = 'block';
     alertBox.style.display = 'none';
 
@@ -159,7 +156,7 @@ function loadTargets() {
             document.getElementById('data-target-title').innerText = `Data Target ${taskName}`;
             
             if (!res.success) {
-                tbody.innerHTML = `<tr><td colspan="3" style="text-align:center; padding: 20px; color: var(--attention);">${res.message}</td></tr>`;
+                tbody.innerHTML = `<tr><td colspan="3" class="td-center-p20 text-attention">${res.message}</td></tr>`;
                 return;
             }
 
@@ -168,11 +165,15 @@ function loadTargets() {
             if (userRole === 'ho') {
                 res.data.kanwils.forEach(k => {
                     tbody.innerHTML += `
-                        <tr style="border-bottom: 1px solid var(--hairline);">
-                            <td style="padding: 12px;">${k.kode}</td>
-                            <td style="padding: 12px; font-weight: 500;">${k.kanwil_nama}</td>
-                            <td style="padding: 12px; text-align: right;">
-                                <input type="number" name="target_${k.kanwil_id}" class="target-input select-field" data-id="${k.kanwil_id}" value="${k.target_value}" min="0" style="width: 100px; text-align: right;">
+                        <tr class="tr-border">
+                            <td class="td-p12">${k.kode}</td>
+                            <td class="td-p12 font-medium">${k.kanwil_nama}</td>
+                            <td class="td-right-p12">
+                                <div class="adjust-group">
+                                    <button type="button" onclick="adjustTarget(-1, 'target-inp-${k.kanwil_id}')" class="adjust-btn-minus">−</button>
+                                    <input type="number" name="target_${k.kanwil_id}" id="target-inp-${k.kanwil_id}" class="target-input adjust-input" data-id="${k.kanwil_id}" value="${k.target_value}" min="0" oninput="calculateTotal()">
+                                    <button type="button" onclick="adjustTarget(1, 'target-inp-${k.kanwil_id}')" class="adjust-btn-plus">+</button>
+                                </div>
                             </td>
                         </tr>
                     `;
@@ -182,26 +183,26 @@ function loadTargets() {
                 document.getElementById('plafon-label').innerText = currentPlafon;
                 
                 if (currentPlafon === 0) {
+                    alertBox.className = 'target-alert-box login-alert-error';
                     alertBox.style.display = 'block';
-                    alertBox.style.background = '#fff3cd';
-                    alertBox.style.color = '#856404';
-                    alertBox.style.border = '1px solid #ffeeba';
                     alertBox.innerHTML = '⚠️ HO belum menentukan target (plafon) untuk Regional Office Anda pada bulan ini.';
                 } else {
+                    alertBox.className = 'target-alert-box login-alert-success';
                     alertBox.style.display = 'block';
-                    alertBox.style.background = '#d4edda';
-                    alertBox.style.color = '#155724';
-                    alertBox.style.border = '1px solid #c3e6cb';
                     alertBox.innerHTML = `ℹ️ Plafon target dari HO untuk Regional Office Anda adalah: <b>${currentPlafon}</b>`;
                 }
 
                 res.data.officers.forEach(o => {
                     tbody.innerHTML += `
-                        <tr style="border-bottom: 1px solid var(--hairline);">
-                            <td style="padding: 12px; font-weight: 500;">${o.nama}</td>
-                            <td style="padding: 12px; color: var(--steel);">${o.username}</td>
-                            <td style="padding: 12px; text-align: right;">
-                                <input type="number" name="target_${o.user_id}" class="target-input select-field" data-id="${o.user_id}" value="${o.target_value}" min="0" style="width: 100px; text-align: right;" oninput="calculateTotal()">
+                        <tr class="tr-border">
+                            <td class="td-p12 font-medium">${o.nama}</td>
+                            <td class="td-p12 text-steel">${o.username}</td>
+                            <td class="td-right-p12">
+                                <div class="adjust-group">
+                                    <button type="button" onclick="adjustTarget(-1, 'target-inp-${o.user_id}')" class="adjust-btn-minus">−</button>
+                                    <input type="number" name="target_${o.user_id}" id="target-inp-${o.user_id}" class="target-input adjust-input" data-id="${o.user_id}" value="${o.target_value}" min="0" oninput="calculateTotal()">
+                                    <button type="button" onclick="adjustTarget(1, 'target-inp-${o.user_id}')" class="adjust-btn-plus">+</button>
+                                </div>
                             </td>
                         </tr>
                     `;
@@ -211,7 +212,7 @@ function loadTargets() {
         })
         .catch(err => {
             console.error(err);
-            tbody.innerHTML = `<tr><td colspan="3" style="text-align:center; padding: 20px; color: var(--attention);">Terjadi kesalahan koneksi.</td></tr>`;
+            tbody.innerHTML = `<tr><td colspan="3" class="td-center-p20 text-attention">Terjadi kesalahan koneksi.</td></tr>`;
         });
 }
 
@@ -237,6 +238,16 @@ function calculateTotal() {
         saveBtn.disabled = false;
         saveBtn.classList.remove('ds-btn-disabled');
     }
+}
+
+function adjustTarget(diff, inputId) {
+    const input = document.getElementById(inputId);
+    if (!input) return;
+    let val = parseInt(input.value) || 0;
+    val += diff;
+    if (val < 0) val = 0;
+    input.value = val;
+    calculateTotal();
 }
 
 function saveTargets(e) {

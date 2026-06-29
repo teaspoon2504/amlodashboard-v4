@@ -102,12 +102,12 @@ include __DIR__ . '/../includes/layout_header.php';
                             <tr>
                                 <td><span class="chip-wilayah"><?= e($w['kode']) ?></span></td>
                                 <td><b><?= e($w['nama']) ?></b></td>
-                                <td style="text-align:center"><?= $w['total_officer'] ?></td>
-                                <td style="text-align:center;color:var(--success);font-weight:700"><?= $w['exceed_count'] ?></td>
-                                <td style="text-align:center;color:#3498db;font-weight:700"><?= $w['good_count'] ?></td>
-                                <td style="text-align:center;color:var(--critical);font-weight:700"><?= $w['below_count'] ?></td>
+                                <td class="td-center"><?= $w['total_officer'] ?></td>
+                                <td class="td-center text-success font-bold"><?= $w['exceed_count'] ?></td>
+                                <td class="td-center text-blue font-bold"><?= $w['good_count'] ?></td>
+                                <td class="td-center text-critical font-bold"><?= $w['below_count'] ?></td>
                                 <td><span class="perf-badge <?= $perf_cls ?>"><?= $perf_label ?> (<?= $overall ?>%)</span></td>
-                                <td><a href="assessment.php?kanwil=<?= $w['id'] ?>" style="color:var(--teal-light);font-size:11px">Review →</a></td>
+                                <td><a href="assessment.php?kanwil=<?= $w['id'] ?>" class="text-teal font-11">Review →</a></td>
                             </tr>
                         <?php endforeach; ?>
                     </tbody>

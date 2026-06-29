@@ -109,21 +109,25 @@ flowchart LR
         UC8([Monitoring Performa Tim Regional]):::usecase
         UC9([Review Progress Laporan Officer]):::usecase
         UC14([Approve Tugas Officer]):::usecase
+        UC16([Distribusi Target ke Officer]):::usecase
     end
     Lead --- UC7
     Lead --- UC8
     Lead --- UC9
     Lead --- UC14
+    Lead --- UC16
 
     subgraph Spesifik Head Office
         direction TB
         UC10([Monitoring Performa Agregat Nasional]):::usecase
         UC11([Memberikan Assessment & Feedback]):::usecase
         UC12([Melihat Indikator KPI Wilayah Good]):::usecase
+        UC15([Tentukan Target per Regional Office]):::usecase
     end
     HO --- UC10
     HO --- UC11
     HO --- UC12
+    HO --- UC15
     </div>
 
     <h2>2. Deskripsi Fungsionalitas Aktor</h2>
@@ -148,6 +152,7 @@ flowchart LR
         <li><strong>Monitoring Tim Regional:</strong> Mengukur kinerja <em>Officer</em> di bawah wewenang Kanwil-nya secara spesifik.</li>
         <li><strong>Review Progress:</strong> Meninjau apakah laporan atau tugas yang dilempar ke <em>Officer</em> terlaksana sesuai tenggat waktu.</li>
         <li><strong>Approve Tugas:</strong> Memeriksa tugas Officer dan memberikan persetujuan (Approve) agar tugas dihitung selesai, atau menolak jika masih kurang.</li>
+        <li><strong>Distribusi Target Officer:</strong> Memecah kuota target tugas dari HO untuk dibagikan secara spesifik kepada tiap <em>Officer</em>.</li>
     </ul>
 
     <h3>D. Head Office / HO (Level Eksekutif Nasional)</h3>
@@ -155,6 +160,7 @@ flowchart LR
         <li><strong>Monitoring Agregat:</strong> Memantau skor performa <em>compliance</em> dari seluruh wilayah di Indonesia.</li>
         <li><strong>Memberikan Feedback:</strong> Memiliki wewenang untuk mengirimkan teguran (<em>Assessment & Feedback</em>) langsung kepada Lead/Officer.</li>
         <li><strong>Melihat KPI Nasional:</strong> Mengakses indikator "Wilayah Good" untuk melihat agregat standar AML.</li>
+        <li><strong>Penentuan Target Regional:</strong> Menetapkan plafon target tugas secara spesifik untuk masing-masing <em>Regional Office</em> pada setiap periode.</li>
     </ul>
     </div>
 </body>

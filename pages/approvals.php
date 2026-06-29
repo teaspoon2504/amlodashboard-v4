@@ -67,37 +67,37 @@ include __DIR__ . '/../includes/layout_header.php';
                             <th>Kategori</th>
                             <th>Keterangan / Evidence</th>
                             <th>Tanggal Pengajuan</th>
-                            <th style="text-align:center">Aksi</th>
+                            <th class="th-center">Aksi</th>
                         </tr>
                     </thead>
                     <tbody id="approvals-tbody">
                         <?php if (empty($submissions)): ?>
                             <tr>
-                                <td colspan="7" style="text-align:center;color:var(--steel);padding:40px">
-                                    <div style="font-size:24px;margin-bottom:8px">🎉</div>
+                                <td colspan="7" class="empty-state-p40">
+                                    <div class="font-24 mb-sm">🎉</div>
                                     Tidak ada pengajuan yang perlu di-review saat ini.
                                 </td>
                             </tr>
                         <?php else: ?>
                             <?php $no = 1; foreach ($submissions as $s): ?>
                                 <tr id="row-<?= $s['id'] ?>">
-                                    <td style="color:var(--steel)"><?= $no++ ?></td>
+                                    <td class="text-steel"><?= $no++ ?></td>
                                     <td>
-                                        <div style="font-weight:600;color:var(--teal-light)">👤 <?= e($s['officer_name']) ?></div>
+                                        <div class="font-semibold text-teal">👤 <?= e($s['officer_name']) ?></div>
                                         <?php if($user['role']==='ho'): ?>
-                                            <div style="font-size:11px;color:var(--steel);margin-top:2px"><?= e($s['kanwil_nama']) ?></div>
+                                            <div class="font-11 text-steel mt-xs"><?= e($s['kanwil_nama']) ?></div>
                                         <?php endif; ?>
                                     </td>
                                     <td><b><?= e($s['task_name']) ?></b></td>
                                     <td><span class="chip-wilayah"><?= e($s['kategori']) ?></span></td>
                                     <td>
-                                        <div style="font-size:12px;color:var(--steel);max-width:250px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;" title="<?= e($s['keterangan']) ?>">
+                                        <div class="font-12 text-steel max-w-250 text-ellipsis" title="<?= e($s['keterangan']) ?>">
                                             <?= $s['keterangan'] ? e($s['keterangan']) : '<i>Tidak ada keterangan</i>' ?>
                                         </div>
                                     </td>
                                     <td><?= date('d M Y, H:i', strtotime($s['submitted_at'])) ?></td>
-                                    <td style="text-align:center">
-                                        <div style="display:flex;gap:8px;justify-content:center;">
+                                    <td class="td-center">
+                                        <div class="approval-actions-row">
                                             <?= render_ds_button([
                                                 'type' => 'button',
                                                 'variant' => 'filled',
@@ -134,7 +134,7 @@ include __DIR__ . '/../includes/layout_header.php';
             <div class="modal-close" onclick="closeModal()">✕</div>
         </div>
         <div id="modal-body">
-            <div style="margin-bottom:16px; font-size:14px; color:var(--steel)" id="modal-desc">
+            <div class="font-14 text-steel mb-base" id="modal-desc">
                 Anda akan menyetujui pengajuan dari Officer.
             </div>
             
@@ -143,7 +143,7 @@ include __DIR__ . '/../includes/layout_header.php';
             
             <div class="input-group">
                 <label class="input-label">Catatan / Pesan Tambahan (Opsional)</label>
-                <textarea id="modal-catatan" class="textarea-field" placeholder="Ketik catatan atau alasan (jika ada)..." style="min-height:80px"></textarea>
+                <textarea id="modal-catatan" class="textarea-field min-h-80" placeholder="Ketik catatan atau alasan (jika ada)..."></textarea>
             </div>
             
             <div class="modal-actions">
@@ -232,8 +232,8 @@ function submitApproval() {
                     if (tbody.children.length === 0) {
                         tbody.innerHTML = `
                             <tr>
-                                <td colspan="7" style="text-align:center;color:var(--steel);padding:40px">
-                                    <div style="font-size:24px;margin-bottom:8px">🎉</div>
+                                <td colspan="7" class="empty-state-p40">
+                                    <div class="font-24 mb-sm">🎉</div>
                                     Tidak ada pengajuan yang perlu di-review saat ini.
                                 </td>
                             </tr>

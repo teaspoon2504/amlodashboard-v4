@@ -349,7 +349,7 @@ include __DIR__ . '/../includes/layout_header.php';
                     $filtered_progress = array_filter($perf['tasks'], fn($t) => $t['progress'] > 0 && $t['periode'] !== 'harian');
                     if (empty($filtered_progress)): 
                     ?>
-                        <div style="padding:var(--s-xl);text-align:center;color:var(--steel);font-size:13px">
+                        <div class="empty-state-p40 font-13">
                             Belum melakukan progress laporan. ✨
                         </div>
                     <?php 
@@ -359,7 +359,8 @@ include __DIR__ . '/../includes/layout_header.php';
                         <div class="prog-bar-wrap">
                             <div class="prog-bar-label">
                                 <span><?= e($t['nama']) ?></span>
-                                <span style="color:<?= get_progress_color($t['progress']) ?>"><?= $t['progress'] ?>%</span>
+                                <?php $pctClass = $t['progress'] >= 100 ? 'text-success' : ($t['progress'] >= 80 ? 'text-blue' : ($t['progress'] >= 50 ? 'text-attention' : 'text-critical')); ?>
+                                <span class="<?= $pctClass ?>"><?= $t['progress'] ?>%</span>
                             </div>
                             <div class="prog-bar-track">
                                 <div class="prog-bar-fill <?= $t['progress'] >= 100 ? 'bar-exceed' : ($t['progress'] >= 80 ? 'bar-good' : 'bar-below') ?>"
@@ -373,20 +374,20 @@ include __DIR__ . '/../includes/layout_header.php';
                 </div>
 
                 <div class="card">
-                    <div class="card-header" style="flex-direction: column; align-items: flex-start; gap: 16px;">
-                        <div class="card-title" style="width: 100%;">📅 Kalender Aktivitas — <?= $nama_bulan[$bulan] ?> <?= $tahun ?></div>
-                        <form method="GET" id="cal-filter-form" class="todo-filters-container" style="display: flex; gap: 16px; align-items: flex-end; flex-wrap: wrap; width: 100%;">
+                    <div class="card-header card-header-col">
+                        <div class="card-title w-full">📅 Kalender Aktivitas — <?= $nama_bulan[$bulan] ?> <?= $tahun ?></div>
+                        <form method="GET" id="cal-filter-form" class="todo-filters-container cal-filter-form">
                             <div>
-                                <label style="font-size: 11px; font-weight: 600; text-transform: uppercase; letter-spacing: 1px; color: var(--steel); margin-bottom: 6px; display: block;">Bulan</label>
-                                <select name="bulan" class="select-field" style="width: 160px; padding: 10px 14px; border-radius: 8px; border: 1px solid var(--hairline); background: var(--surface-soft); color: var(--ink-deep);" onchange="document.getElementById('cal-filter-form').submit()">
+                                <label class="filter-label">Bulan</label>
+                                <select name="bulan" class="select-field filter-select w-160" onchange="document.getElementById('cal-filter-form').submit()">
                                     <?php for ($m=1; $m<=12; $m++): ?>
                                         <option value="<?= $m ?>" <?= $bulan == $m ? 'selected' : '' ?>><?= $nama_bulan[$m] ?></option>
                                     <?php endfor; ?>
                                 </select>
                             </div>
                             <div>
-                                <label style="font-size: 11px; font-weight: 600; text-transform: uppercase; letter-spacing: 1px; color: var(--steel); margin-bottom: 6px; display: block;">Tahun</label>
-                                <select name="tahun" class="select-field" style="width: 120px; padding: 10px 14px; border-radius: 8px; border: 1px solid var(--hairline); background: var(--surface-soft); color: var(--ink-deep);" onchange="document.getElementById('cal-filter-form').submit()">
+                                <label class="filter-label">Tahun</label>
+                                <select name="tahun" class="select-field filter-select w-120" onchange="document.getElementById('cal-filter-form').submit()">
                                     <option value="2026" <?= $tahun == 2026 ? 'selected' : '' ?>>2026</option>
                                     <option value="2027" <?= $tahun == 2027 ? 'selected' : '' ?>>2027</option>
                                 </select>
@@ -403,13 +404,24 @@ include __DIR__ . '/../includes/layout_header.php';
                     $taskDaysMap = [];
                     if ($user['role'] === 'lead' || $user['role'] === 'officer') {
                         $cal_assignments = db_fetch_all(
-                            "SELECT task_name, due_date, status FROM assignments 
-                             WHERE YEAR(due_date) = ? AND MONTH(due_date) = ? 
-                             AND (from_user_id = ? OR to_user_id = ?)
-                             AND task_name IN ('Adhoc RFI Remittance', 'Adhoc EDD', 'Adhoc Pendampingan AML')",
+                            "SELECT a.task_name, a.due_date, a.status, tp.status as real_status 
+                             FROM assignments a
+                             LEFT JOIN task_templates tt ON tt.nama = a.task_name
+                             LEFT JOIN task_progress tp ON tp.template_id = tt.id AND tp.user_id = a.to_user_id AND tp.tahun = YEAR(a.due_date) AND tp.bulan = MONTH(a.due_date)
+                             WHERE YEAR(a.due_date) = ? AND MONTH(a.due_date) = ? 
+                             AND (a.from_user_id = ? OR a.to_user_id = ?)
+                             AND a.task_name IN ('RFI Remittance', 'Adhoc Enhanced Due Diligence (EDD)', 'Pendampingan Verifikasi Lapangan', 'Adhoc Asistensi UKO')",
                             [$tahun, $bulan, $user['id'], $user['id']]
                         );
                         foreach ($cal_assignments as $ca) {
+                            if (!empty($ca['real_status'])) {
+                                $rs = $ca['real_status'];
+                                if ($rs === 'done' || $rs === 'approved') {
+                                    $ca['status'] = 'selesai';
+                                } elseif ($rs === 'pending' || $rs === 'active') {
+                                    $ca['status'] = 'in_progress';
+                                }
+                            }
                             $day = (int)date('j', strtotime($ca['due_date']));
                             if (!isset($taskDaysMap[$day])) {
                                 $taskDaysMap[$day] = [];
@@ -431,31 +443,44 @@ include __DIR__ . '/../includes/layout_header.php';
                         
                         $dayTasks = $taskDaysMap[$d] ?? [];
                         $hasTask = count($dayTasks) > 0;
-                        $isDone = false;
+                        $dayStatus = null;
                         
                         $onclick = '';
                         if ($hasTask) {
-                            $allDone = true;
+                            $hasBelumMulai = false;
+                            $hasInProgress = false;
                             foreach ($dayTasks as $t) {
-                                if ($t['status'] !== 'selesai') $allDone = false;
+                                if ($t['status'] === 'belum_mulai') $hasBelumMulai = true;
+                                if ($t['status'] === 'in_progress') $hasInProgress = true;
                             }
-                            if ($allDone) $isDone = true;
-                            $onclick = " onclick=\"showCalTasks($d, this)\" style=\"cursor:pointer\" title=\"Klik untuk Menampilkan/Menyembunyikan Penugasan\"";
+                            if ($hasBelumMulai) {
+                                $dayStatus = 'belum_mulai';
+                            } elseif ($hasInProgress) {
+                                $dayStatus = 'in_progress';
+                            } else {
+                                $dayStatus = 'selesai';
+                            }
+
+                            $onclick = " onclick=\"showCalTasks($d, this)\" title=\"Klik untuk Menampilkan/Menyembunyikan Penugasan\"";
                         }
 
                         $cls = 'cal-day';
+                        if ($hasTask) $cls .= ' has-task cursor-pointer';
                         if ($isToday) $cls .= ' today';
-                        elseif ($isDone) $cls .= ' completed';
-                        elseif ($hasTask) $cls .= ' has-task';
+                        
+                        if ($dayStatus === 'selesai') $cls .= ' completed';
+                        elseif ($dayStatus === 'in_progress') $cls .= ' in-progress';
+                        elseif ($dayStatus === 'belum_mulai') $cls .= ' belum-mulai';
                         
                         echo "<div class=\"$cls\"$onclick>$d</div>";
                     }
                     echo '</div>';
                     ?>
                     <div class="cal-legend">
-                        <div class="cal-legend-item"><span class="cal-legend-dot" style="background:var(--ink-button)"></span>Hari Ini</div>
-                        <div class="cal-legend-item"><span class="cal-legend-dot" style="background:var(--success)"></span>Selesai</div>
-                        <div class="cal-legend-item"><span class="cal-legend-dot" style="background:var(--teal-light)"></span>Ada Tugas</div>
+                        <div class="cal-legend-item"><span class="cal-legend-dot cal-legend-dot-today"></span>Hari Ini</div>
+                        <div class="cal-legend-item"><span class="cal-legend-dot cal-legend-dot-success"></span>Selesai</div>
+                        <div class="cal-legend-item"><span class="cal-legend-dot cal-legend-dot-attention"></span>Berjalan</div>
+                        <div class="cal-legend-item"><span class="cal-legend-dot cal-legend-dot-critical"></span>Belum Mulai</div>
                     </div>
                     
                     <div id="cal-details-container" class="cal-details-container"></div>
@@ -464,8 +489,15 @@ include __DIR__ . '/../includes/layout_header.php';
                     foreach ($taskDaysMap as $day => $tasks) {
                         $html = "<div class='cal-details-title'>Penugasan Tanggal $day</div>";
                         foreach ($tasks as $t) {
-                            $badge = $t['status'] === 'selesai' ? '<span style="color:var(--success); font-weight:600; font-size:10px;">✅ Selesai</span>' : '<span style="color:var(--attention); font-weight:600; font-size:10px;">⏳ Menunggu</span>';
-                            $html .= "<div style='font-size:13px; margin-bottom:6px; color:var(--ink-deep);'>• " . e($t['task_name']) . " <span style='float:right'>$badge</span></div>";
+                            $badge = '';
+                            if ($t['status'] === 'selesai') {
+                                $badge = '<span class="font-semibold font-10 text-success">✅ Selesai</span>';
+                            } elseif ($t['status'] === 'in_progress') {
+                                $badge = '<span class="font-semibold font-10 text-attention">⏳ Berjalan</span>';
+                            } else {
+                                $badge = '<span class="font-semibold font-10 text-critical">⚠️ Belum Mulai</span>';
+                            }
+                            $html .= "<div class='font-13 mb-sm text-ink'>• " . e($t['task_name']) . " <span class='float-right'>$badge</span></div>";
                         }
                         $taskData[$day] = $html;
                     }
@@ -511,7 +543,7 @@ include __DIR__ . '/../includes/layout_header.php';
 
                     <?php
                     if (empty($alerts)) {
-                        echo '<div style="padding:var(--s-xl);text-align:center;color:var(--steel);font-size:13px">Tidak ada notifikasi saat ini. ✨</div>';
+                        echo '<div class="empty-state-p40 font-13">Tidak ada notifikasi saat ini. ✨</div>';
                     } else {
                         foreach ($alerts as $alert):
                     ?>

@@ -192,10 +192,10 @@ include __DIR__ . '/../includes/layout_header.php';
                 <p>Status seluruh jenis laporan AMLO beserta progress realization untuk Tahun <?= $period['tahun'] ?></p>
             </div>
 
-            <div class="todo-filters-container" style="display: flex; gap: 16px; margin-bottom: 20px; align-items: flex-end; flex-wrap: wrap;">
+            <div class="todo-filters-container cal-filter-form mb-xl">
                 <div>
-                    <label style="font-size: 11px; font-weight: 600; text-transform: uppercase; letter-spacing: 1px; color: var(--steel); margin-bottom: 6px; display: block;">Jenis Laporan</label>
-                    <select id="filter-kategori" class="select-field" style="width: 180px; padding: 10px 14px;" onchange="applyFilters()">
+                    <label class="filter-label letter-spacing-1">Jenis Laporan</label>
+                    <select id="filter-kategori" class="select-field filter-select w-180" onchange="applyFilters()">
                         <option value="all">Semua Jenis</option>
                         <?php 
                         $kategoris = array_unique(array_column($tasks, 'kategori'));
@@ -205,8 +205,8 @@ include __DIR__ . '/../includes/layout_header.php';
                     </select>
                 </div>
                 <div>
-                    <label style="font-size: 11px; font-weight: 600; text-transform: uppercase; letter-spacing: 1px; color: var(--steel); margin-bottom: 6px; display: block;">Periode</label>
-                    <select id="filter-periode" class="select-field" style="width: 180px; padding: 10px 14px;" onchange="applyFilters()">
+                    <label class="filter-label letter-spacing-1">Periode</label>
+                    <select id="filter-periode" class="select-field filter-select w-180" onchange="applyFilters()">
                         <option value="all">Semua Periode</option>
                         <option value="bulanan">Bulanan</option>
                         <option value="triwulan">Triwulanan</option>
@@ -215,9 +215,9 @@ include __DIR__ . '/../includes/layout_header.php';
                     </select>
                 </div>
                 <div>
-                    <label style="font-size: 11px; font-weight: 600; text-transform: uppercase; letter-spacing: 1px; color: var(--steel); margin-bottom: 6px; display: block;">Bulan</label>
+                    <label class="filter-label letter-spacing-1">Bulan</label>
                     <?php $now_bulan = (int)date('n'); ?>
-                    <select id="filter-bulan" class="select-field" style="width: 180px; padding: 10px 14px;" onchange="applyFilters()">
+                    <select id="filter-bulan" class="select-field filter-select w-180" onchange="applyFilters()">
                         <option value="all">Semua Bulan</option>
                         <?php foreach($nama_bulan as $num => $name): ?>
                             <option value="<?= $num ?>" <?= $num === $now_bulan ? 'selected' : '' ?>><?= $name ?></option>
@@ -225,8 +225,8 @@ include __DIR__ . '/../includes/layout_header.php';
                     </select>
                 </div>
                 <div>
-                    <label style="font-size: 11px; font-weight: 600; text-transform: uppercase; letter-spacing: 1px; color: var(--steel); margin-bottom: 6px; display: block;">Tahun</label>
-                    <select id="filter-tahun" class="select-field" style="width: 140px; padding: 10px 14px;" onchange="window.location.href='?tahun=' + this.value">
+                    <label class="filter-label letter-spacing-1">Tahun</label>
+                    <select id="filter-tahun" class="select-field filter-select w-140" onchange="window.location.href='?tahun=' + this.value">
                         <?php 
                         $current_req_tahun = $period['tahun'];
                         for($y = 2024; $y <= 2030; $y++): ?>
@@ -236,8 +236,8 @@ include __DIR__ . '/../includes/layout_header.php';
                 </div>
                 <?php if ($user['role'] !== 'officer'): ?>
                 <div>
-                    <label style="font-size: 11px; font-weight: 600; text-transform: uppercase; letter-spacing: 1px; color: var(--steel); margin-bottom: 6px; display: block;">AMLO Officer</label>
-                    <select id="filter-officer" class="select-field" style="width: 150px; padding: 10px 14px;" onchange="applyFilters()">
+                    <label class="filter-label letter-spacing-1">AMLO Officer</label>
+                    <select id="filter-officer" class="select-field filter-select w-150" onchange="applyFilters()">
                         <option value="all">Semua Officer</option>
                         <?php foreach($target_officers as $off): ?>
                             <option value="<?= $off['id'] ?>"><?= e($off['nama']) ?></option>
@@ -245,8 +245,8 @@ include __DIR__ . '/../includes/layout_header.php';
                     </select>
                 </div>
                 <?php endif; ?>
-                <div style="font-size: 13px; color: var(--steel); margin-bottom: 10px; margin-left: auto;">
-                    Total: <span id="filtered-count" style="font-weight: 700; color: var(--gold);"><?= count($tasks) ?></span> tugas
+                <div class="filtered-count-wrapper">
+                    Total: <span id="filtered-count" class="filtered-count-num"><?= count($tasks) ?></span> tugas
                 </div>
             </div>
 
@@ -271,8 +271,8 @@ include __DIR__ . '/../includes/layout_header.php';
                     <tbody>
                         <?php if (empty($tasks)): ?>
                             <tr>
-                                <td colspan="8" style="text-align:center;color:var(--steel);padding:40px">
-                                    Belum ada data. <a href="tasks.php" style="color:var(--gold)">Input progress pertama →</a>
+                                <td colspan="8" class="table-empty-cell">
+                                    Belum ada data. <a href="tasks.php" class="text-gold">Input progress pertama →</a>
                                 </td>
                             </tr>
                         <?php else: ?>
@@ -294,22 +294,23 @@ include __DIR__ . '/../includes/layout_header.php';
                                 $barClass = $percent >= 100 ? 'bar-exceed' : ($percent >= 80 ? 'bar-good' : 'bar-below');
                                 ?>
                                 <tr class="laporan-row" data-kategori="<?= e($t['kategori']) ?>" data-periode="<?= e($t['periode']) ?>" data-bulan="<?= e($t['vis_bulan']) ?>" data-officer="<?= e($t['officer_id']) ?>">
-                                    <td style="color:var(--steel)"><?= $no++ ?></td>
-                                    <td><span style="font-weight:600;color:var(--teal-light)">👤 <?= e($t['officer_nama']) ?></span></td>
+                                    <td class="text-steel"><?= $no++ ?></td>
+                                    <td><span class="officer-badge-chip font-weight-600">👤 <?= e($t['officer_nama']) ?></span></td>
                                     <td><b><?= e($t['nama']) ?></b></td>
                                     <td><span class="chip-wilayah"><?= e($t['kategori']) ?></span></td>
                                     <td><span class="todo-tag tag-<?= e($t['tag']) ?>"><?= e(ucfirst($t['periode'])) ?></span></td>
                                     <td>
                                         <?php if ($isTriSemZero): ?>
-                                            <span style="font-size:11px;color:var(--steel);font-style:italic;">Belum memulai tugas <?= e($periode === 'triwulan' ? 'triwulanan' : 'semesteran') ?></span>
+                                            <span class="text-steel-italic font-size-11">Belum memulai tugas <?= e($periode === 'triwulan' ? 'triwulanan' : 'semesteran') ?></span>
                                         <?php elseif ($isAdhocZero): ?>
-                                            <span style="font-size:11px;color:var(--steel);font-style:italic;">Belum ada tugas adhoc</span>
+                                            <span class="text-steel-italic font-size-11">Belum ada tugas adhoc</span>
                                         <?php else: ?>
-                                            <div style="display:flex;align-items:center;gap:8px">
+                                            <?php $pctClass = $percent >= 80 ? 'text-success' : ($percent >= 50 ? 'text-attention' : 'text-critical'); ?>
+                                            <div class="officer-name-row">
                                                 <div class="mini-progress">
                                                     <div class="mini-progress-bar <?= $barClass ?>" style="width:<?= $percent ?>%"></div>
                                                 </div>
-                                                <span style="font-family:monospace;font-weight:700;color:<?= $percent >= 80 ? 'var(--success)' : ($percent >= 50 ? 'var(--attention)' : 'var(--critical)') ?>"><?= $percent ?>%</span>
+                                                <span class="mono-percent <?= $pctClass ?>"><?= $percent ?>%</span>
                                             </div>
                                         <?php endif; ?>
                                     </td>

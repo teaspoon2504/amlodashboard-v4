@@ -43,19 +43,34 @@ Alur kerja yang paling krusial dan baru ditambahkan adalah mekanisme validasi tu
 ---
 
 ## 5. Perubahan Skema Database Terakhir
-Untuk mengeksekusi fitur *Approval Workflow*, terdapat pembaruan skema yang harus selalu dipastikan sudah ada di server produksi:
+Untuk mengeksekusi fitur *Approval Workflow* dan *Manajemen Target*, terdapat pembaruan skema yang harus selalu dipastikan sudah ada di server produksi:
 
 1. **Tabel `task_progress`**: Kolom `status` ditambahkan opsi `approved` (Enum: `'pending','active','done','approved'`).
 2. **Tabel `submissions`**: Menyimpan data tugas yang diajukan Officer ke Lead.
    - Kolom penting: `task_progress_id`, `submitted_by`, `status` (`pending/approved/rejected`).
 3. **Tabel `approvals`**: Menyimpan rekam jejak (*log*) siapa Lead/HO yang melakukan *approve* atau *reject* beserta catatannya.
+4. **Tabel `task_targets` (Baru):** Digunakan untuk fitur Manajemen Tugas. Menyimpan `target_value` (plafon) yang di-set oleh HO untuk Kanwil, dan target spesifik yang didistribusikan oleh Lead untuk tiap Officer.
+   - Kolom penting: `task_template_id`, `kanwil_id`, `user_id`, `tahun`, `bulan`, `target_value`.
+5. **Tabel `task_templates` (Pembaruan):** Penambahan tugas baru "Adhoc Asistensi UKO", perubahan nama menjadi "Pendampingan Verifikasi Lapangan", serta penyesuaian *periode* tugas menjadi bulanan/adhoc.
 
 ---
 
-## 6. Status Deployment & Shared Hosting
+## 6. Fitur Manajemen Target & UI/UX Terkini
+1. **Manajemen Target (Plafon vs Distribusi):**
+   - **HO** menetapkan batas kuota (Plafon) ke masing-masing *Regional Office* (Kanwil).
+   - **Lead** memecah dan mendistribusikan Plafon tersebut kepada para *Officer* di bawahnya.
+   - Menggunakan komponen *Stepper* (`-` dan `+`) yang dinamis untuk mengatur nilai angka `target_value`.
+2. **Visibilitas Tugas Adhoc:**
+   - Tugas dengan periode **Adhoc** secara otomatis disembunyikan dari halaman *To-Do Harian* milik Officer. Tugas ini hanya akan muncul *jika dan hanya jika* Officer tersebut secara spesifik telah diberi *assignment* (penugasan) oleh Lead/HO.
+3. **Peningkatan UI (Toast Notification):**
+   - Menggantikan *pop-up* `alert()` standar browser dengan komponen *Toast Notification* kustom yang terpusat di atas layar (*top-center*), lebih besar (1.3x), dan menghilang otomatis dalam 4 detik, memberikan kesan *premium* dan *modern*.
+
+---
+
+## 7. Status Deployment & Shared Hosting
 - **Server:** Aplikasi ini di-*deploy* ke Shared Hosting menggunakan cPanel.
-- **Metode Update:** Seluruh pembaruan di-*package* dalam file `amlodashboard_deploy_update.zip` (mengabaikan `.git` dan `node_modules`). Zip ini di-*upload* ke File Manager cPanel dan di-ekstrak (overwrite) pada direktori `public_html`.
-- **Integrasi UML:** Diagram Use Case yang merepresentasikan alur kerja ini tersedia di `uml_diagram.html` dengan desain responsif (dioptimalkan untuk format *print* kertas A4).
+- **Metode Update:** Seluruh pembaruan di-*package* dalam file `amlodashboard_deploy_update.zip` (mengabaikan `.git` dan `node_modules`). Zip ini di-*upload* ke File Manager cPanel dan di-ekstrak (overwrite) pada direktori `public_html`. (Penting untuk tidak lupa mengeksekusi *query* SQL jika ada tabel baru seperti `task_targets`).
+- **Integrasi UML:** Diagram Use Case yang merepresentasikan alur kerja (termasuk fitur Distribusi Target) tersedia di `uml_diagram.html` dengan desain responsif (dioptimalkan untuk format *print* kertas A4).
 
 ---
 

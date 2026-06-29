@@ -8,20 +8,21 @@ Tabel berikut memuat detail lengkap seluruh tugas (Task Templates) yang saat ini
 
 | ID | Nama Tugas | Kategori | Periode | Target | Tenggat Waktu (Due Label) | Sumber Data (Source Link) |
 |---|---|:---:|:---:|---|---|---|
-Tindak Lanjut Alert STR | A | Bulanan | Sesuai target yang didistribusikan oleh lead dari target total yang disetting oleh HO pada bulan terkait | setiap Akhir bulan | Inputan AMLO |
+Tindak Lanjut Alert STR | A | Bulanan | Silakan lakukan update tindak lanjut Alert STR pada Sistem AML, CFT & CPF (https://brisim.bri.co.id/) | setiap Akhir bulan | Inputan AMLO |
 STR Proaktif | A | Bulanan | Sesuai target yang didistribusikan oleh lead dari target total yang disetting oleh HO pada bulan terkait | setiap Akhir bulan | Inputan AMLO |
 Pengkinian Bad Data | B | Bulanan | Sesuai target yang didistribusikan oleh lead dari target total yang disetting oleh HO pada bulan terkait | setiap Akhir bulan | Inputan AMLO |
 Pengkinian CIF ganda | B | Bulanan | Sesuai target yang didistribusikan oleh lead dari target total yang disetting oleh HO pada bulan terkait | setiap Akhir bulan | Inputan AMLO |
 Pengkinian data nasabah | B | Bulanan | Sesuai target yang didistribusikan oleh lead dari target total yang disetting oleh HO pada bulan terkait | setiap Akhir bulan | Inputan AMLO |
 Pengkinian data Beneficial Owner | B | Bulanan | Sesuai target yang didistribusikan oleh lead dari target total yang disetting oleh HO pada bulan terkait | setiap Akhir bulan | Inputan AMLO |
 Tindak Lanjut PEP Sistem AML CFT CPF | B | Bulanan | Sesuai target yang didistribusikan oleh lead dari target total yang disetting oleh HO pada bulan terkait | setiap Akhir bulan | Inputan AMLO |
-E-Learning Target | C | Semesteran | 100% | Semester | Input PSA + Progress E-Learning |
-Sosialisasi AML CFT CPF | D | Semesteran | 1x setiap semester | Semester | Inputan AMLO |
+E-Learning Target | C | Bulanan | 100% | Semester | Input PSA + Progress E-Learning |
+Sosialisasi AML CFT CPF | D | Bulanan | 1x setiap semester | Semester | Inputan AMLO |
 Tindak Lanjut RBA Bankwide | E | Triwulan | Action plan sesuai ketentuan 100% | Per tenggat aksi | Enterprise Risk |
-Report Progress AML CFT CPF | F | Triwulan | Laporan + attach 100% | Tgl 10 Apr, Jul, Okt, Jan | Inputan |
+Report Progress AML CFT CPF | F | Bulanan | Laporan + attach 100% | Tgl 10 Apr, Jul, Okt, Jan | Inputan |
 RFI Remittance | BX | Adhoc | target yang diberikan oleh Lead atau HO | due date yang diberikan oleh Lead atau HO | List request dari Kanpus |
 Adhoc Enhanced Due Diligence (EDD) | BX | Adhoc | target yang diberikan oleh Lead atau HO | due date yang diberikan oleh Lead atau HO | List request dari Kanpus |
-Pendampingan AML | X | Adhoc | target yang diberikan oleh Lead atau HO | due date yang diberikan oleh Lead atau HO | List request Kanpus |
+Pendampingan Verifikasi Lapangan | X | Adhoc | target yang diberikan oleh Lead atau HO | due date yang diberikan oleh Lead atau HO | List request Kanpus |
+Adhoc Asistensi UKO | X | Adhoc | target yang diberikan oleh Lead atau HO | due date yang diberikan oleh Lead atau HO | List request Kanpus |
 
 
 ---

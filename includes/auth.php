@@ -131,7 +131,6 @@ function get_nav_items($role) {
         'officer' => [
             ['id' => 'tasks', 'icon' => '✅', 'label' => 'To-Do Harian'],
             ['id' => 'laporan', 'icon' => '📋', 'label' => 'Tracking Laporan'],
-            ['id' => 'performa', 'icon' => '📈', 'label' => 'Performa Saya'],
             ['id' => 'jobdesc', 'icon' => '📌', 'label' => 'Job Description']
         ],
         'lead' => [
@@ -139,7 +138,6 @@ function get_nav_items($role) {
             ['id' => 'laporan', 'icon' => '📋', 'label' => 'Tracking Laporan'],
             ['id' => 'approvals', 'icon' => '✓', 'label' => 'Approvals'],
             ['id' => 'officers', 'icon' => '👥', 'label' => 'Monitoring Officer'],
-            ['id' => 'performa', 'icon' => '📈', 'label' => 'Performa Tim'],
             ['id' => 'assignments', 'icon' => '📤', 'label' => 'Penugasan'],
             ['id' => 'manajemen_tugas', 'icon' => '🎯', 'label' => 'Manajemen Tugas'],
             ['id' => 'jobdesc', 'icon' => '📌', 'label' => 'Job Description']
@@ -148,6 +146,7 @@ function get_nav_items($role) {
             ['id' => 'wilayah', 'icon' => '🗺', 'label' => 'Monitoring RO'],
             ['id' => 'laporan', 'icon' => '📋', 'label' => 'Tracking Laporan'],
             ['id' => 'performa', 'icon' => '📈', 'label' => 'Performa Agregat'],
+            ['id' => 'assignments', 'icon' => '📤', 'label' => 'Penugasan'],
             ['id' => 'manajemen_tugas', 'icon' => '🎯', 'label' => 'Manajemen Tugas'],
             ['id' => 'assessment', 'icon' => '📝', 'label' => 'Assessment & Feedback'],
             ['id' => 'jobdesc', 'icon' => '📌', 'label' => 'Job Description']

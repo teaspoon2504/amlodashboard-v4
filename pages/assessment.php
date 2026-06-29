@@ -151,7 +151,7 @@ include __DIR__ . '/../includes/layout_header.php';
             </div>
 
             <?php if (empty($recent_feedbacks)): ?>
-                <div style="text-align:center;color:var(--steel);padding:40px">
+                <div class="empty-state-p40">
                     Belum ada feedback terkirim
                 </div>
             <?php else: ?>
@@ -172,7 +172,7 @@ include __DIR__ . '/../includes/layout_header.php';
     </div>
 
     <?php if (!empty($pending_submissions)): ?>
-        <div class="card" style="margin-bottom:20px">
+        <div class="card mb-xl">
             <div class="card-header">
                 <div class="card-title">⏳ Pending Submissions (<?= count($pending_submissions) ?>)</div>
             </div>
@@ -186,9 +186,9 @@ include __DIR__ . '/../includes/layout_header.php';
                         <div class="submission-progress"><?= $s['progress'] ?>%</div>
                     </div>
                     <?php if ($s['keterangan']): ?>
-                        <div style="font-size:11px;color:var(--steel);margin-bottom:8px"><?= e($s['keterangan']) ?></div>
+                        <div class="font-11 text-steel mb-sm"><?= e($s['keterangan']) ?></div>
                     <?php endif; ?>
-                    <div style="font-size:10px;color:var(--steel)">Submit: <?= date('d/m/Y H:i', strtotime($s['submitted_at'])) ?></div>
+                    <div class="font-10 text-steel">Submit: <?= date('d/m/Y H:i', strtotime($s['submitted_at'])) ?></div>
                 </div>
             <?php endforeach; ?>
         </div>

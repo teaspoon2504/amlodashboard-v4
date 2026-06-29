@@ -152,6 +152,19 @@ foreach ($targets_records as $tg) {
     $targets_map[$tg['user_id']][$tg['task_template_id']][$tg['bulan']] = $tg['target_value'];
 }
 
+// 4.5 Get ALL adhoc assignments for target officers
+$assignments_records = db_fetch_all(
+    "SELECT to_user_id, task_name, due_date 
+     FROM assignments 
+     WHERE to_user_id IN ($placeholders) AND YEAR(due_date) = ?",
+    $query_params
+);
+
+$assignments_map = [];
+foreach ($assignments_records as $ar) {
+    $assignments_map[$ar['to_user_id']][$ar['task_name']][] = $ar['due_date'];
+}
+
 // 5. Build $display_tasks array
 $default_prog = [
     'progress_id' => null,
@@ -241,8 +254,31 @@ foreach ($target_officers as $officer) {
             $m = $period['bulan'];
             $t = $tt;
             if ($tt['periode'] === 'adhoc') {
+                $original_nama = $tt['nama'];
+                
+                // HANYA MUNCUL JIKA ADA ASSIGNMENT ATAU PROGRESS YANG SUDAH DIBUAT
+                if (!isset($assignments_map[$uid][$original_nama]) && !isset($progress_map[$uid][$tt['id']][$m])) {
+                    continue;
+                }
+
                 $t['nama'] .= ' ' . $period['tahun'];
                 $t['vis_bulan'] = '1,2,3,4,5,6,7,8,9,10,11,12';
+                
+                if (isset($assignments_map[$uid][$original_nama])) {
+                    $dates = $assignments_map[$uid][$original_nama];
+                    sort($dates);
+                    $formatted_dates = array_map(function($d) {
+                        return date('d M Y', strtotime($d));
+                    }, $dates);
+                    
+                    if (count($formatted_dates) == 1) {
+                        $t['due_label'] = $formatted_dates[0];
+                    } else {
+                        $t['due_label'] = $formatted_dates[0] . ' (+ ' . (count($formatted_dates) - 1) . ' adhoc)';
+                    }
+                } else {
+                    $t['due_label'] = 'Assignment selesai/terhapus';
+                }
             } else {
                 $t['vis_bulan'] = (string)$m;
             }
@@ -283,10 +319,10 @@ include __DIR__ . '/../includes/layout_header.php';
                 <p>Input progress tugas secara real-time</p>
             </div>
 
-            <div class="todo-filters-container" style="display: flex; gap: 16px; margin-bottom: 20px; align-items: flex-end; flex-wrap: wrap;">
+            <div class="todo-filters-container cal-filter-form mb-xl">
                 <div>
-                    <label style="font-size: 11px; font-weight: 600; text-transform: uppercase; letter-spacing: 1px; color: var(--steel); margin-bottom: 6px; display: block;">Status Tugas</label>
-                    <select id="filter-status" class="select-field" style="width: 150px; padding: 10px 14px;" onchange="applyFilters()">
+                    <label class="filter-label letter-spacing-1">Status Tugas</label>
+                    <select id="filter-status" class="select-field filter-select w-150" onchange="applyFilters()">
                         <option value="all">Semua Status</option>
                         <option value="pending">Belum Dimulai</option>
                         <option value="active">Sedang Berjalan</option>
@@ -296,8 +332,8 @@ include __DIR__ . '/../includes/layout_header.php';
                 </div>
 
                 <div>
-                    <label style="font-size: 11px; font-weight: 600; text-transform: uppercase; letter-spacing: 1px; color: var(--steel); margin-bottom: 6px; display: block;">Periode</label>
-                    <select id="filter-periode" class="select-field" style="width: 150px; padding: 10px 14px;" onchange="applyFilters()">
+                    <label class="filter-label letter-spacing-1">Periode</label>
+                    <select id="filter-periode" class="select-field filter-select w-150" onchange="applyFilters()">
                         <option value="all">Semua Periode</option>
                         <option value="bulanan">Bulanan</option>
                         <option value="triwulan">Triwulanan</option>
@@ -306,9 +342,9 @@ include __DIR__ . '/../includes/layout_header.php';
                     </select>
                 </div>
                 <div>
-                    <label style="font-size: 11px; font-weight: 600; text-transform: uppercase; letter-spacing: 1px; color: var(--steel); margin-bottom: 6px; display: block;">Bulan</label>
+                    <label class="filter-label letter-spacing-1">Bulan</label>
                     <?php $now_bulan = (int)date('n'); ?>
-                    <select id="filter-bulan" class="select-field" style="width: 150px; padding: 10px 14px;" onchange="applyFilters()">
+                    <select id="filter-bulan" class="select-field filter-select w-150" onchange="applyFilters()">
                         <option value="all">Semua Bulan</option>
                         <?php foreach($nama_bulan as $num => $name): ?>
                             <option value="<?= $num ?>" <?= $num === $now_bulan ? 'selected' : '' ?>><?= $name ?></option>
@@ -316,8 +352,8 @@ include __DIR__ . '/../includes/layout_header.php';
                     </select>
                 </div>
                 <div>
-                    <label style="font-size: 11px; font-weight: 600; text-transform: uppercase; letter-spacing: 1px; color: var(--steel); margin-bottom: 6px; display: block;">Tahun</label>
-                    <select id="filter-tahun" class="select-field" style="width: 120px; padding: 10px 14px;" onchange="window.location.href='?tahun=' + this.value">
+                    <label class="filter-label letter-spacing-1">Tahun</label>
+                    <select id="filter-tahun" class="select-field filter-select w-120" onchange="window.location.href='?tahun=' + this.value">
                         <?php 
                         $current_req_tahun = $period['tahun'];
                         for($y = 2024; $y <= 2030; $y++): ?>
@@ -327,8 +363,8 @@ include __DIR__ . '/../includes/layout_header.php';
                 </div>
                 <?php if ($user['role'] !== 'officer'): ?>
                 <div>
-                    <label style="font-size: 11px; font-weight: 600; text-transform: uppercase; letter-spacing: 1px; color: var(--steel); margin-bottom: 6px; display: block;">AMLO Officer</label>
-                    <select id="filter-officer" class="select-field" style="width: 150px; padding: 10px 14px;" onchange="applyFilters()">
+                    <label class="filter-label letter-spacing-1">AMLO Officer</label>
+                    <select id="filter-officer" class="select-field filter-select w-150" onchange="applyFilters()">
                         <option value="all">Semua Officer</option>
                         <?php foreach($target_officers as $off): ?>
                             <option value="<?= $off['id'] ?>"><?= e($off['nama']) ?></option>
@@ -336,8 +372,8 @@ include __DIR__ . '/../includes/layout_header.php';
                     </select>
                 </div>
                 <?php endif; ?>
-                <div style="font-size: 13px; color: var(--steel); margin-bottom: 10px; margin-left: auto;">
-                    Tampil: <span id="filtered-count" style="font-weight: 700; color: var(--gold);"><?= count($tasks) ?></span> tugas
+                <div class="filtered-count-wrapper">
+                    Tampil: <span id="filtered-count" class="filtered-count-num"><?= count($tasks) ?></span> tugas
                 </div>
             </div>
 
@@ -354,7 +390,7 @@ include __DIR__ . '/../includes/layout_header.php';
                     }
 
                     $isDone = $t['submission_status'] === 'approved' || $t['progress_status'] === 'approved';
-                    $pctColor = $vis_pct >= 100 ? 'var(--success)' : ($vis_pct >= 80 ? '#3498db' : ($vis_pct >= 50 ? 'var(--attention)' : 'var(--critical)'));
+                    $pctClass = $vis_pct >= 100 ? 'text-success' : ($vis_pct >= 80 ? 'text-blue' : ($vis_pct >= 50 ? 'text-attention' : 'text-critical'));
                     $barClass = $vis_pct >= 100 ? 'bar-exceed' : ($vis_pct >= 80 ? 'bar-good' : 'bar-below');
                     ?>
                     <div class="todo-item <?= $isDone ? 'done' : '' ?> <?= $t['submission_status'] === 'pending' && $t['progress'] > 0 ? 'pending-submit' : '' ?>"
@@ -371,24 +407,24 @@ include __DIR__ . '/../includes/layout_header.php';
                             <div class="todo-body">
                                 <div class="todo-title">
                                     <?= e($t['nama']) ?>
-                                    <span style="font-size:10px;color:var(--steel)">[<?= e($t['kategori']) ?>]</span>
+                                    <span class="text-steel font-size-10">[<?= e($t['kategori']) ?>]</span>
                                     <?php if ($t['submission_status'] === 'pending'): ?>
-                                        <span class="perf-badge" style="margin-left:8px; background:rgba(245, 158, 11, 0.15); color:var(--attention);">⌛ WAITING FOR APPROVAL</span>
+                                        <span class="perf-badge badge-waiting-approval">⌛ WAITING FOR APPROVAL</span>
                                     <?php elseif ($isDone): ?>
-                                        <span class="perf-badge" style="margin-left:8px; background:var(--success-bg); color:var(--success);">✅ SELESAI</span>
+                                        <span class="perf-badge badge-done-approval">✅ SELESAI</span>
                                     <?php endif; ?>
                                 </div>
                                 <div class="todo-meta">
                                     <span class="todo-tag tag-<?= e($t['tag']) ?>"><?= e(ucfirst($t['periode'])) ?></span>
                                     <span class="due-badge">🕒 <?= e($t['due_label']) ?></span>
-                                    <span class="due-badge" style="margin-left:8px;color:var(--teal-light)">👤 <?= e($t['officer_nama']) ?></span>
+                                    <span class="due-badge officer-badge-chip">👤 <?= e($t['officer_nama']) ?></span>
                                 </div>
                             </div>
-                            <div style="display:flex;align-items:center;gap:12px">
+                            <div class="task-progress-row">
                                 <div class="mini-progress">
                                     <div class="mini-progress-bar <?= $barClass ?>" style="width:<?= $vis_pct ?>%"></div>
                                 </div>
-                                <div class="progress-pct" style="color:<?= $pctColor ?>"><?= $vis_pct ?>%</div>
+                                <div class="progress-pct <?= $pctClass ?>"><?= $vis_pct ?>%</div>
                             </div>
                         </div>
                     </div>
@@ -400,7 +436,7 @@ include __DIR__ . '/../includes/layout_header.php';
 
 <div class="modal-overlay" id="modal-overlay" onclick="if(event.target===this)closeModal()">
     <div class="modal" id="modal-box">
-        <div class="modal-header" style="display: none;">
+        <div class="modal-header d-none">
             <div class="modal-title" id="modal-title">✏️ Input Progress</div>
             <div class="modal-close" onclick="closeModal()">✕</div>
         </div>
@@ -532,7 +568,7 @@ function openTaskModal(templateId, reqBulan, reqTahun, officerId) {
                     <div class="tm-divider"></div>
 
                     <div class="tm-form-group tm-form-row">
-                        <div class="tm-label" style="margin-bottom:0;">Due Date</div>
+                        <div class="tm-label mb-0">Due Date</div>
                         <div class="tm-value">${task.due_label}</div>
                     </div>
 
@@ -540,7 +576,7 @@ function openTaskModal(templateId, reqBulan, reqTahun, officerId) {
                         (task.keterangan.trim() ? `
                         <div class="tm-form-group">
                             <div class="tm-label">Catatan dari AMLO</div>
-                            <div class="tm-description" style="font-style:italic; background:var(--surface-soft); padding:10px; border-radius:8px; border:1px solid var(--hairline); color:var(--ink-deep);">
+                            <div class="tm-description amlo-note-box">
                                 ${task.keterangan}
                             </div>
                         </div>
@@ -549,7 +585,9 @@ function openTaskModal(templateId, reqBulan, reqTahun, officerId) {
                         <div class="tm-form-group">
                             <div class="tm-label">Deskripsi</div>
                             <div class="tm-description">
-                                Ini adalah deskripsi tugas. Kategori penugasan ini adalah [${task.kategori}]. Target yang harus dicapai adalah: ${task.target || 'Tepat Waktu'}.
+                                ${task.nama.includes('Tindak Lanjut Alert STR') ? 
+                                    'Silakan lakukan update tindak lanjut Alert STR pada Sistem AML, CFT &amp; CPF (<a href="https://brisim.bri.co.id/" target="_blank" style="color: var(--brand-primary); text-decoration: underline;">https://brisim.bri.co.id/</a>)' : 
+                                    `Ini adalah deskripsi tugas. Kategori penugasan ini adalah [${task.kategori}]. Target yang harus dicapai adalah: ${task.target || 'Tepat Waktu'}.`}
                             </div>
                         </div>
 
@@ -573,14 +611,14 @@ function getActionsHtml(task) {
         return `
             <div class="tm-actions">
                 <button type="button" onclick="closeModal()" class="tm-btn tm-cancel">Tutup</button>
-                <button type="button" onclick="approveTask(${task.submission_id})" class="tm-btn tm-save" style="background:var(--success);">✅ Approve Tugas</button>
+                <button type="button" onclick="approveTask(${task.submission_id})" class="tm-btn tm-save btn-approve-success">✅ Approve Tugas</button>
             </div>
         `;
     } else if (task.submission_status === 'approved' || task.progress_status === 'approved') {
         return `
             <div class="tm-approval">
-                <button type="button" onclick="closeModal()" class="tm-btn tm-cancel" style="width:100%; margin-bottom:20px;">Tutup</button>
-                <div style="background: var(--success-bg); color: var(--success); padding: 10px; border-radius: 8px; font-weight: bold; font-size: 14px; text-align:center;">
+                <button type="button" onclick="closeModal()" class="tm-btn tm-cancel w-100 mb-xl">Tutup</button>
+                <div class="task-approved-banner">
                     ✅ TUGAS SELESAI (APPROVED)
                 </div>
             </div>
@@ -589,7 +627,7 @@ function getActionsHtml(task) {
         if (userRole === 'lead') {
             return `
                 <div class="tm-actions">
-                    <button type="button" onclick="closeModal()" class="tm-btn tm-cancel" style="width:100%;">Tutup</button>
+                    <button type="button" onclick="closeModal()" class="tm-btn tm-cancel w-100">Tutup</button>
                 </div>
             `;
         } else {
