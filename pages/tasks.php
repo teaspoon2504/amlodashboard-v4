@@ -528,6 +528,10 @@ function openTaskModal(templateId, reqBulan, reqTahun, officerId) {
     const task = tasks.find(t => t.id === templateId && t.req_bulan === reqBulan && t.req_tahun === reqTahun && t.officer_id === officerId);
     if (!task) return;
 
+    const targetVal = task.numeric_target > 0 ? task.numeric_target : 100;
+    const completedVal = task.progress || 0;
+    const remainingVal = Math.max(0, targetVal - completedVal);
+
     const oldHeader = document.querySelector('#modal-box .modal-header');
     if (oldHeader) oldHeader.style.display = 'none';
 
@@ -555,14 +559,27 @@ function openTaskModal(templateId, reqBulan, reqTahun, officerId) {
                 <input type="hidden" name="officer_id" value="${officerId}">
 
                 <div class="tm-content">
-                    <div class="tm-counter">
-                        <button type="button" id="minusBtn" onclick="adjustProgress(-1, ${task.numeric_target})" ${userRole === 'lead' || task.progress <= 0 ? 'disabled' : ''}>−</button>
-                        <div class="tm-score">
-                            <div class="tm-number" id="progress-display-value">${task.progress}</div>
-                            <input type="hidden" name="progress" id="prog-slider" value="${task.progress}">
-                            <div class="tm-target">Target ${task.numeric_target > 0 ? task.numeric_target : '100'}</div>
+                    <div class="tm-counter new-tm-counter">
+                        <div class="tm-counter-left">
+                            <div class="tm-badge-card tm-badge-target">
+                                <div class="tm-badge-label">Target</div>
+                                <div class="tm-badge-val">${targetVal}</div>
+                            </div>
+                            <div class="tm-badge-card tm-badge-remaining">
+                                <div class="tm-badge-label">Remaining</div>
+                                <div class="tm-badge-val" id="remaining-display-value">${remainingVal}</div>
+                            </div>
                         </div>
-                        <button type="button" id="plusBtn" onclick="adjustProgress(1, ${task.numeric_target})" ${userRole === 'lead' || task.progress >= (task.numeric_target > 0 ? task.numeric_target : 100) ? 'disabled' : ''}>+</button>
+                        <div class="tm-counter-divider"></div>
+                        <div class="tm-counter-right">
+                            <div class="tm-completed-label">Completed</div>
+                            <div class="tm-stepper">
+                                <button type="button" class="tm-step-btn" id="minusBtn" onclick="adjustProgress(-1, ${targetVal})" ${userRole === 'lead' || completedVal <= 0 ? 'disabled' : ''}>−</button>
+                                <div class="tm-completed-val" id="progress-display-value">${completedVal}</div>
+                                <input type="hidden" name="progress" id="prog-slider" value="${completedVal}">
+                                <button type="button" class="tm-step-btn" id="plusBtn" onclick="adjustProgress(1, ${targetVal})" ${userRole === 'lead' || completedVal >= targetVal ? 'disabled' : ''}>+</button>
+                            </div>
+                        </div>
                     </div>
 
                     <div class="tm-divider"></div>
@@ -773,6 +790,11 @@ function adjustProgress(diff, numericTarget) {
     
     hiddenInput.value = val;
     display.textContent = val;
+
+    const remainingDisplay = document.getElementById('remaining-display-value');
+    if (remainingDisplay) {
+        remainingDisplay.textContent = Math.max(0, maxVal - val);
+    }
 
     const btnMinus = document.getElementById('minusBtn');
     const btnPlus = document.getElementById('plusBtn');

@@ -3770,6 +3770,128 @@ a:hover {
 .tm-counter button:hover { border-color:#0b59c7; color:#0b59c7; background:#f5f8ff; }
 .tm-counter button:active { transform:scale(.95); }
 .tm-counter button:disabled { opacity:.4; cursor:not-allowed; }
+
+/* New TM Counter Redesign */
+.new-tm-counter {
+    display: flex !important;
+    align-items: stretch !important;
+    justify-content: space-between !important;
+    gap: 16px !important;
+    background: #f8fafc;
+    border: 1px solid #f1f5f9;
+    padding: 16px;
+    border-radius: 20px;
+    margin-bottom: 20px;
+}
+.new-tm-counter .tm-counter-left {
+    display: flex;
+    flex-direction: column;
+    justify-content: space-between;
+    gap: 10px;
+    flex: 1;
+    min-width: 130px;
+}
+.new-tm-counter .tm-badge-card {
+    border-radius: 16px;
+    padding: 12px 14px;
+    text-align: center;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    flex: 1;
+}
+.new-tm-counter .tm-badge-target {
+    background: #2563eb;
+    color: white;
+}
+.new-tm-counter .tm-badge-remaining {
+    background: #63bde3;
+    color: white;
+}
+.new-tm-counter .tm-badge-label {
+    font-size: 13px;
+    font-weight: 500;
+    opacity: 0.95;
+    margin-bottom: 2px;
+}
+.new-tm-counter .tm-badge-val {
+    font-size: 26px;
+    font-weight: 700;
+    line-height: 1.1;
+}
+.new-tm-counter .tm-counter-divider {
+    width: 1px;
+    background: #e2e8f0;
+    margin: 4px 0;
+}
+.new-tm-counter .tm-counter-right {
+    background: #0b52c0;
+    border-radius: 18px;
+    padding: 16px 20px;
+    color: white;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    flex: 1.4;
+}
+.new-tm-counter .tm-completed-label {
+    font-size: 14px;
+    font-weight: 500;
+    opacity: 0.95;
+    margin-bottom: 10px;
+}
+.new-tm-counter .tm-stepper {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 18px;
+    width: 100%;
+}
+.new-tm-counter button.tm-step-btn {
+    width: 42px !important;
+    height: 42px !important;
+    border-radius: 10px !important;
+    background: rgba(255, 255, 255, 0.15) !important;
+    border: 1px solid rgba(255, 255, 255, 0.2) !important;
+    color: #ffffff !important;
+    font-size: 24px !important;
+    display: flex !important;
+    align-items: center !important;
+    justify-content: center !important;
+    cursor: pointer;
+    transition: 0.2s;
+}
+.new-tm-counter button.tm-step-btn:hover:not(:disabled) {
+    background: rgba(255, 255, 255, 0.28) !important;
+    border-color: rgba(255, 255, 255, 0.4) !important;
+}
+.new-tm-counter button.tm-step-btn:active:not(:disabled) {
+    transform: scale(0.95);
+}
+.new-tm-counter button.tm-step-btn:disabled {
+    opacity: 0.3 !important;
+    cursor: not-allowed;
+}
+.new-tm-counter .tm-completed-val {
+    font-size: 44px;
+    font-weight: 800;
+    line-height: 1;
+    color: #ffffff;
+    min-width: 50px;
+    text-align: center;
+}
+@media (max-width: 500px) {
+    .new-tm-counter {
+        flex-direction: column !important;
+    }
+    .new-tm-counter .tm-counter-divider {
+        width: 100%;
+        height: 1px;
+        margin: 8px 0;
+    }
+}
 .tm-score { text-align:center; }
 .tm-number { font-size: 48px; line-height: 1.2; font-weight: 700; color: #075bc7; }
 .tm-description { color: var(--text-secondary); font-size: 12px; line-height: 1.5; }
