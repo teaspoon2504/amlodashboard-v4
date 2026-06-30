@@ -186,7 +186,7 @@ include __DIR__ . '/../includes/layout_header.php';
                         <div class="submission-progress"><?= $s['progress'] ?>%</div>
                     </div>
                     <?php if ($s['keterangan']): ?>
-                        <div class="font-11 text-steel mb-sm"><?= e($s['keterangan']) ?></div>
+                        <div class="font-11 text-steel mb-sm"><?= e(format_keterangan($s['keterangan'])) ?></div>
                     <?php endif; ?>
                     <div class="font-10 text-steel">Submit: <?= date('d/m/Y H:i', strtotime($s['submitted_at'])) ?></div>
                 </div>

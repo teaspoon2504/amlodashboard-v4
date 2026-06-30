@@ -420,12 +420,22 @@ include __DIR__ . '/../includes/layout_header.php';
                                     <span class="due-badge officer-badge-chip">👤 <?= e($t['officer_nama']) ?></span>
                                 </div>
                             </div>
-                            <div class="task-progress-row">
-                                <div class="mini-progress">
-                                    <div class="mini-progress-bar <?= $barClass ?>" style="width:<?= $vis_pct ?>%"></div>
+                            <?php if ($vis_pct <= 0 && stripos($t['nama'], 'Sosialisasi AML CFT CPF') !== false): ?>
+                                <div class="task-progress-row" style="color: var(--steel); font-size: 12px; font-style: italic;">
+                                    Belum melakukan sosialisasi
                                 </div>
-                                <div class="progress-pct <?= $pctClass ?>"><?= $vis_pct ?>%</div>
-                            </div>
+                            <?php elseif ($vis_pct <= 0 && stripos($t['nama'], 'Report Progress AML CFT CPF') !== false): ?>
+                                <div class="task-progress-row" style="color: var(--steel); font-size: 12px; font-style: italic;">
+                                    Belum kirim laporan bulanan
+                                </div>
+                            <?php else: ?>
+                                <div class="task-progress-row">
+                                    <div class="mini-progress">
+                                        <div class="mini-progress-bar <?= $barClass ?>" style="width:<?= $vis_pct ?>%"></div>
+                                    </div>
+                                    <div class="progress-pct <?= $pctClass ?>"><?= $vis_pct ?>%</div>
+                                </div>
+                            <?php endif; ?>
                         </div>
                     </div>
                 <?php endforeach; ?>
@@ -538,6 +548,157 @@ function openTaskModal(templateId, reqBulan, reqTahun, officerId) {
     const modalBox = document.getElementById('modal-box');
     if (modalBox) {
         modalBox.removeAttribute('style');
+    }
+
+    if (task.nama.includes('Sosialisasi AML CFT CPF') || task.nama.includes('Report Progress AML CFT CPF')) {
+        const isSos = task.nama.includes('Sosialisasi');
+        const deskripsiText = isSos 
+            ? 'Edukasi untuk memperkuat peran setiap unit kerja dalam mendeteksi dan mencegah pencucian uang serta pendanaan ilegal sesuai standar terbaru minimal <b>1 kali dalam 1 bulan.</b>'
+            : 'Penyampaian laporan progres dan pemantauan implementasi program AML, CFT, dan CPF secara berkala beserta bukti lampiran (evidence).';
+        const btnAddText = isSos ? '+ Buat laporan sosialisasi' : '+ Buat laporan progress';
+        const emptyText = isSos ? 'Belum ada laporan sosialisasi yang diajukan oleh Officer.' : 'Belum ada laporan progress yang diajukan oleh Officer.';
+        const formTitleLabel = isSos ? 'Nama Sosialisasi' : 'Nama Laporan';
+        const formTitlePlaceholder = isSos ? 'Contoh: Sosialisasi cara identifikasi Beneficial Owner' : 'Contoh: Laporan Progress Implementasi AML Bulan Ini';
+        const formLinkPlaceholder = isSos ? 'Masukan link evidence sosialisasi yang dilakukan' : 'Masukan link evidence laporan progress yang dilakukan';
+
+        const namaBulanArr = ['', 'Januari', 'Februari', 'Maret', 'April', 'Mei', 'Juni', 'Juli', 'Agustus', 'September', 'Oktober', 'November', 'Desember'];
+        const bulanName = namaBulanArr[reqBulan] || '';
+        let sosData = null;
+        if (task.progress > 0 && task.keterangan) {
+            try {
+                const parsed = JSON.parse(task.keterangan);
+                if (parsed && (parsed.nama || parsed.link)) {
+                    sosData = parsed;
+                }
+            } catch (e) {
+                sosData = { nama: task.keterangan, link: '' };
+            }
+        }
+
+        if (!sosData) {
+            document.getElementById('modal-body').innerHTML = `
+                <div class="tm-modal">
+                    <!-- HEADER -->
+                    <div class="tm-header">
+                        <div class="tm-title">${task.nama}</div>
+                        <div class="tm-subtitle">Update progress tugas <span class="todo-tag tag-${task.periode}">${task.periode.charAt(0).toUpperCase() + task.periode.slice(1)}</span></div>
+                        <div class="tm-close" onclick="closeModal()">×</div>
+                    </div>
+
+                    <!-- STATE 1: NO ITEM CONTENT -->
+                    <div class="tm-content" id="sos-state-no-item">
+                        <div class="tm-form-group mb-0">
+                            <div class="tm-label" style="font-size: 15px; font-weight: 600; color: #171717; margin-bottom: 8px;">Deskripsi</div>
+                            <div class="tm-description" style="background: transparent; padding: 0; border: none; font-size: 14px; color: #525252; line-height: 1.5;">
+                                ${deskripsiText}
+                            </div>
+                        </div>
+
+                        ${userRole !== 'lead' ? `
+                        <div>
+                            <a onclick="showSosialisasiForm()" class="sos-btn-add">
+                                <span>+</span> ${isSos ? 'Buat laporan sosialisasi' : 'Buat laporan progress'}
+                            </a>
+                        </div>
+                        ` : `
+                        <div style="margin-top: 24px; font-style: italic; color: #737373;">${emptyText}</div>
+                        `}
+                    </div>
+
+                    <!-- STATE 2: ADD ITEM FORM -->
+                    ${userRole !== 'lead' ? `
+                    <form id="sosProgressForm" onsubmit="saveSosialisasiAjax(event, ${templateId}, ${reqBulan}, ${reqTahun}, ${officerId}, ${targetVal})" style="display: none;">
+                        <div class="tm-content" style="padding-top: 0;">
+                            <div class="tm-form-group mb-0">
+                                <div class="tm-label" style="font-size: 15px; font-weight: 600; color: #171717; margin-bottom: 8px;">Deskripsi</div>
+                                <div class="tm-description" style="background: transparent; padding: 0; border: none; font-size: 14px; color: #525252; line-height: 1.5; margin-bottom: 24px;">
+                                    ${deskripsiText}
+                                </div>
+                            </div>
+
+                            <div class="tm-form-group">
+                                <div class="tm-label" style="font-size: 14px; font-weight: 600; color: #171717; margin-bottom: 8px;">${formTitleLabel}</div>
+                                <input type="text" class="tm-input" id="sos_nama" required placeholder="${formTitlePlaceholder}" style="width: 100%; padding: 12px 14px; border: 1px solid #d4d4d4; border-radius: 8px; font-size: 14px;">
+                            </div>
+
+                            <div class="tm-form-group" style="margin-top: 16px;">
+                                <div class="tm-label" style="font-size: 14px; font-weight: 600; color: #171717; margin-bottom: 8px;">Evidence (Link)</div>
+                                <input type="text" class="tm-input" id="sos_link" required placeholder="${formLinkPlaceholder}" style="width: 100%; padding: 12px 14px; border: 1px solid #d4d4d4; border-radius: 8px; font-size: 14px;">
+                            </div>
+                        </div>
+
+                        <div class="tm-actions" style="margin-top: 24px; padding: 16px 24px; display: flex; gap: 16px;">
+                            <button type="button" onclick="hideSosialisasiForm()" class="tm-btn tm-cancel" style="flex: 1; padding: 12px; border-radius: 8px; border: 1px solid #d4d4d4; background: #fff; font-weight: 600; cursor: pointer;">Batal</button>
+                            <button type="submit" class="tm-btn tm-save" style="flex: 1; padding: 12px; border-radius: 8px; background: #0052cc; color: #fff; font-weight: 600; border: none; cursor: pointer;">Simpan</button>
+                        </div>
+                    </form>
+                    ` : ''}
+                </div>
+            `;
+            document.getElementById('modal-overlay').classList.add('open');
+            return;
+        } else {
+            document.getElementById('modal-body').innerHTML = `
+                <div class="tm-modal">
+                    <!-- HEADER -->
+                    <div class="tm-header">
+                        <div class="tm-title">${task.nama}</div>
+                        <div class="tm-subtitle">Update progress tugas <span class="todo-tag tag-${task.periode}">${task.periode.charAt(0).toUpperCase() + task.periode.slice(1)}</span></div>
+                        <div class="tm-close" onclick="closeModal()">×</div>
+                    </div>
+
+                    <!-- CONTENT -->
+                    <div class="tm-content">
+                        <div class="tm-form-group mb-0">
+                            <div class="tm-label" style="font-size: 15px; font-weight: 600; color: #171717; margin-bottom: 8px;">Deskripsi</div>
+                            <div class="tm-description" style="background: transparent; padding: 0; border: none; font-size: 14px; color: #525252; line-height: 1.5;">
+                                ${deskripsiText}
+                            </div>
+                        </div>
+
+                        <div class="sos-item-card">
+                            <div style="display: flex; align-items: center; gap: 14px; overflow: hidden; padding-right: 12px;">
+                                <div class="sos-icon-circle">
+                                    <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 2L2 7l10 5 10-5-10-5zM2 17l10 5 10-5M2 12l10 5 10-5"/></svg>
+                                </div>
+                                <div style="overflow: hidden;">
+                                    <div class="sos-item-title">${sosData.nama}</div>
+                                    <div class="sos-item-link">
+                                        ${sosData.link ? (sosData.link.startsWith('http') ? `<a href="${sosData.link}" target="_blank">${sosData.link}</a>` : sosData.link) : ''}
+                                    </div>
+                                </div>
+                            </div>
+                            ${userRole !== 'lead' && (!task.submission_status || task.submission_status === 'rejected') ? `
+                            <a onclick="removeSosialisasiAjax(${templateId}, ${reqBulan}, ${reqTahun}, ${officerId})" class="sos-btn-remove">Remove</a>
+                            ` : ''}
+                        </div>
+
+                        ${userRole === 'lead' ? `
+                            ${task.submission_status === 'pending' ? `
+                            <div class="sos-divider"><span>Tindakan Lead</span></div>
+                            <div class="tm-actions">
+                                <button type="button" onclick="closeModal()" class="tm-btn tm-cancel">Tutup</button>
+                                <button type="button" onclick="approveTask(${task.submission_id})" class="tm-btn tm-save btn-approve-success">✅ Approve Tugas</button>
+                            </div>
+                            ` : `
+                            <div style="margin-top: 24px;">
+                                <button type="button" onclick="closeModal()" class="tm-btn tm-cancel w-100">Tutup</button>
+                            </div>
+                            `}
+                        ` : `
+                            <div class="sos-divider"><span>Silakan Lakukan</span></div>
+                            <div style="padding-bottom: 8px;">
+                                <button type="button" id="btn-request-approval" onclick="submitForApproval(${task.progress_id ? '\'' + task.progress_id + '\'' : 'null'})" style="background: ${task.submission_status ? '#e5e5e5' : '#61bcf7'}; color: ${task.submission_status ? '#737373' : '#fff'}; font-weight: 600; border-radius: 8px; padding: 14px; border: none; width: 100%; font-size: 15px; cursor: ${task.submission_status ? 'not-allowed' : 'pointer'};" ${task.submission_status ? 'disabled' : ''}>
+                                    ${task.submission_status ? (task.submission_status === 'pending' ? '⏳ WAITING FOR APPROVAL' : 'Status: ' + task.submission_status.toUpperCase()) : 'Request for approval'}
+                                </button>
+                            </div>
+                        `}
+                    </div>
+                </div>
+            `;
+            document.getElementById('modal-overlay').classList.add('open');
+            return;
+        }
     }
 
     document.getElementById('modal-body').innerHTML = `
@@ -762,6 +923,90 @@ async function saveProgressAjax(event) {
             // or we assume it's fine. For now, just alert success.
         } else {
             alert(result.message || 'Error saving progress');
+        }
+    } catch (e) {
+        console.error(e);
+        alert('Terjadi kesalahan jaringan');
+    }
+}
+
+function showSosialisasiForm() {
+    document.getElementById('sos-state-no-item').style.display = 'none';
+    document.getElementById('sosProgressForm').style.display = 'block';
+}
+
+function hideSosialisasiForm() {
+    document.getElementById('sosProgressForm').style.display = 'none';
+    document.getElementById('sos-state-no-item').style.display = 'block';
+}
+
+async function saveSosialisasiAjax(event, templateId, bulan, tahun, officerId, targetVal) {
+    event.preventDefault();
+    const nama = document.getElementById('sos_nama').value.trim();
+    const link = document.getElementById('sos_link').value.trim();
+    if (!nama || !link) {
+        alert('Silakan isi Nama dan Evidence Link');
+        return;
+    }
+    const ketJson = JSON.stringify({ nama: nama, link: link });
+
+    try {
+        const response = await fetch('../api/tasks.php', {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+                'X-Requested-With': 'XMLHttpRequest'
+            },
+            body: JSON.stringify({
+                action: 'update_progress',
+                template_id: templateId,
+                bulan: bulan,
+                tahun: tahun,
+                officer_id: officerId,
+                progress: targetVal,
+                keterangan: ketJson
+            })
+        });
+
+        const result = await response.json();
+        if (result.success) {
+            alert('Laporan berhasil disimpan!');
+            location.reload();
+        } else {
+            alert(result.message || 'Error saving laporan');
+        }
+    } catch (e) {
+        console.error(e);
+        alert('Terjadi kesalahan jaringan');
+    }
+}
+
+async function removeSosialisasiAjax(templateId, bulan, tahun, officerId) {
+    if (!confirm('Apakah Anda yakin ingin menghapus laporan ini?')) return;
+    try {
+        const response = await fetch('../api/tasks.php', {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+                'X-Requested-With': 'XMLHttpRequest'
+            },
+            body: JSON.stringify({
+                action: 'update_progress',
+                template_id: templateId,
+                bulan: bulan,
+                tahun: tahun,
+                officer_id: officerId,
+                progress: 0,
+                keterangan: ''
+            })
+        });
+
+        const result = await response.json();
+        if (result.success) {
+            alert('Laporan dihapus.');
+            location.reload();
+        } else {
+            alert(result.message || 'Error removing laporan');
         }
     } catch (e) {
         console.error(e);

@@ -4325,4 +4325,102 @@ body.login-body {
 .text-attention { color: var(--attention); }
 .text-critical { color: var(--critical); }
 
+/* Sosialisasi AML CFT CPF Pop Up Modal Styles */
+.sos-item-card {
+  border: 1px solid var(--border-color, #e5e5e5);
+  border-radius: 12px;
+  padding: 16px;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-top: 20px;
+  background: var(--card-bg, #fff);
+  transition: all 0.2s ease;
+}
+.sos-item-card:hover {
+  box-shadow: 0 4px 12px rgba(0,0,0,0.05);
+}
+.sos-icon-circle {
+  width: 44px;
+  height: 44px;
+  min-width: 44px;
+  border-radius: 50%;
+  background: #f0e6ff;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: #6b21a8;
+}
+[data-theme="dark"] .sos-icon-circle {
+  background: rgba(107, 33, 168, 0.25);
+  color: #d8b4fe;
+}
+.sos-item-title {
+  font-weight: 600;
+  font-size: 15px;
+  color: var(--text-main, #171717);
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+.sos-item-link {
+  font-size: 13px;
+  color: var(--text-muted, #737373);
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  margin-top: 2px;
+}
+.sos-item-link a {
+  color: inherit;
+  text-decoration: underline;
+}
+.sos-btn-remove {
+  color: #c93b2b;
+  font-weight: 600;
+  font-size: 14px;
+  cursor: pointer;
+  text-decoration: none;
+  white-space: nowrap;
+  margin-left: 12px;
+}
+.sos-btn-remove:hover {
+  text-decoration: underline;
+}
+.sos-btn-add {
+  color: var(--brand-primary, #0052cc);
+  font-weight: 600;
+  font-size: 15px;
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  cursor: pointer;
+  text-decoration: none;
+  margin-top: 24px;
+}
+.sos-btn-add:hover {
+  text-decoration: underline;
+}
+.sos-btn-add span {
+  font-size: 20px;
+  font-weight: 400;
+  line-height: 1;
+}
+.sos-divider {
+  display: flex;
+  align-items: center;
+  text-align: center;
+  color: var(--text-muted, #737373);
+  font-size: 13px;
+  margin: 24px 0;
+}
+.sos-divider::before, .sos-divider::after {
+  content: "";
+  flex: 1;
+  border-top: 1px solid var(--border-color, #e5e5e5);
+}
+.sos-divider span {
+  padding: 0 16px;
+}
+
 /*# sourceMappingURL=amlo-design-system.css.map */

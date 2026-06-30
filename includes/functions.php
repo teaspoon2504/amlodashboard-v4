@@ -339,3 +339,18 @@ function render_ds_button($props) {
 
     return $html;
 }
+
+/**
+ * Format keterangan task progress (if JSON sosialisasi, format readable)
+ */
+function format_keterangan($ket) {
+    if (!$ket) return '';
+    $trimmed = trim($ket);
+    if (str_starts_with($trimmed, '{')) {
+        $data = json_decode($trimmed, true);
+        if (is_array($data) && isset($data['nama'])) {
+            return $data['nama'] . (!empty($data['link']) ? ' (' . $data['link'] . ')' : '');
+        }
+    }
+    return $ket;
+}

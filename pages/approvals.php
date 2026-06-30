@@ -91,8 +91,8 @@ include __DIR__ . '/../includes/layout_header.php';
                                     <td><b><?= e($s['task_name']) ?></b></td>
                                     <td><span class="chip-wilayah"><?= e($s['kategori']) ?></span></td>
                                     <td>
-                                        <div class="font-12 text-steel max-w-250 text-ellipsis" title="<?= e($s['keterangan']) ?>">
-                                            <?= $s['keterangan'] ? e($s['keterangan']) : '<i>Tidak ada keterangan</i>' ?>
+                                        <div class="font-12 text-steel max-w-250 text-ellipsis" title="<?= e(format_keterangan($s['keterangan'])) ?>">
+                                            <?= $s['keterangan'] ? e(format_keterangan($s['keterangan'])) : '<i>Tidak ada keterangan</i>' ?>
                                         </div>
                                     </td>
                                     <td><?= date('d M Y, H:i', strtotime($s['submitted_at'])) ?></td>
