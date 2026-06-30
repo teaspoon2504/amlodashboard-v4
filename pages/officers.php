@@ -164,7 +164,7 @@ include __DIR__ . '/../includes/layout_header.php';
 
 <div class="content">
             <?php if ($flash): ?>
-                <div class="alert alert-success">✅ <?= e($flash['message']) ?></div>
+                <div class="alert alert-success"><i class="ph ph-check-circle"></i> <?= e($flash['message']) ?></div>
             <?php endif; ?>
 
             <div class="page-header">
@@ -253,7 +253,7 @@ include __DIR__ . '/../includes/layout_header.php';
 <div class="modal-overlay" id="modal-overlay" onclick="if(event.target===this)closeModal()">
     <div class="modal" id="modal-box">
         <div class="modal-header">
-            <div class="modal-title" id="modal-title">💬 Feedback</div>
+            <div class="modal-title" id="modal-title"><i class="ph ph-chat-text"></i> Feedback</div>
             <div class="modal-close" onclick="closeModal()">✕</div>
         </div>
         <div id="modal-body">
@@ -265,9 +265,9 @@ include __DIR__ . '/../includes/layout_header.php';
                 <div class="input-group">
                     <label class="input-label">Penilaian</label>
                     <select class="select-field" name="penilaian" id="feedback-penilaian">
-                        <option>⭐ Exceed — Pertahankan</option>
-                        <option>👍 Good — Terus tingkatkan</option>
-                        <option>⚠️ Below — Perlu coaching intensif</option>
+                        <option>Exceed — Pertahankan</option>
+                        <option>Good — Terus tingkatkan</option>
+                        <option>Below — Perlu coaching intensif</option>
                     </select>
                 </div>
 
@@ -298,7 +298,7 @@ include __DIR__ . '/../includes/layout_header.php';
 
 <script>
 function openFeedbackModal(officerId, officerName) {
-    document.getElementById('modal-title').textContent = '💬 Feedback untuk ' + officerName;
+    document.getElementById('modal-title').innerHTML = '<i class="ph ph-chat-text"></i> Feedback untuk ' + officerName;
     document.getElementById('feedback-task-id').value = officerId;
     document.getElementById('modal-overlay').classList.add('open');
 }

@@ -95,9 +95,10 @@ foreach ($all_templates as $tt) {
         
         if ($count_in_total) {
             $kpi_gold++;
-            if ($sub_status === 'pending') {
+            $isNoApproval = stripos($tt['nama'], 'E-Learning Target') !== false || stripos($tt['nama'], 'Tindak Lanjut RBA Bankwide') !== false;
+            if (!$isNoApproval && $sub_status === 'pending') {
                 $kpi_waiting++;
-            } elseif ($sub_status === 'approved') {
+            } elseif ($sub_status === 'approved' || ($isNoApproval && $prog >= 100)) {
                 $kpi_green++;
             } elseif ($prog > 0) {
                 $kpi_teal++; // In progress or reached target but not submitted
@@ -164,7 +165,7 @@ if ($user['role'] === 'officer') {
         ORDER BY f.created_at DESC LIMIT 5", [$user['id']]
     );
     foreach ($fbs as $fb) {
-        $alerts[] = ['type' => 'blue', 'text' => '💬 <b>Feedback HO:</b> ' . e(substr($fb['isi'], 0, 50)) . (strlen($fb['isi']) > 50 ? '...' : '') . ' pada ' . e($fb['task_name']), 'time' => date('d/m/Y H:i', strtotime($fb['created_at']))];
+        $alerts[] = ['type' => 'blue', 'text' => '<i class="ph ph-chat-centered-text"></i> <b>Feedback HO:</b> ' . e(substr($fb['isi'], 0, 50)) . (strlen($fb['isi']) > 50 ? '...' : '') . ' pada ' . e($fb['task_name']), 'time' => date('d/m/Y H:i', strtotime($fb['created_at']))];
     }
 } elseif ($user['role'] === 'lead') {
     $fbs = db_fetch_all("
@@ -177,20 +178,20 @@ if ($user['role'] === 'officer') {
         ORDER BY f.created_at DESC LIMIT 5", [$user['kanwil_id']]
     );
     foreach ($fbs as $fb) {
-        $alerts[] = ['type' => 'blue', 'text' => '💬 <b>HO Feedback (' . e($fb['off_nama']) . '):</b> ' . e(substr($fb['isi'], 0, 50)) . (strlen($fb['isi']) > 50 ? '...' : ''), 'time' => date('d/m/Y H:i', strtotime($fb['created_at']))];
+        $alerts[] = ['type' => 'blue', 'text' => '<i class="ph ph-chat-centered-text"></i> <b>HO Feedback (' . e($fb['off_nama']) . '):</b> ' . e(substr($fb['isi'], 0, 50)) . (strlen($fb['isi']) > 50 ? '...' : ''), 'time' => date('d/m/Y H:i', strtotime($fb['created_at']))];
     }
 }
 
 foreach ($perf['tasks'] as $t) {
     if ($t['status'] === 'pending') {
-        $alerts[] = ['type' => 'red', 'text' => '⚠️ <b>' . e($t['nama']) . '</b> belum disubmit', 'time' => '🕒 Overdue — segera submit'];
+        $alerts[] = ['type' => 'red', 'text' => '<i class="ph ph-warning-circle"></i> <b>' . e($t['nama']) . '</b> belum disubmit', 'time' => '<i class="ph ph-clock"></i> Overdue — segera submit'];
     } elseif ($t['progress'] < 50 && $t['progress'] > 0) {
-        $alerts[] = ['type' => 'amber', 'text' => '📌 <b>' . e($t['nama']) . '</b> progress rendah: ' . $t['progress'] . '%', 'time' => '⏳ Perlu perhatian'];
+        $alerts[] = ['type' => 'amber', 'text' => '<i class="ph ph-push-pin"></i> <b>' . e($t['nama']) . '</b> progress rendah: ' . $t['progress'] . '%', 'time' => '<i class="ph ph-hourglass"></i> Perlu perhatian'];
     }
 }
 foreach ($perf['tasks'] as $t) {
     if ($t['status'] === 'done' || $t['status'] === 'approved') {
-        $alerts[] = ['type' => 'green', 'text' => '✅ <b>' . e($t['nama']) . '</b> selesai ' . $t['progress'] . '%', 'time' => 'Selesai'];
+        $alerts[] = ['type' => 'green', 'text' => '<i class="ph ph-check-circle"></i> <b>' . e($t['nama']) . '</b> selesai ' . $t['progress'] . '%', 'time' => 'Selesai'];
     }
 }
 $alerts = array_slice($alerts, 0, 5);
@@ -227,41 +228,41 @@ include __DIR__ . '/../includes/layout_header.php';
                 <div class="kpi-grid">
                     <div class="kpi-card gold">
                         <div class="kpi-details">
-                            <div class="kpi-card-icon">📋</div>
+                            <div class="kpi-card-icon"><i class="ph ph-clipboard-text"></i></div>
                             <div class="kpi-label">Total Tugas</div>
-                            <div class="kpi-sub">📅 <?= date('F Y') ?></div>
+                            <div class="kpi-sub"><i class="ph ph-calendar"></i> <?= date('F Y') ?></div>
                         </div>
                         <div class="kpi-value"><?= $kpi_gold ?></div>
                     </div>
                     <div class="kpi-card green">
                         <div class="kpi-details">
-                            <div class="kpi-card-icon">✅</div>
+                            <div class="kpi-card-icon"><i class="ph ph-check-circle"></i></div>
                             <div class="kpi-label">Selesai</div>
-                            <div class="kpi-sub">🎯 <?= $kpi_gold > 0 ? round($kpi_green / $kpi_gold * 100) : 0 ?>% dari total</div>
+                            <div class="kpi-sub"><i class="ph ph-target"></i> <?= $kpi_gold > 0 ? round($kpi_green / $kpi_gold * 100) : 0 ?>% dari total</div>
                         </div>
                         <div class="kpi-value"><?= $kpi_green ?></div>
                     </div>
                     <div class="kpi-card orange">
                         <div class="kpi-details">
-                            <div class="kpi-card-icon">⌛</div>
+                            <div class="kpi-card-icon"><i class="ph ph-hourglass"></i></div>
                             <div class="kpi-label">Waiting Approval</div>
-                            <div class="kpi-sub">⏳ Menunggu Lead</div>
+                            <div class="kpi-sub"><i class="ph ph-clock"></i> Menunggu Lead</div>
                         </div>
                         <div class="kpi-value"><?= $kpi_waiting ?></div>
                     </div>
                     <div class="kpi-card teal">
                         <div class="kpi-details">
-                            <div class="kpi-card-icon">⚡</div>
+                            <div class="kpi-card-icon"><i class="ph ph-lightning"></i></div>
                             <div class="kpi-label">Berjalan</div>
-                            <div class="kpi-sub">🔄 In progress</div>
+                            <div class="kpi-sub"><i class="ph ph-arrows-clockwise"></i> In progress</div>
                         </div>
                         <div class="kpi-value"><?= $kpi_teal ?></div>
                     </div>
                     <div class="kpi-card red">
                         <div class="kpi-details">
-                            <div class="kpi-card-icon">⏳</div>
+                            <div class="kpi-card-icon"><i class="ph ph-hourglass-empty"></i></div>
                             <div class="kpi-label">Not started</div>
-                            <div class="kpi-sub">⚠️ Perlu perhatian</div>
+                            <div class="kpi-sub"><i class="ph ph-warning-circle"></i> Perlu perhatian</div>
                         </div>
                         <div class="kpi-value"><?= $kpi_red ?></div>
                     </div>
@@ -270,33 +271,33 @@ include __DIR__ . '/../includes/layout_header.php';
                 <div class="kpi-grid">
                     <div class="kpi-card gold">
                         <div class="kpi-details">
-                            <div class="kpi-card-icon">👥</div>
+                            <div class="kpi-card-icon"><i class="ph ph-users"></i></div>
                             <div class="kpi-label">AMLO member</div>
-                            <div class="kpi-sub">📍 <?= e($user['kanwil_nama']) ?></div>
+                            <div class="kpi-sub"><i class="ph ph-map-pin"></i> <?= e($user['kanwil_nama']) ?></div>
                         </div>
                         <div class="kpi-value"><?= count($team_tasks) ?></div>
                     </div>
                     <div class="kpi-card green">
                         <div class="kpi-details">
-                            <div class="kpi-card-icon">⭐</div>
+                            <div class="kpi-card-icon"><i class="ph ph-star"></i></div>
                             <div class="kpi-label">Exceed</div>
-                            <div class="kpi-sub">✅ Officer berprestasi</div>
+                            <div class="kpi-sub"><i class="ph ph-check-circle"></i> Officer berprestasi</div>
                         </div>
                         <div class="kpi-value"><?= count(array_filter($team_tasks, fn($t) => $t['summary']['done'] + $t['summary']['approved'] >= 8)) ?></div>
                     </div>
                     <div class="kpi-card teal">
                         <div class="kpi-details">
-                            <div class="kpi-card-icon">👍</div>
+                            <div class="kpi-card-icon"><i class="ph ph-thumbs-up"></i></div>
                             <div class="kpi-label">Good</div>
-                            <div class="kpi-sub">📊 Sesuai target</div>
+                            <div class="kpi-sub"><i class="ph ph-chart-bar"></i> Sesuai target</div>
                         </div>
                         <div class="kpi-value"><?= count(array_filter($team_tasks, fn($t) => $t['summary']['done'] + $t['summary']['approved'] >= 5 && $t['summary']['done'] + $t['summary']['approved'] < 8)) ?></div>
                     </div>
                     <div class="kpi-card red">
                         <div class="kpi-details">
-                            <div class="kpi-card-icon">❗</div>
+                            <div class="kpi-card-icon"><i class="ph ph-warning"></i></div>
                             <div class="kpi-label">Below</div>
-                            <div class="kpi-sub">⚡ Butuh Coaching</div>
+                            <div class="kpi-sub"><i class="ph ph-lightning"></i> Butuh Coaching</div>
                         </div>
                         <div class="kpi-value"><?= count(array_filter($team_tasks, fn($t) => $t['summary']['done'] + $t['summary']['approved'] < 5)) ?></div>
                     </div>
@@ -305,33 +306,33 @@ include __DIR__ . '/../includes/layout_header.php';
                 <div class="kpi-grid">
                     <div class="kpi-card gold">
                         <div class="kpi-details">
-                            <div class="kpi-card-icon">🌐</div>
+                            <div class="kpi-card-icon"><i class="ph ph-globe"></i></div>
                             <div class="kpi-label">Total Regional Office</div>
-                            <div class="kpi-sub">📍 Seluruh Indonesia</div>
+                            <div class="kpi-sub"><i class="ph ph-map-pin"></i> Seluruh Indonesia</div>
                         </div>
                         <div class="kpi-value"><?= count($wilayah_data) ?></div>
                     </div>
                     <div class="kpi-card green">
                         <div class="kpi-details">
-                            <div class="kpi-card-icon">✅</div>
+                            <div class="kpi-card-icon"><i class="ph ph-check-circle"></i></div>
                             <div class="kpi-label">RO Exceed</div>
-                            <div class="kpi-sub">↑ RO berprestasi</div>
+                            <div class="kpi-sub"><i class="ph ph-trend-up"></i> RO berprestasi</div>
                         </div>
                         <div class="kpi-value"><?= count(array_filter($wilayah_data, fn($w) => $w['exceed_count'] > $w['below_count'])) ?></div>
                     </div>
                     <div class="kpi-card teal">
                         <div class="kpi-details">
-                            <div class="kpi-card-icon">👤</div>
+                            <div class="kpi-card-icon"><i class="ph ph-user"></i></div>
                             <div class="kpi-label">Total AML Officer</div>
-                            <div class="kpi-sub">📊 AMLO Aktif</div>
+                            <div class="kpi-sub"><i class="ph ph-chart-bar"></i> AMLO Aktif</div>
                         </div>
                         <div class="kpi-value"><?= array_sum(array_column($wilayah_data, 'total_officer')) ?></div>
                     </div>
                     <div class="kpi-card blue">
                         <div class="kpi-details">
-                            <div class="kpi-card-icon">🌟</div>
+                            <div class="kpi-card-icon"><i class="ph ph-sparkle"></i></div>
                             <div class="kpi-label">AMLO Exceed</div>
-                            <div class="kpi-sub">✅ AMLO berprestasi</div>
+                            <div class="kpi-sub"><i class="ph ph-check-circle"></i> AMLO berprestasi</div>
                         </div>
                         <div class="kpi-value"><?= array_sum(array_column($wilayah_data, 'exceed_count')) ?></div>
                     </div>
@@ -342,7 +343,7 @@ include __DIR__ . '/../includes/layout_header.php';
             <div class="two-col">
                 <div class="card">
                     <div class="card-header">
-                        <div class="card-title">📊 Progress Laporan</div>
+                        <div class="card-title"><i class="ph ph-chart-bar"></i> Progress Laporan</div>
                         <a href="laporan.php" class="card-action">Lihat Semua →</a>
                     </div>
                     <?php 
@@ -350,7 +351,7 @@ include __DIR__ . '/../includes/layout_header.php';
                     if (empty($filtered_progress)): 
                     ?>
                         <div class="empty-state-p40 font-13">
-                            Belum melakukan progress laporan. ✨
+                            Belum melakukan progress laporan.
                         </div>
                     <?php 
                     else:
@@ -375,7 +376,7 @@ include __DIR__ . '/../includes/layout_header.php';
 
                 <div class="card">
                     <div class="card-header card-header-col">
-                        <div class="card-title w-full">📅 Kalender Aktivitas — <?= $nama_bulan[$bulan] ?> <?= $tahun ?></div>
+                        <div class="card-title w-full"><i class="ph ph-calendar"></i> Kalender Aktivitas — <?= $nama_bulan[$bulan] ?> <?= $tahun ?></div>
                         <form method="GET" id="cal-filter-form" class="todo-filters-container cal-filter-form">
                             <div>
                                 <label class="filter-label">Bulan</label>
@@ -491,11 +492,11 @@ include __DIR__ . '/../includes/layout_header.php';
                         foreach ($tasks as $t) {
                             $badge = '';
                             if ($t['status'] === 'selesai') {
-                                $badge = '<span class="font-semibold font-10 text-success">✅ Selesai</span>';
+                                $badge = '<span class="font-semibold font-10 text-success"><i class="ph ph-check-circle"></i> Selesai</span>';
                             } elseif ($t['status'] === 'in_progress') {
-                                $badge = '<span class="font-semibold font-10 text-attention">⏳ Berjalan</span>';
+                                $badge = '<span class="font-semibold font-10 text-attention"><i class="ph ph-hourglass-high"></i> Berjalan</span>';
                             } else {
-                                $badge = '<span class="font-semibold font-10 text-critical">⚠️ Belum Mulai</span>';
+                                $badge = '<span class="font-semibold font-10 text-critical"><i class="ph ph-warning-circle"></i> Belum Mulai</span>';
                             }
                             $html .= "<div class='font-13 mb-sm text-ink'>• " . e($t['task_name']) . " <span class='float-right'>$badge</span></div>";
                         }
@@ -538,12 +539,12 @@ include __DIR__ . '/../includes/layout_header.php';
             <div class="two-col">
                 <div class="card" id="notifikasi-section">
                     <div class="card-header">
-                        <div class="card-title">🔔 Notifikasi & Alert</div>
+                        <div class="card-title"><i class="ph ph-bell"></i> Notifikasi & Alert</div>
                     </div>
 
                     <?php
                     if (empty($alerts)) {
-                        echo '<div class="empty-state-p40 font-13">Tidak ada notifikasi saat ini. ✨</div>';
+                        echo '<div class="empty-state-p40 font-13">Tidak ada notifikasi saat ini.</div>';
                     } else {
                         foreach ($alerts as $alert):
                     ?>

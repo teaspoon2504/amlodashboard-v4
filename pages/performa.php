@@ -334,15 +334,15 @@ include __DIR__ . '/../includes/layout_header.php';
                     $avg = $display_avg;
                     if ($avg >= 100) {
                         $badge_class = 'perf-exceed';
-                        $badge_text = '⭐ EXCEED';
+                        $badge_text = '<i class="ph ph-star"></i> EXCEED';
                         $badge_desc = 'Luar Biasa! Semua target selesai.';
                     } elseif ($avg >= 80) {
                         $badge_class = 'perf-good';
-                        $badge_text = '👍 GOOD';
+                        $badge_text = '<i class="ph ph-thumbs-up"></i> GOOD';
                         $badge_desc = 'Kerja Bagus! Pertahankan.';
                     } else {
                         $badge_class = 'perf-below';
-                        $badge_text = '⚠️ BELOW';
+                        $badge_text = '<i class="ph ph-warning"></i> BELOW';
                         $badge_desc = 'Perlu Perbaikan. Tingkatkan effort.';
                     }
                     ?>
@@ -361,7 +361,7 @@ include __DIR__ . '/../includes/layout_header.php';
 
                 <div class="card">
                     <div class="card-header">
-                        <div class="card-title">🎯 Performa per Jenis Laporan</div>
+                        <div class="card-title"><i class="ph ph-target"></i> Performa per Jenis Laporan</div>
                     </div>
                     <table class="perf-table">
                         <thead>
@@ -460,7 +460,7 @@ include __DIR__ . '/../includes/layout_header.php';
             <?php if ($team_perf && count($team_perf) > 0): ?>
             <div class="separator"></div>
             <div class="card">
-                <div class="card-header"><div class="card-title">👥 Performa Tim AMLO <?= $user['role'] === 'ho' ? 'Seluruh Wilayah' : 'Officer' ?> — <?= $nama_bulan[$req_bulan] ?> <?= $req_tahun ?></div></div>
+                <div class="card-header"><div class="card-title"><i class="ph ph-users"></i> Performa Tim AMLO <?= $user['role'] === 'ho' ? 'Seluruh Wilayah' : 'Officer' ?> — <?= $nama_bulan[$req_bulan] ?> <?= $req_tahun ?></div></div>
                 <table class="perf-table">
                     <thead><tr>
                         <th>Officer</th>

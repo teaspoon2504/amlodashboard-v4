@@ -124,32 +124,32 @@ function can_access_kanwil($kanwil_id) {
  */
 function get_nav_items($role) {
     $base = [
-        ['id' => 'dashboard', 'icon' => '🏠', 'label' => 'Beranda']
+        ['id' => 'dashboard', 'icon' => '<i class="ph ph-house"></i>', 'label' => 'Beranda']
     ];
 
     $role_navs = [
         'officer' => [
-            ['id' => 'tasks', 'icon' => '✅', 'label' => 'To-Do Harian'],
-            ['id' => 'laporan', 'icon' => '📋', 'label' => 'Tracking Laporan'],
-            ['id' => 'jobdesc', 'icon' => '📌', 'label' => 'Job Description']
+            ['id' => 'tasks', 'icon' => '<i class="ph ph-check-square"></i>', 'label' => 'To-Do Harian'],
+            ['id' => 'laporan', 'icon' => '<i class="ph ph-file-text"></i>', 'label' => 'Tracking Laporan'],
+            ['id' => 'jobdesc', 'icon' => '<i class="ph ph-push-pin"></i>', 'label' => 'Job Description']
         ],
         'lead' => [
-            ['id' => 'tasks', 'icon' => '✅', 'label' => 'To-Do Harian'],
-            ['id' => 'laporan', 'icon' => '📋', 'label' => 'Tracking Laporan'],
-            ['id' => 'approvals', 'icon' => '✓', 'label' => 'Approvals'],
-            ['id' => 'officers', 'icon' => '👥', 'label' => 'Monitoring Officer'],
-            ['id' => 'assignments', 'icon' => '📤', 'label' => 'Penugasan'],
-            ['id' => 'manajemen_tugas', 'icon' => '🎯', 'label' => 'Manajemen Tugas'],
-            ['id' => 'jobdesc', 'icon' => '📌', 'label' => 'Job Description']
+            ['id' => 'tasks', 'icon' => '<i class="ph ph-check-square"></i>', 'label' => 'To-Do Harian'],
+            ['id' => 'laporan', 'icon' => '<i class="ph ph-file-text"></i>', 'label' => 'Tracking Laporan'],
+            ['id' => 'approvals', 'icon' => '<i class="ph ph-seal-check"></i>', 'label' => 'Approvals'],
+            ['id' => 'officers', 'icon' => '<i class="ph ph-users"></i>', 'label' => 'Monitoring Officer'],
+            ['id' => 'assignments', 'icon' => '<i class="ph ph-paper-plane-tilt"></i>', 'label' => 'Penugasan'],
+            ['id' => 'manajemen_tugas', 'icon' => '<i class="ph ph-target"></i>', 'label' => 'Manajemen Tugas'],
+            ['id' => 'jobdesc', 'icon' => '<i class="ph ph-push-pin"></i>', 'label' => 'Job Description']
         ],
         'ho' => [
-            ['id' => 'wilayah', 'icon' => '🗺', 'label' => 'Monitoring RO'],
-            ['id' => 'laporan', 'icon' => '📋', 'label' => 'Tracking Laporan'],
-            ['id' => 'performa', 'icon' => '📈', 'label' => 'Performa Agregat'],
-            ['id' => 'assignments', 'icon' => '📤', 'label' => 'Penugasan'],
-            ['id' => 'manajemen_tugas', 'icon' => '🎯', 'label' => 'Manajemen Tugas'],
-            ['id' => 'assessment', 'icon' => '📝', 'label' => 'Assessment & Feedback'],
-            ['id' => 'jobdesc', 'icon' => '📌', 'label' => 'Job Description']
+            ['id' => 'wilayah', 'icon' => '<i class="ph ph-map-trifold"></i>', 'label' => 'Monitoring RO'],
+            ['id' => 'laporan', 'icon' => '<i class="ph ph-file-text"></i>', 'label' => 'Tracking Laporan'],
+            ['id' => 'performa', 'icon' => '<i class="ph ph-chart-line-up"></i>', 'label' => 'Performa Agregat'],
+            ['id' => 'assignments', 'icon' => '<i class="ph ph-paper-plane-tilt"></i>', 'label' => 'Penugasan'],
+            ['id' => 'manajemen_tugas', 'icon' => '<i class="ph ph-target"></i>', 'label' => 'Manajemen Tugas'],
+            ['id' => 'assessment', 'icon' => '<i class="ph ph-clipboard-text"></i>', 'label' => 'Assessment & Feedback'],
+            ['id' => 'jobdesc', 'icon' => '<i class="ph ph-push-pin"></i>', 'label' => 'Job Description']
         ]
     ];
 

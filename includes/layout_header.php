@@ -21,6 +21,9 @@ if (!isset($page_title)) {
     <!-- Design System (Global Styles) -->
     <link href="../assets/css/amlo-design-system.css?v=1780939681" rel="stylesheet">
     
+    <!-- Phosphor Icons -->
+    <script src="https://unpkg.com/@phosphor-icons/web@2.1.1"></script>
+    
     <!-- Page Specific CSS -->
     <?php if (isset($page_css)): ?>
     <link href="<?= htmlspecialchars($page_css, ENT_QUOTES, 'UTF-8') ?>" rel="stylesheet">

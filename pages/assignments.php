@@ -104,7 +104,7 @@ include __DIR__ . '/../includes/layout_header.php';
 <div class="content">
             <?php if ($flash): ?>
                 <div id="toast-notification" class="toast-notification <?= $flash['type'] ?? 'success' ?>">
-                    <span class="toast-icon toast-icon-lg"><?= ($flash['type'] ?? 'success') === 'success' ? '✅' : '⚠️' ?></span>
+                    <span class="toast-icon toast-icon-lg"><?= ($flash['type'] ?? 'success') === 'success' ? '<i class="ph ph-check-circle"></i>' : '<i class="ph ph-warning-circle"></i>' ?></span>
                     <span class="toast-message"><?= e($flash['message']) ?></span>
                 </div>
                 <script>

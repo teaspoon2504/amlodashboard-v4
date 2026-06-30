@@ -22,14 +22,14 @@
     </div>
     <div class="topbar-right">
         <div class="topbar-notif theme-toggle cursor-pointer font-16" onclick="toggleTheme()" title="Toggle Theme">
-            <span id="theme-icon">🌙</span>
+            <i id="theme-icon" class="ph ph-moon font-18"></i>
         </div>
         <?php if (!empty($topbar_notif_action)): ?>
             <div class="topbar-notif cursor-pointer" onclick="<?= htmlspecialchars($topbar_notif_action, ENT_QUOTES, 'UTF-8') ?>" title="Lihat Notifikasi">
-                🔔<?php if (!empty($alerts)): ?><div class="notif-dot"></div><?php endif; ?>
+                <i class="ph ph-bell font-18"></i><?php if (!empty($alerts)): ?><div class="notif-dot"></div><?php endif; ?>
             </div>
         <?php else: ?>
-            <div class="topbar-notif">🔔</div>
+            <div class="topbar-notif"><i class="ph ph-bell font-18"></i></div>
         <?php endif; ?>
         
         <div class="topbar-profile" tabindex="0">
@@ -40,7 +40,7 @@
                     <div class="dropdown-role"><?= htmlspecialchars(get_role_label($user['role'] ?? ''), ENT_QUOTES, 'UTF-8') ?></div>
                 </div>
                 <a href="../logout.php" class="dropdown-item text-critical">
-                    <span class="font-16">🚪</span> Keluar
+                    <i class="ph ph-sign-out font-16"></i> Keluar
                 </a>
             </div>
         </div>
@@ -51,7 +51,7 @@
 function updateThemeIcon(theme) {
     const icon = document.getElementById('theme-icon');
     if(icon) {
-        icon.textContent = theme === 'light' ? '☀️' : '🌙';
+        icon.className = theme === 'light' ? 'ph ph-sun font-18' : 'ph ph-moon font-18';
     }
 }
 

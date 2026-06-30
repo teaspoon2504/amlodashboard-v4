@@ -183,16 +183,19 @@ function json_response($success, $message = '', $data = []) {
  */
 function get_task_summary($user_id, $tahun, $bulan) {
     $all = db_fetch_all(
-        "SELECT status, COUNT(*) as count FROM task_progress
-         WHERE user_id = ? AND tahun = ? AND bulan = ? AND periode != 'harian'
-         GROUP BY status",
+        "SELECT tp.status, tp.progress, tt.nama FROM task_progress tp
+         JOIN task_templates tt ON tp.template_id = tt.id
+         WHERE tp.user_id = ? AND tp.tahun = ? AND tp.bulan = ? AND tp.periode != 'harian'",
         [$user_id, $tahun, $bulan]
     );
 
     $summary = ['done' => 0, 'active' => 0, 'pending' => 0, 'approved' => 0, 'total' => 0];
     foreach ($all as $row) {
-        $summary[$row['status']] = (int)$row['count'];
-        $summary['total'] += (int)$row['count'];
+        $isNoApproval = stripos($row['nama'], 'E-Learning Target') !== false || stripos($row['nama'], 'Tindak Lanjut RBA Bankwide') !== false;
+        $status = ($isNoApproval && $row['progress'] >= 100) ? 'approved' : $row['status'];
+        if (!isset($summary[$status])) $summary[$status] = 0;
+        $summary[$status]++;
+        $summary['total']++;
     }
     return $summary;
 }

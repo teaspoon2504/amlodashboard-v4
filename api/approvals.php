@@ -39,7 +39,7 @@ switch ($_SERVER['REQUEST_METHOD']) {
              JOIN users u ON s.submitted_by = u.id
              JOIN kantor_wilayah kw ON u.kanwil_id = kw.id
              JOIN task_templates tt ON tp.template_id = tt.id
-             WHERE s.status = 'pending' $role_filter
+             WHERE s.status = 'pending' AND tt.nama NOT LIKE '%E-Learning Target%' AND tt.nama NOT LIKE '%Tindak Lanjut RBA Bankwide%' $role_filter
              ORDER BY s.submitted_at DESC",
             $params
         );

@@ -34,7 +34,7 @@ $submissions = db_fetch_all(
      JOIN users u ON s.submitted_by = u.id
      JOIN kantor_wilayah kw ON u.kanwil_id = kw.id
      JOIN task_templates tt ON tp.template_id = tt.id
-     WHERE s.status = 'pending' AND tt.periode != 'harian' $role_filter
+     WHERE s.status = 'pending' AND tt.periode != 'harian' AND tt.nama NOT LIKE '%E-Learning Target%' AND tt.nama NOT LIKE '%Tindak Lanjut RBA Bankwide%' $role_filter
      ORDER BY s.submitted_at DESC",
     $params
 );
@@ -56,7 +56,7 @@ include __DIR__ . '/../includes/layout_header.php';
             
             <div class="card">
                 <div class="card-header">
-                    <div class="card-title">⏳ Menunggu Persetujuan (Pending Approvals)</div>
+                    <div class="card-title"><i class="ph ph-hourglass-high"></i> Menunggu Persetujuan (Pending Approvals)</div>
                 </div>
                 <table class="perf-table">
                     <thead>
@@ -74,7 +74,7 @@ include __DIR__ . '/../includes/layout_header.php';
                         <?php if (empty($submissions)): ?>
                             <tr>
                                 <td colspan="7" class="empty-state-p40">
-                                    <div class="font-24 mb-sm">🎉</div>
+                                    <div class="font-24 mb-sm"><i class="ph ph-party-popper font-size-28"></i></div>
                                     Tidak ada pengajuan yang perlu di-review saat ini.
                                 </td>
                             </tr>
@@ -83,7 +83,7 @@ include __DIR__ . '/../includes/layout_header.php';
                                 <tr id="row-<?= $s['id'] ?>">
                                     <td class="text-steel"><?= $no++ ?></td>
                                     <td>
-                                        <div class="font-semibold text-teal">👤 <?= e($s['officer_name']) ?></div>
+                                        <div class="font-semibold text-teal"><?= e($s['officer_name']) ?></div>
                                         <?php if($user['role']==='ho'): ?>
                                             <div class="font-11 text-steel mt-xs"><?= e($s['kanwil_nama']) ?></div>
                                         <?php endif; ?>
@@ -103,7 +103,7 @@ include __DIR__ . '/../includes/layout_header.php';
                                                 'variant' => 'filled',
                                                 'size' => 'small',
                                                 'children' => 'Approve',
-                                                'leftIcon' => '✅',
+                                                'leftIcon' => '<i class="ph ph-check-circle"></i>',
                                                 'onClick' => "openApprovalModal({$s['id']}, 'approve', '" . htmlspecialchars($s['officer_name'], ENT_QUOTES) . "')"
                                             ]) ?>
                                             <?= render_ds_button([
@@ -111,7 +111,7 @@ include __DIR__ . '/../includes/layout_header.php';
                                                 'variant' => 'outlined',
                                                 'size' => 'small',
                                                 'children' => 'Reject',
-                                                'leftIcon' => '❌',
+                                                'leftIcon' => '<i class="ph ph-x-circle"></i>',
                                                 'onClick' => "openApprovalModal({$s['id']}, 'reject', '" . htmlspecialchars($s['officer_name'], ENT_QUOTES) . "')"
                                             ]) ?>
                                         </div>
@@ -178,12 +178,12 @@ function openApprovalModal(submissionId, action, officerName) {
     const btn = document.getElementById('btn-submit-modal');
     
     if (action === 'approve') {
-        title.textContent = '✅ Konfirmasi Approve';
+        title.innerHTML = '<i class="ph ph-check-circle text-success"></i> Konfirmasi Approve';
         desc.innerHTML = `Anda akan menyetujui pengajuan tugas dari <b>${officerName}</b>. Status tugas ini akan berubah menjadi <b>Selesai</b>.`;
         btn.textContent = 'Approve Tugas';
         btn.style.background = 'var(--success)';
     } else {
-        title.textContent = '❌ Konfirmasi Reject';
+        title.innerHTML = '<i class="ph ph-x-circle text-critical"></i> Konfirmasi Reject';
         desc.innerHTML = `Anda akan menolak (reject) pengajuan tugas dari <b>${officerName}</b>.`;
         btn.textContent = 'Reject Tugas';
         btn.style.background = 'var(--critical)';
@@ -233,7 +233,7 @@ function submitApproval() {
                         tbody.innerHTML = `
                             <tr>
                                 <td colspan="7" class="empty-state-p40">
-                                    <div class="font-24 mb-sm">🎉</div>
+                                    <div class="font-24 mb-sm"><i class="ph ph-party-popper font-size-28"></i></div>
                                     Tidak ada pengajuan yang perlu di-review saat ini.
                                 </td>
                             </tr>

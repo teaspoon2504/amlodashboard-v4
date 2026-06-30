@@ -58,6 +58,16 @@ $csrf_token = generate_csrf_token();
     <title>Login — AMLO Dashboard</title>
     <link href="../assets/css/fonts.css" rel="stylesheet">
     <link href="../assets/css/amlo-design-system.css" rel="stylesheet">
+    <script src="https://unpkg.com/@phosphor-icons/web@2.1.1"></script>
+    <style>
+        body {
+            background-color: var(--canvas-alt);
+            min-height: 100vh;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+    </style>
     <script>
         const savedTheme = localStorage.getItem('theme') || 'dark';
         document.documentElement.setAttribute('data-theme', savedTheme);
@@ -68,7 +78,7 @@ $csrf_token = generate_csrf_token();
 
     <div class="login-shell">
         <div class="theme-toggle login-theme-toggle" onclick="toggleTheme()" title="Toggle Theme">
-            <span id="theme-icon">🌙</span>
+            <i id="theme-icon" class="ph ph-moon font-18"></i>
         </div>
         <div class="login-card">
             <div class="login-form-wrap">
@@ -77,13 +87,13 @@ $csrf_token = generate_csrf_token();
 
                 <?php if ($error): ?>
                     <div class="login-alert login-alert-error mt-lg">
-                        <span>⚠️</span><span><?= e($error) ?></span>
+                        <i class="ph ph-warning-circle font-18"></i><span><?= e($error) ?></span>
                     </div>
                 <?php endif; ?>
 
                 <?php if ($success): ?>
                     <div class="login-alert login-alert-success mt-lg">
-                        <span>✅</span><span><?= e($success) ?></span>
+                        <i class="ph ph-check-circle font-18"></i><span><?= e($success) ?></span>
                     </div>
                 <?php endif; ?>
 
@@ -123,7 +133,7 @@ $csrf_token = generate_csrf_token();
         function updateThemeIcon(theme) {
             const icon = document.getElementById('theme-icon');
             if(icon) {
-                icon.textContent = theme === 'light' ? '☀️' : '🌙';
+                icon.className = theme === 'light' ? 'ph ph-sun font-18' : 'ph ph-moon font-18';
             }
         }
 

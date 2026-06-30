@@ -87,7 +87,7 @@ include __DIR__ . '/../includes/layout_header.php';
             </div>
 
             <div class="mb-xxl">
-                <input type="text" id="searchInput" class="job-search-input" onkeyup="filterJobs()" placeholder="🔍 Cari job description atau kategori...">
+                <input type="text" id="searchInput" class="job-search-input" onkeyup="filterJobs()" placeholder="Cari job description atau kategori...">
             </div>
 
             <?php

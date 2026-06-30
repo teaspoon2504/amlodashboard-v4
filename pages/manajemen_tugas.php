@@ -185,11 +185,11 @@ function loadTargets() {
                 if (currentPlafon === 0) {
                     alertBox.className = 'target-alert-box login-alert-error';
                     alertBox.style.display = 'block';
-                    alertBox.innerHTML = '⚠️ HO belum menentukan target untuk Regional Office Anda pada bulan ini.';
+                    alertBox.innerHTML = '<i class="ph ph-warning-circle"></i> HO belum menentukan target untuk Regional Office Anda pada bulan ini.';
                 } else {
                     alertBox.className = 'target-alert-box login-alert-success';
                     alertBox.style.display = 'block';
-                    alertBox.innerHTML = `ℹ️ Plafon target dari HO untuk Regional Office Anda adalah: <b>${currentPlafon}</b>`;
+                    alertBox.innerHTML = `<i class="ph ph-info"></i> Plafon target dari HO untuk Regional Office Anda adalah: <b>${currentPlafon}</b>`;
                 }
 
                 res.data.officers.forEach(o => {

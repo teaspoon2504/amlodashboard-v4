@@ -316,7 +316,7 @@ include __DIR__ . '/../includes/layout_header.php';
         <div class="content">
             <?php if ($flash): ?>
                 <div class="alert alert-<?= $flash['type'] ?>">
-                    <?= $flash['type'] === 'success' ? '✅' : '⚠️' ?> <?= e($flash['message']) ?>
+                    <?= $flash['type'] === 'success' ? '<i class="ph ph-check-circle"></i>' : '<i class="ph ph-warning-circle"></i>' ?> <?= e($flash['message']) ?>
                 </div>
             <?php endif; ?>
 
@@ -395,14 +395,15 @@ include __DIR__ . '/../includes/layout_header.php';
                         $vis_pct = $t['progress'] >= 100 ? 100 : $t['progress']; // fallback
                     }
 
-                    $isDone = $t['submission_status'] === 'approved' || $t['progress_status'] === 'approved';
+                    $isNoApproval = stripos($t['nama'], 'E-Learning Target') !== false || stripos($t['nama'], 'Tindak Lanjut RBA Bankwide') !== false;
+                    $isDone = $t['submission_status'] === 'approved' || $t['progress_status'] === 'approved' || ($isNoApproval && $vis_pct >= 100);
                     $pctClass = $vis_pct >= 100 ? 'text-success' : ($vis_pct >= 80 ? 'text-blue' : ($vis_pct >= 50 ? 'text-attention' : 'text-critical'));
                     $barClass = $vis_pct >= 100 ? 'bar-exceed' : ($vis_pct >= 80 ? 'bar-good' : 'bar-below');
                     ?>
-                    <div class="todo-item <?= $isDone ? 'done' : '' ?> <?= $t['submission_status'] === 'pending' && $t['progress'] > 0 ? 'pending-submit' : '' ?>"
+                    <div class="todo-item <?= $isDone ? 'done' : '' ?> <?= (!$isNoApproval && $t['submission_status'] === 'pending' && $t['progress'] > 0) ? 'pending-submit' : '' ?>"
                          data-tag="<?= e($t['tag']) ?>"
-                         data-status="<?= e($t['progress_status'] ?? 'pending') ?>"
-                         data-submission-status="<?= e($t['submission_status'] ?? '') ?>"
+                         data-status="<?= e(($isNoApproval && $vis_pct >= 100) ? 'done' : ($t['progress_status'] ?? 'pending')) ?>"
+                         data-submission-status="<?= e($isNoApproval ? '' : ($t['submission_status'] ?? '')) ?>"
                          data-kategori="<?= e($t['kategori']) ?>"
                          data-bulan="<?= e($t['vis_bulan']) ?>"
                          data-officer="<?= e($t['officer_id']) ?>"
@@ -414,10 +415,10 @@ include __DIR__ . '/../includes/layout_header.php';
                                 <div class="todo-title">
                                     <?= e($t['nama']) ?>
                                     <span class="text-steel font-size-10">[<?= e($t['kategori']) ?>]</span>
-                                    <?php if ($t['submission_status'] === 'pending'): ?>
+                                    <?php if (!$isNoApproval && $t['submission_status'] === 'pending'): ?>
                                         <span class="perf-badge badge-waiting-approval">⌛ WAITING FOR APPROVAL</span>
                                     <?php elseif ($isDone): ?>
-                                        <span class="perf-badge badge-done-approval">✅ SELESAI</span>
+                                        <span class="perf-badge badge-done-approval"><i class="ph ph-check-circle"></i> SELESAI</span>
                                     <?php endif; ?>
                                 </div>
                                 <div class="todo-meta">
@@ -453,7 +454,7 @@ include __DIR__ . '/../includes/layout_header.php';
 <div class="modal-overlay" id="modal-overlay" onclick="if(event.target===this)closeModal()">
     <div class="modal" id="modal-box">
         <div class="modal-header d-none">
-            <div class="modal-title" id="modal-title">✏️ Input Progress</div>
+            <div class="modal-title" id="modal-title"><i class="ph ph-pencil-simple"></i> Input Progress</div>
             <div class="modal-close" onclick="closeModal()">✕</div>
         </div>
         <div id="modal-body"></div>
@@ -722,7 +723,7 @@ function openTaskModal(templateId, reqBulan, reqTahun, officerId) {
                             <div class="sos-divider"><span>Tindakan Lead</span></div>
                             <div class="tm-actions">
                                 <button type="button" onclick="closeModal()" class="tm-btn tm-cancel">Tutup</button>
-                                <button type="button" onclick="approveTask(${task.submission_id})" class="tm-btn tm-save btn-approve-success">✅ Approve Tugas</button>
+                                <button type="button" onclick="approveTask(${task.submission_id})" class="tm-btn tm-save btn-approve-success"><i class="ph ph-check-circle"></i> Approve Tugas</button>
                             </div>
                             ` : `
                             <div style="margin-top: 24px;">
@@ -733,7 +734,7 @@ function openTaskModal(templateId, reqBulan, reqTahun, officerId) {
                             <div class="sos-divider"><span>Silakan Lakukan</span></div>
                             <div style="padding-bottom: 8px;">
                                 <button type="button" id="btn-request-approval" onclick="submitForApproval(${task.progress_id ? '\'' + task.progress_id + '\'' : 'null'})" style="background: ${task.submission_status ? '#e5e5e5' : '#61bcf7'}; color: ${task.submission_status ? '#737373' : '#fff'}; font-weight: 600; border-radius: 8px; padding: 14px; border: none; width: 100%; font-size: 15px; cursor: ${task.submission_status ? 'not-allowed' : 'pointer'};" ${task.submission_status ? 'disabled' : ''}>
-                                    ${task.submission_status ? (task.submission_status === 'pending' ? '⏳ WAITING FOR APPROVAL' : 'Status: ' + task.submission_status.toUpperCase()) : 'Request for approval'}
+                                    ${task.submission_status ? (task.submission_status === 'pending' ? '<i class="ph ph-hourglass-high"></i> WAITING FOR APPROVAL' : 'Status: ' + task.submission_status.toUpperCase()) : 'Request for approval'}
                                 </button>
                             </div>
                         `}
@@ -833,7 +834,7 @@ function getActionsHtml(task) {
         return `
             <div class="tm-actions">
                 <button type="button" onclick="closeModal()" class="tm-btn tm-cancel">Tutup</button>
-                <button type="button" onclick="approveTask(${task.submission_id})" class="tm-btn tm-save btn-approve-success">✅ Approve Tugas</button>
+                <button type="button" onclick="approveTask(${task.submission_id})" class="tm-btn tm-save btn-approve-success"><i class="ph ph-check-circle"></i> Approve Tugas</button>
             </div>
         `;
     } else if (task.submission_status === 'approved' || task.progress_status === 'approved') {
@@ -841,7 +842,7 @@ function getActionsHtml(task) {
             <div class="tm-approval">
                 <button type="button" onclick="closeModal()" class="tm-btn tm-cancel w-100 mb-xl">Tutup</button>
                 <div class="task-approved-banner">
-                    ✅ TUGAS SELESAI (APPROVED)
+                    <i class="ph ph-check-circle"></i> TUGAS SELESAI (APPROVED)
                 </div>
             </div>
         `;
@@ -867,7 +868,7 @@ function getActionsHtml(task) {
                 <div class="tm-approval" id="approval-section" style="display: ${showApproval};">
                     <div class="tm-approval-title">Silakan Lakukan</div>
                     <button type="button" id="btn-request-approval" class="tm-btn-approval" onclick="submitForApproval(${task.progress_id ? '\'' + task.progress_id + '\'' : 'null'})" ${task.progress >= targetMax && !task.submission_status ? '' : 'disabled'}>
-                        ${task.submission_status ? (task.submission_status === 'pending' ? '⏳ WAITING FOR APPROVAL' : 'Status: ' + task.submission_status.toUpperCase()) : '✓ &nbsp; Request for approval'}
+                        ${task.submission_status ? (task.submission_status === 'pending' ? '<i class="ph ph-hourglass-high"></i> WAITING FOR APPROVAL' : 'Status: ' + task.submission_status.toUpperCase()) : '<i class="ph ph-check"></i> &nbsp; Request for approval'}
                     </button>
                 </div>
             `;
@@ -930,7 +931,7 @@ async function submitForApproval(taskProgressId) {
             alert('Tugas berhasil disubmit untuk review!');
             const btn = document.getElementById('btn-request-approval');
             if(btn) {
-                btn.innerText = '⏳ WAITING FOR APPROVAL';
+                btn.innerHTML = '<i class="ph ph-hourglass-high"></i> WAITING FOR APPROVAL';
                 btn.disabled = true;
             }
         } else {

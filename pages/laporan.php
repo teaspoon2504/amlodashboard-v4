@@ -252,7 +252,7 @@ include __DIR__ . '/../includes/layout_header.php';
 
             <div class="card">
                 <div class="card-header">
-                    <div class="card-title">📋 Rekap Status Laporan</div>
+                    <div class="card-title"><i class="ph ph-clipboard-text"></i> Rekap Status Laporan</div>
                     <a href="tasks.php" class="card-action">Input Progress →</a>
                 </div>
                 <table class="perf-table">
@@ -288,14 +288,15 @@ include __DIR__ . '/../includes/layout_header.php';
                                 $isTriSemZero = ($progress === 0 && ($periode === 'triwulan' || $periode === 'semesteran'));
                                 $isAdhocZero = ($progress === 0 && $periode === 'adhoc');
 
-                                $subStatus = $t['submission_status'] ?? null;
+                                $isNoApproval = stripos($t['nama'], 'E-Learning Target') !== false || stripos($t['nama'], 'Tindak Lanjut RBA Bankwide') !== false;
+                                $subStatus = $isNoApproval ? null : ($t['submission_status'] ?? null);
                                 $perf = $subStatus === 'pending' ? 'Waiting Approval' : ($percent >= 100 ? 'Exceed' : ($percent >= 80 ? 'Good' : ($progress > 0 ? 'Below' : 'Not started')));
                                 $perfClass = $perf === 'Exceed' ? 'perf-exceed' : ($perf === 'Waiting Approval' ? 'perf-waiting' : ($perf === 'Good' ? 'perf-good' : ($perf === 'Not started' ? 'perf-pending' : 'perf-below')));
                                 $barClass = $percent >= 100 ? 'bar-exceed' : ($percent >= 80 ? 'bar-good' : 'bar-below');
                                 ?>
                                 <tr class="laporan-row" data-kategori="<?= e($t['kategori']) ?>" data-periode="<?= e($t['periode']) ?>" data-bulan="<?= e($t['vis_bulan']) ?>" data-officer="<?= e($t['officer_id']) ?>">
                                     <td class="text-steel"><?= $no++ ?></td>
-                                    <td><span class="officer-badge-chip font-weight-600">👤 <?= e($t['officer_nama']) ?></span></td>
+                                    <td><span class="officer-badge-chip font-weight-600"><i class="ph ph-user"></i> <?= e($t['officer_nama']) ?></span></td>
                                     <td><b><?= e($t['nama']) ?></b></td>
                                     <td><span class="chip-wilayah"><?= e($t['kategori']) ?></span></td>
                                     <td><span class="todo-tag tag-<?= e($t['tag']) ?>"><?= e(ucfirst($t['periode'])) ?></span></td>
@@ -326,7 +327,7 @@ include __DIR__ . '/../includes/layout_header.php';
             <?php if ($user['role'] !== 'officer' && !empty($feedbacks)): ?>
             <div class="card">
                 <div class="card-header">
-                    <div class="card-title">📊 Rekap Feedback Officer</div>
+                    <div class="card-title"><i class="ph ph-chart-bar"></i> Rekap Feedback Officer</div>
                 </div>
                 <table class="perf-table">
                     <thead>

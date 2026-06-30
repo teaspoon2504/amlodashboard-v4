@@ -65,7 +65,7 @@ $pending_submissions = db_fetch_all(
      JOIN users u ON s.submitted_by = u.id
      JOIN kantor_wilayah kw ON u.kanwil_id = kw.id
      JOIN task_templates tt ON tp.template_id = tt.id
-     WHERE s.status = 'pending'
+     WHERE s.status = 'pending' AND tt.nama NOT LIKE '%E-Learning Target%' AND tt.nama NOT LIKE '%Tindak Lanjut RBA Bankwide%'
      ORDER BY s.submitted_at DESC"
 );
 
@@ -87,7 +87,7 @@ include __DIR__ . '/../includes/layout_header.php';
 
 <div class="content">
     <?php if ($flash): ?>
-        <div class="alert alert-success">✅ <?= e($flash['message']) ?></div>
+        <div class="alert alert-success"><i class="ph ph-check-circle"></i> <?= e($flash['message']) ?></div>
     <?php endif; ?>
 
     <div class="page-header">
@@ -98,7 +98,7 @@ include __DIR__ . '/../includes/layout_header.php';
     <div class="two-col">
         <div class="card">
             <div class="card-header">
-                <div class="card-title">📝 Beri Feedback ke Regional Office</div>
+                <div class="card-title"><i class="ph ph-note-pencil"></i> Beri Feedback ke Regional Office</div>
             </div>
             <form method="POST" action="assessment.php">
                 <input type="hidden" name="csrf_token" value="<?= e($csrf_token) ?>">
@@ -124,9 +124,9 @@ include __DIR__ . '/../includes/layout_header.php';
                 <div class="input-group">
                     <label class="input-label">Penilaian</label>
                     <select class="select-field" name="penilaian" id="penilaian-select">
-                        <option>✅ Lengkap — Sesuai standar</option>
-                        <option>⚠️ Sebagian — Perlu penyempurnaan</option>
-                        <option>❌ Belum Respon — Perlu tindakan</option>
+                        <option>Lengkap — Sesuai standar</option>
+                        <option>Sebagian — Perlu penyempurnaan</option>
+                        <option>Belum Respon — Perlu tindakan</option>
                     </select>
                 </div>
 
@@ -140,14 +140,14 @@ include __DIR__ . '/../includes/layout_header.php';
                     'variant' => 'filled',
                     'size' => 'large',
                     'children' => 'Kirim Feedback',
-                    'leftIcon' => '📤'
+                    'leftIcon' => '<i class="ph ph-paper-plane-tilt"></i>'
                 ]) ?>
             </form>
         </div>
 
         <div class="card">
             <div class="card-header">
-                <div class="card-title">💬 Riwayat Feedback Terkirim</div>
+                <div class="card-title"><i class="ph ph-chat-centered-text"></i> Riwayat Feedback Terkirim</div>
             </div>
 
             <?php if (empty($recent_feedbacks)): ?>
@@ -174,21 +174,15 @@ include __DIR__ . '/../includes/layout_header.php';
     <?php if (!empty($pending_submissions)): ?>
         <div class="card mb-xl">
             <div class="card-header">
-                <div class="card-title">⏳ Pending Submissions (<?= count($pending_submissions) ?>)</div>
+                <div class="card-title"><i class="ph ph-hourglass-high"></i> Pending Submissions (<?= count($pending_submissions) ?>)</div>
             </div>
             <?php foreach ($pending_submissions as $s): ?>
                 <div class="submission-item">
-                    <div class="submission-header">
-                        <div>
-                            <div class="submission-officer"><?= e($s['officer_name']) ?></div>
-                            <div class="submission-task"><?= e($s['task_name']) ?> — <span class="chip-wilayah"><?= e($s['kanwil_nama']) ?></span></div>
-                        </div>
-                        <div class="submission-progress"><?= $s['progress'] ?>%</div>
+                    <div>
+                        <strong><?= e($s['task_name']) ?></strong> — <?= e($s['officer_name']) ?>
+                        <div class="font-12 text-ink-muted">Disubmit pada <?= date('d/m/Y H:i', strtotime($s['submitted_at'])) ?></div>
                     </div>
-                    <?php if ($s['keterangan']): ?>
-                        <div class="font-11 text-steel mb-sm"><?= e(format_keterangan($s['keterangan'])) ?></div>
-                    <?php endif; ?>
-                    <div class="font-10 text-steel">Submit: <?= date('d/m/Y H:i', strtotime($s['submitted_at'])) ?></div>
+                    <a href="approvals.php?highlight=<?= $s['id'] ?>" class="ds-button ds-button--outline ds-button--small">Review</a>
                 </div>
             <?php endforeach; ?>
         </div>
@@ -213,7 +207,7 @@ document.getElementById('kanwil-select').addEventListener('change', function() {
     officersData[kanwilId].forEach(function(officer) {
         const option = document.createElement('option');
         option.value = officer.id;
-        option.textContent = '👤 ' + officer.nama;
+        option.textContent = officer.nama;
         officerSelect.appendChild(option);
     });
 });

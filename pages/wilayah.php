@@ -45,40 +45,40 @@ include __DIR__ . '/../includes/layout_header.php';
 
             <div class="kpi-grid">
                 <div class="kpi-card teal">
-                    <span class="kpi-icon">👤</span>
+                    <div class="kpi-card-icon"><i class="ph ph-user"></i></div>
                     <div class="kpi-label">Total AMLO Officer</div>
                     <div class="kpi-value teal"><?= $total_officer ?></div>
                     <div class="kpi-sub">Regional Office aktif</div>
                 </div>
                 <div class="kpi-card gold">
-                    <span class="kpi-icon">🌐</span>
+                    <div class="kpi-card-icon"><i class="ph ph-globe"></i></div>
                     <div class="kpi-label">Total RO</div>
                     <div class="kpi-value gold"><?= count($wilayah_data) ?></div>
                     <div class="kpi-sub">Seluruh Indonesia</div>
                 </div>
                 <div class="kpi-card green">
-                    <span class="kpi-icon">⭐</span>
+                    <div class="kpi-card-icon"><i class="ph ph-star"></i></div>
                     <div class="kpi-label">RO Exceed</div>
                     <div class="kpi-value green"><?= $exceed_wilayah ?></div>
                     <div class="kpi-sub">↑ Performanya di atas target</div>
                 </div>
                 <div class="kpi-card blue">
-                    <span class="kpi-icon">👍</span>
+                    <div class="kpi-card-icon"><i class="ph ph-thumbs-up"></i></div>
                     <div class="kpi-label">RO Good</div>
                     <div class="kpi-value blue"><?= $good_wilayah ?></div>
-                    <div class="kpi-sub">✓ Sesuai standar performa</div>
+                    <div class="kpi-sub"><i class="ph ph-check"></i> Sesuai standar performa</div>
                 </div>
                 <div class="kpi-card red">
-                    <span class="kpi-icon">⚠️</span>
+                    <div class="kpi-card-icon"><i class="ph ph-warning"></i></div>
                     <div class="kpi-label">RO Below</div>
                     <div class="kpi-value red"><?= $below_wilayah ?></div>
-                    <div class="kpi-sub">🔴 Perlu intervensi</div>
+                    <div class="kpi-sub"><i class="ph ph-warning-circle"></i> Perlu intervensi</div>
                 </div>
             </div>
 
             <div class="card">
                 <div class="card-header">
-                    <div class="card-title">📊 Scorecard Kinerja per Regional Office</div>
+                    <div class="card-title"><i class="ph ph-chart-bar"></i> Scorecard Kinerja per Regional Office</div>
                 </div>
                 <table class="wilayah-table">
                     <thead>
