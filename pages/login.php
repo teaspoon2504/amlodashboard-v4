@@ -93,7 +93,7 @@ $csrf_token = generate_csrf_token();
                     <div class="input-group">
                         <label class="input-label">Username</label>
                         <input type="text" name="username" class="input-field"
-                               placeholder="masukan username anda disini" required autofocus
+                               placeholder="Masukan username" required autofocus
                                value="<?= e($_POST['username'] ?? '') ?>">
                     </div>
 

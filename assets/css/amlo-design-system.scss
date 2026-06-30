@@ -1423,7 +1423,7 @@ a:hover { text-decoration: underline; }
             .officer-info h3 { font-size: 14px; font-weight: 600; }
             .officer-info p { font-size: 11px; color: var(--steel); }
             .officer-stats { display: grid; grid-template-columns: 1fr 1fr; gap: 8px; }
-            .officer-stat { text-align: center; background: var(--hairline); border-radius: 8px; padding: 8px; }
+            .officer-stat { text-align: center; background: var(--canvas); border-radius: 8px; padding: 8px; }
             .officer-stat-val { font-size: 18px; font-weight: 700; }
             .officer-stat-label { font-size: 10px; color: var(--steel); text-transform: uppercase; letter-spacing: 0.5px; }
             .perf-badge { display: inline-flex; align-items: center; gap: 5px; padding: 3px 10px; border-radius: 20px; font-size: 10px; font-weight: 700; }

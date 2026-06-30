@@ -2413,7 +2413,7 @@ a:hover {
 }
 .page-officers .officer-stat {
   text-align: center;
-  background: var(--hairline);
+  background: var(--canvas);
   border-radius: 8px;
   padding: 8px;
 }

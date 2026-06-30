@@ -107,13 +107,14 @@ $templates = db_fetch_all(
 $target_officers = [];
 if ($user['role'] === 'lead') {
     $target_officers = db_fetch_all(
-        "SELECT id, nama FROM users WHERE kanwil_id = ? AND role = 'officer' AND aktif = 1 ORDER BY nama",
+        "SELECT u.id, u.nama, COALESCE(kw.nama, 'Regional Office') as kanwil_nama FROM users u LEFT JOIN kantor_wilayah kw ON u.kanwil_id = kw.id WHERE u.kanwil_id = ? AND u.role = 'officer' AND u.aktif = 1 ORDER BY u.nama",
         [$user['kanwil_id']]
     );
 } elseif ($user['role'] === 'ho') {
-    $target_officers = db_fetch_all("SELECT id, nama FROM users WHERE role = 'officer' AND aktif = 1 ORDER BY nama");
+    $target_officers = db_fetch_all("SELECT u.id, u.nama, COALESCE(kw.nama, 'Regional Office') as kanwil_nama FROM users u LEFT JOIN kantor_wilayah kw ON u.kanwil_id = kw.id WHERE u.role = 'officer' AND u.aktif = 1 ORDER BY u.nama");
 } else {
-    $target_officers = [['id' => $user['id'], 'nama' => $user['nama']]];
+    $kw = db_fetch_one("SELECT nama FROM kantor_wilayah WHERE id = ?", [$user['kanwil_id']]);
+    $target_officers = [['id' => $user['id'], 'nama' => $user['nama'], 'kanwil_nama' => $kw['nama'] ?? 'Regional Office']];
 }
 
 $officer_ids = array_column($target_officers, 'id');
@@ -181,6 +182,7 @@ $display_tasks = [];
 foreach ($target_officers as $officer) {
     $uid = $officer['id'];
     $unama = $officer['nama'];
+    $ukanwil = $officer['kanwil_nama'] ?? 'Regional Office';
 
     foreach ($templates as $tt) {
         if ($tt['periode'] === 'bulanan') {
@@ -207,6 +209,7 @@ foreach ($target_officers as $officer) {
                 $t['numeric_target'] = $targets_map[$uid][$tt['id']][$m] ?? 0;
                 $t['officer_id'] = $uid;
                 $t['officer_nama'] = $unama;
+                $t['kanwil_nama'] = $ukanwil;
                 $display_tasks[] = $t;
             }
         } elseif ($tt['periode'] === 'triwulan') {
@@ -227,6 +230,7 @@ foreach ($target_officers as $officer) {
                 $t['numeric_target'] = $targets_map[$uid][$tt['id']][$m] ?? 0;
                 $t['officer_id'] = $uid;
                 $t['officer_nama'] = $unama;
+                $t['kanwil_nama'] = $ukanwil;
                 $display_tasks[] = $t;
             }
         } elseif ($tt['periode'] === 'semesteran') {
@@ -247,6 +251,7 @@ foreach ($target_officers as $officer) {
                 $t['numeric_target'] = $targets_map[$uid][$tt['id']][$m] ?? 0;
                 $t['officer_id'] = $uid;
                 $t['officer_nama'] = $unama;
+                $t['kanwil_nama'] = $ukanwil;
                 $display_tasks[] = $t;
             }
         } else {
@@ -290,6 +295,7 @@ foreach ($target_officers as $officer) {
             $t['numeric_target'] = $targets_map[$uid][$tt['id']][$m] ?? 0;
             $t['officer_id'] = $uid;
             $t['officer_nama'] = $unama;
+            $t['kanwil_nama'] = $ukanwil;
             $display_tasks[] = $t;
         }
     }
@@ -532,7 +538,8 @@ function openTaskModal(templateId, reqBulan, reqTahun, officerId) {
         'submission_id' => $t['submission_id'] ?? null,
         'submission_status' => $t['submission_status'],
         'officer_id' => $t['officer_id'],
-        'officer_nama' => $t['officer_nama']
+        'officer_nama' => $t['officer_nama'],
+        'kanwil_nama' => $t['kanwil_nama'] ?? 'Regional Office'
     ], $tasks)) ?>;
 
     const task = tasks.find(t => t.id === templateId && t.req_bulan === reqBulan && t.req_tahun === reqTahun && t.officer_id === officerId);
@@ -548,6 +555,43 @@ function openTaskModal(templateId, reqBulan, reqTahun, officerId) {
     const modalBox = document.getElementById('modal-box');
     if (modalBox) {
         modalBox.removeAttribute('style');
+    }
+
+    if (task.nama.includes('E-Learning Target') || task.nama.includes('Tindak Lanjut RBA Bankwide')) {
+        const isELearning = task.nama.includes('E-Learning Target');
+        const roName = task.kanwil_nama || 'Regional Office';
+        const cardTitle = isELearning ? 'Partisipasi Pengerjaan E-Learning' : 'Tindak Lanjut RBA Bankwide';
+        const deskripsiText = isELearning 
+            ? `Pastikan partisipasi pengerjaan E-Learning di ${roName} mencapai 100%`
+            : `Pastikan action plan tindak lanjut RBA Bankwide di ${roName} terlaksana sesuai ketentuan 100%`;
+        document.getElementById('modal-body').innerHTML = `
+            <div class="tm-modal">
+                <div class="tm-header">
+                    <div class="tm-title">${task.nama}</div>
+                    <div class="tm-subtitle">Update progress tugas <span class="todo-tag tag-${task.periode}">${task.periode.charAt(0).toUpperCase() + task.periode.slice(1)}</span></div>
+                    <div class="tm-close" onclick="closeModal()">×</div>
+                </div>
+                <div class="tm-content">
+                    <div style="background: var(--surface-soft, #f7f8fa); border: 1px solid var(--border-color, #e5e5e5); border-radius: 20px; padding: 24px; margin-bottom: 24px;">
+                        <div style="display: flex; justify-content: space-between; align-items: flex-start;">
+                            <div>
+                                <div style="font-size: 16px; font-weight: 700; color: var(--text-main, #171717); margin-bottom: 8px;">${cardTitle}</div>
+                                <span style="display: inline-block; border: 1px solid #0097A6; border-radius: 12px; padding: 2px 12px; font-size: 12px; font-weight: 600; color: #0097A6;">${roName}</span>
+                            </div>
+                            <div style="font-size: 32px; font-weight: 800; color: var(--text-main, #171717);">${completedVal}%</div>
+                        </div>
+                        <hr style="border: none; border-top: 1px solid var(--border-color, #e5e5e5); margin: 20px 0;">
+                        <div>
+                            <div style="font-size: 14px; font-weight: 700; color: var(--text-main, #171717); margin-bottom: 6px;">Deskripsi</div>
+                            <div style="font-size: 14px; color: var(--text-muted, #525252); line-height: 1.5;">${deskripsiText}</div>
+                        </div>
+                    </div>
+                    <button type="button" onclick="closeModal()" style="width: 100%; padding: 12px; background: var(--card-bg, #ffffff); border: 1px solid var(--border-color, #d4d4d4); border-radius: 8px; font-size: 15px; font-weight: 600; color: var(--text-main, #171717); cursor: pointer; transition: all 0.2s;">Tutup</button>
+                </div>
+            </div>
+        `;
+        document.getElementById('modal-overlay').classList.add('open');
+        return;
     }
 
     if (task.nama.includes('Sosialisasi AML CFT CPF') || task.nama.includes('Report Progress AML CFT CPF')) {

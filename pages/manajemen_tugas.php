@@ -185,7 +185,7 @@ function loadTargets() {
                 if (currentPlafon === 0) {
                     alertBox.className = 'target-alert-box login-alert-error';
                     alertBox.style.display = 'block';
-                    alertBox.innerHTML = '⚠️ HO belum menentukan target (plafon) untuk Regional Office Anda pada bulan ini.';
+                    alertBox.innerHTML = '⚠️ HO belum menentukan target untuk Regional Office Anda pada bulan ini.';
                 } else {
                     alertBox.className = 'target-alert-box login-alert-success';
                     alertBox.style.display = 'block';
